@@ -4,11 +4,11 @@ namespace RealmSync.SyncService
 {
     public class UploadDataResponse
     {
-        public List<RealmSyncObjectInfo> Results { get; set; }
+        public List<UploadDataResponseItem> Results { get; set; }
 
         public UploadDataResponse()
         {
-            Results = new List<RealmSyncObjectInfo>();
+            Results = new List<UploadDataResponseItem>();
         }
     }
 }

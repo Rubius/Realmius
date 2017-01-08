@@ -25,8 +25,6 @@ namespace RealmSync.Model
         public string Id { get; set; }
 
         public int SyncState { get; set; }
-        public DateTimeOffset LastChangeClient { get; set; }
-        public DateTimeOffset LastChangeServer { get; set; }
         public string MobilePrimaryKey { get { return Id; } }
 
         [Ignored]

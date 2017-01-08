@@ -29,16 +29,13 @@ namespace RealmSync.Server
             var ef = _dbContextFactoryFunc();
             foreach (var item in request.ChangeNotifications)
             {
-                RealmSyncObjectInfo objectInfo = null;
+                UploadDataResponseItem objectInfo = null;
 
                 try
                 {
-
                     var type = _syncedTypes[item.Type];
-                    objectInfo = new RealmSyncObjectInfo()
+                    objectInfo = new UploadDataResponseItem(item.PrimaryKey, item.Type)
                     {
-                        LastChangeServer = DateTime.UtcNow,
-                        MobilePrimaryKey = item.PrimaryKey,
                     };
                     result.Results.Add(objectInfo);
 

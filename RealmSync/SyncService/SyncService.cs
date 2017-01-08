@@ -153,16 +153,19 @@ namespace RealmSync.SyncService
             {
                 foreach (var realmSyncObject in result.Results)
                 {
-                    var obj = objectsToUpload[realmSyncObject.MobilePrimaryKey];
-                    if (obj.DateTime > sendObjectsTime)
-                    {
-                        //object has changed since we sent the result, will not change the SyncState
-                    }
-                    else
-                    {
+                    var obj = (IRealmSyncObject)_realm.Find(realmSyncObject.Type, realmSyncObject.MobilePrimaryKey);
+                    _realmSyncData.Remove(objectsToUpload[realmSyncObject.MobilePrimaryKey]);
 
-                        obj.SetSyncState(SyncState.Synced);
-                    }
+                    obj.SetSyncState(SyncState.Synced);
+                    //if (obj.DateTime > sendObjectsTime)
+                    //{
+                    //    //object has changed since we sent the result, will not change the SyncState
+                    //}
+                    //else
+                    //{
+
+                    //    obj.SetSyncState(SyncState.Synced);
+                    //}
                 }
             });
         }
@@ -183,6 +186,8 @@ namespace RealmSync.SyncService
 
         public virtual async Task Download()
         {
+            //doesn't work for now
+
             var result = await _syncApiClient.DownloadData(new DownloadDataRequest()
             {
                 LastChangeTime = _lastDownloadTime.DateTime,

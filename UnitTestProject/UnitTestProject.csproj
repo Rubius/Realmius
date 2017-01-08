@@ -60,7 +60,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Realm">
-      <HintPath>..\RealmTst\Bin\Realm.dll</HintPath>
+      <HintPath>..\..\..\Work\RealmSource\realm-dotnet-master\Platform.Win32\Realm.Win32\bin\Debug\Realm.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
