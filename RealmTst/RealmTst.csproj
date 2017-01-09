@@ -229,10 +229,12 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\RealmSyncController.cs" />
+    <Compile Include="Controllers\SyncDbContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -324,6 +326,10 @@
     <ProjectReference Include="..\RealmSync.Model\RealmSync.Model.csproj">
       <Project>{1217ECDB-CCD8-48D4-B84B-8A87EC9DB2A8}</Project>
       <Name>RealmSync.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RealmSync.Server\RealmSync.Server.csproj">
+      <Project>{197EEC4A-5985-4422-B76F-887281D7BC04}</Project>
+      <Name>RealmSync.Server</Name>
     </ProjectReference>
     <ProjectReference Include="..\RealmSync\RealmSync.csproj">
       <Project>{b1651a06-7cec-4529-b8ee-e594d26a62d3}</Project>

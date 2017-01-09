@@ -5,11 +5,6 @@ using RealmSync.SyncService;
 namespace RealmSync.Model
 {
 
-    //public class RealmObjectSyncBase : RealmObject, IRealmSyncObject
-    //{
-
-    //}
-
     public partial class ChatMessage :
 #if __IOS__
         RealmObject, 
@@ -25,6 +20,7 @@ namespace RealmSync.Model
         public string Id { get; set; }
 
         public int SyncState { get; set; }
+        
         public string MobilePrimaryKey { get { return Id; } }
 
         [Ignored]
