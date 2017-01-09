@@ -6,9 +6,9 @@ namespace RealmSync.Model
 {
 
     public partial class ChatMessage :
-#if __IOS__
+//#if __IOS__
         RealmObject, 
-#endif
+//#endif
         IRealmSyncObject
     {
         public string Author { get; set; }

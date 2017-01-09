@@ -15,6 +15,8 @@ namespace RealmSync.SyncService
                                     && p.PropertyName != "ObjectSchema"
                                     && p.PropertyName != "IsManaged"
                                     && p.PropertyName != "IsValid"
+			                   		&& p.PropertyName != "LastSynchronizedVersion"
+			                   		&& p.PropertyName != "SyncState"
             ).ToList();
         }
     }
