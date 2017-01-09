@@ -31,7 +31,7 @@ namespace RealmIos
 		public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
 		{
 			UITableViewCell cell = tableView.DequeueReusableCell(CellIdentifier);
-			var item = TableItems[indexPath.Row];
+			var item = TableItems[TableItems.Count - indexPath.Row - 1];
 
 			//---- if there are no cells to reuse, create a new one
 			if (cell == null)
