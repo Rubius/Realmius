@@ -27,7 +27,9 @@ namespace RealmIos
 			// If not required for your application you can safely delete this method
 
 			Realm = Realm.GetInstance();
-			RealmSync = new RealmSyncService(Realm, new System.Uri("http://192.168.0.1/Api"), typeof(ChatMessage));
+			RealmSync = new RealmSyncService(Realm, new System.Uri("http://192.168.38.1:44980/realmupload")
+			                                 , new System.Uri("http://192.168.38.1:44980/realmdownload")
+			                                 , typeof(ChatMessage));
 
 			return true;
 		}

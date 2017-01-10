@@ -32,9 +32,8 @@ namespace RealmSync.SyncService
 		public Uri ServerUri { get; set; }
 		private SyncStateOptions _syncOptions;
 
-		public RealmSyncService(Realm realm, Uri serverUri, params Type[] typesToSync)
+		public RealmSyncService(Realm realm, Uri serverUploadUri, Uri serverDownloadUri, params Type[] typesToSync)
 		{
-			ServerUri = serverUri;
 			_realm = realm;
 			_realmSyncData = Realm.GetInstance(new RealmConfiguration("realm.sync")
 			{
@@ -47,7 +46,7 @@ namespace RealmSync.SyncService
 				ContractResolver = new RealmObjectResolver()
 			};
 
-			_syncApiClient = new SyncApiClient(new Uri(ServerUri, "upload"), new Uri(ServerUri, "download"));
+			_syncApiClient = new SyncApiClient(serverUploadUri, serverDownloadUri);
 
 			_syncOptions = _realmSyncData.Find<SyncStateOptions>(1);
 			if (_syncOptions == null)
@@ -167,6 +166,7 @@ namespace RealmSync.SyncService
 				return;
 
 			_uploadInProgress = true;
+			var uploadSucceeeded = false;
 			try
 			{
 				var objectsToUpload = GetObjectsToUpload().Take(10).ToDictionary(x => x.PrimaryKey, x => x);
@@ -211,6 +211,7 @@ namespace RealmSync.SyncService
 							//}
 						}
 					});
+					uploadSucceeeded = result.Results.Any();
 				}
 				catch (Exception ex)
 				{
@@ -221,8 +222,11 @@ namespace RealmSync.SyncService
 			{
 				_uploadInProgress = false;
 			}
-			Task.Factory.StartNew(() =>
+			Task.Factory.StartNew(async () =>
 			{
+				if (!uploadSucceeeded)
+					await Task.Delay(2000);
+				
 				Upload();
 			});
 		}

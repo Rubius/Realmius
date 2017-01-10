@@ -10,7 +10,7 @@ namespace RealmSync.SyncService
         public Uri DownloadServerUri { get; set; }
         public Uri UploadServerUri { get; set; }
 
-        public SyncApiClient(Uri downloadServerUri, Uri uploadServerUri)
+        public SyncApiClient(Uri uploadServerUri, Uri downloadServerUri)
         {
             DownloadServerUri = downloadServerUri;
             UploadServerUri = uploadServerUri;
@@ -24,7 +24,7 @@ namespace RealmSync.SyncService
         public async Task<UploadDataResponse> UploadData(UploadDataRequest request)
         {
             var httpClient = GetHttpClient();
-            var content = new StringContent(JsonConvert.SerializeObject(request));
+            var content = new StringContent(JsonConvert.SerializeObject(request), System.Text.Encoding.UTF8, "application/json");
             var result = await httpClient.PostAsync(UploadServerUri, content);
 
             if (!result.IsSuccessStatusCode)
