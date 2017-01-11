@@ -14,11 +14,11 @@ namespace RealmTst.Controllers
 
         public RealmSyncController()
         {
-            _sync = new RealmSyncServerProcessor(() => new SyncDbContext());
+            _sync = new RealmSyncServerProcessor(() => new SyncDbContext(), typeof(ChatMessage));
         }
 
         [Route("realmupload")]
-        [HttpGet]
+        [HttpPost]
         public UploadDataResponse Upload([FromBody]UploadDataRequest request)
         {
             return _sync.Upload(request);

@@ -6,23 +6,10 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using Realms;
+using RealmTst.Controllers;
 
 namespace RealmTst
 {
-    public class Cat : RealmObject
-    {
-        public string Tst { get; set; }
-        public string Tst2 { get; set; }
-
-        public Dog Dog { get; set; }
-    }
-
-    public class Dog : RealmObject
-    {
-        public string Tst { get; set; }
-
-    }
 
     public class MvcApplication : System.Web.HttpApplication
     {
@@ -39,6 +26,8 @@ namespace RealmTst
             
 
             GlobalConfiguration.Configuration.EnsureInitialized();
+
+            var db = new SyncDbContext();
         }
     }
 }

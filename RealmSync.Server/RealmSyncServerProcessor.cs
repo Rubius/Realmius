@@ -39,19 +39,20 @@ namespace RealmSync.Server
                     };
                     result.Results.Add(objectInfo);
 
-                    //CheckAndProcess(deserialized);
-
                     var dbSet = ef.Set(type);
                     var dbEntity = dbSet.Find(item.PrimaryKey);
                     if (dbEntity != null)
                     {
                         //entity exists in DB, UPDATE it
                         _serializer.Populate(new StringReader(item.SerializedObject), dbEntity);
+
+                        CheckAndProcess(dbEntity);
                     }
                     else
                     {
                         //entity does not exist in DB, CREATE it
                         var deserialized = JsonConvert.DeserializeObject(item.SerializedObject, type);
+                        CheckAndProcess(deserialized);
                         dbSet.Attach(deserialized);
                         ef.Entry(deserialized).State = EntityState.Added;
                     }

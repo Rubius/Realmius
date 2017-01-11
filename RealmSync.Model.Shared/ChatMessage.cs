@@ -1,42 +1,36 @@
 ﻿using System;
-using Realms;
+using Newtonsoft.Json;
 using RealmSync.SyncService;
 
 namespace RealmSync.Model
 {
 
     public partial class ChatMessage :
-//#if __IOS__
-        RealmObject, 
-//#endif
+#if __IOS__  || __MOBILE__
+        Realms.RealmObject,
+#endif
         IRealmSyncObject
     {
         public string Author { get; set; }
         public string Text { get; set; }
+        public string Text2 { get; set; }
         public DateTimeOffset DateTime { get; set; }
 
         #region IRealmSyncObject
-        [PrimaryKey]
+#if __IOS__  || __MOBILE__
+        [Realms.PrimaryKey]
+#endif
         public string Id { get; set; }
 
         public int SyncState { get; set; }
-        
+
         public string MobilePrimaryKey { get { return Id; } }
 
-        [Ignored]
+        [JsonIgnore]
+#if SERVER
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+#endif
         public string LastSynchronizedVersion { get; set; }
         #endregion
     }
-
-    //public class ToDoItem : RealmObjectSyncBase
-    //{
-    //    public bool Done { get; set; }
-    //    public string Title { get; set; }
-    //    public string Description { get; set; }
-    //}
-
-    //public class Project : RealmObjectSyncBase
-    //{
-
-    //}
 }

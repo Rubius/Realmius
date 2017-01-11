@@ -113,9 +113,9 @@
       <Project>{B1651A06-7CEC-4529-B8EE-E594D26A62D3}</Project>
       <Name>RealmSync</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RealmTst\RealmTst.csproj">
+    <ProjectReference Include="..\RealmTst\RealmWeb.csproj">
       <Project>{9769C0B5-C2C1-4B12-92E3-98288BE1F77A}</Project>
-      <Name>RealmTst</Name>
+      <Name>RealmWeb</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
