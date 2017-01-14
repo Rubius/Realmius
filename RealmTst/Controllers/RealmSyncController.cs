@@ -24,6 +24,13 @@ namespace RealmTst.Controllers
             return _sync.Upload(request);
         }
 
+        [Route("realmdownload")]
+        [HttpPost]
+        public DownloadDataResponse Download([FromBody]DownloadDataRequest request)
+        {
+            return _sync.Download(request);
+        }
+
         // GET api/<controller>
         [Route("asd")]
         [HttpGet]

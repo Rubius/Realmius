@@ -4,7 +4,7 @@ using RealmSync.SyncService;
 
 namespace UnitTestProject
 {
-    public class UnknownSyncObject : RealmObject, IRealmSyncObject
+    public class UnknownSyncObject : RealmObject, IRealmSyncObjectClient
     {
         #region IRealmSyncObject
         [PrimaryKey]

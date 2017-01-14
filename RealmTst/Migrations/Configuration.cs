@@ -1,4 +1,4 @@
-namespace RealmTst.Migrations
+namespace RealmWeb.Migrations
 {
     using System;
     using System.Data.Entity;
@@ -9,7 +9,7 @@ namespace RealmTst.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
         }
 
         protected override void Seed(RealmTst.Controllers.SyncDbContext context)

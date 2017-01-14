@@ -1,9 +1,9 @@
-namespace RealmTst.Migrations
+namespace RealmWeb.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Initial : DbMigration
+    public partial class Init : DbMigration
     {
         public override void Up()
         {
@@ -11,20 +11,21 @@ namespace RealmTst.Migrations
                 "dbo.ChatMessages",
                 c => new
                     {
-                        Id = c.String(nullable: false, maxLength: 128),
+                        MobilePrimaryKey = c.String(nullable: false, maxLength: 128),
+                        LastChangeServer = c.DateTime(nullable: false),
                         Author = c.String(),
                         Text = c.String(),
+                        Text2 = c.String(),
                         DateTime = c.DateTimeOffset(nullable: false, precision: 7),
-                        SyncState = c.Int(nullable: false),
-                        LastChangeClient = c.DateTimeOffset(nullable: false, precision: 7),
-                        LastChangeServer = c.DateTimeOffset(nullable: false, precision: 7),
                     })
-                .PrimaryKey(t => t.Id);
+                .PrimaryKey(t => t.MobilePrimaryKey)
+                .Index(t => new { t.MobilePrimaryKey, t.LastChangeServer }, name: "Sync");
             
         }
         
         public override void Down()
         {
+            DropIndex("dbo.ChatMessages", "Sync");
             DropTable("dbo.ChatMessages");
         }
     }

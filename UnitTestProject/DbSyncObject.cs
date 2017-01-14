@@ -9,7 +9,7 @@ namespace UnitTestProject
 #if __IOS__
         RealmObject, 
 #endif
-        IRealmSyncObject
+        IRealmSyncObjectClient
     {
         public string Text { get; set; }
 

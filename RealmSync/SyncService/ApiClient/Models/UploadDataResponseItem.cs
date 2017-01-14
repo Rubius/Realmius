@@ -1,19 +1,5 @@
-﻿using System;
-
-namespace RealmSync.SyncService
+﻿namespace RealmSync.SyncService
 {
-    public interface IRealmSyncObject
-    {
-        /// <summary>
-        /// values are from SyncState enum. enums are not supported by Realm yet
-        /// </summary>
-        int SyncState { get; set; }
-        //DateTimeOffset LastChangeClient { get; set; }
-        //DateTimeOffset LastChangeServer { get; set; }
-        string MobilePrimaryKey { get; }
-        string LastSynchronizedVersion { get; set; }
-    }
-
     public class UploadDataResponseItem
     {
         public string MobilePrimaryKey { get; set; }

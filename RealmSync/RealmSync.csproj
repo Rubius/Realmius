@@ -40,7 +40,7 @@
     <Compile Include="SyncService\ApiClient\Models\DownloadDataRequest.cs" />
     <Compile Include="SyncService\ApiClient\Models\DownloadDataResponse.cs" />
     <Compile Include="SyncService\ApiClient\Models\DownloadRequestItem.cs" />
-    <Compile Include="SyncService\IRealmSyncObject.cs" />
+    <Compile Include="SyncService\IRealmSyncObjectClient.cs" />
     <Compile Include="SyncService\ApiClient\SyncApiClient.cs" />
     <Compile Include="SyncService\JsonHelper.cs" />
     <Compile Include="SyncService\RealmObjectResolver.cs" />
@@ -50,6 +50,7 @@
     <Compile Include="SyncService\ApiClient\Models\UploadDataRequest.cs" />
     <Compile Include="SyncService\ApiClient\Models\UploadDataResponse.cs" />
     <Compile Include="SyncService\ApiClient\Models\UploadRequestItem.cs" />
+    <Compile Include="SyncService\ApiClient\Models\UploadDataResponseItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="DotNetCross.Memory.Unsafe, Version=0.2.2.0, Culture=neutral, processorArchitecture=MSIL">
