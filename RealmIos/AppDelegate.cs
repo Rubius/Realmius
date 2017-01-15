@@ -1,5 +1,6 @@
 ﻿using Foundation;
 using Realms;
+using RealmSync;
 using RealmSync.Model;
 using RealmSync.SyncService;
 using UIKit;
@@ -25,11 +26,17 @@ namespace RealmIos
 		{
 			// Override point for customization after application launch.
 			// If not required for your application you can safely delete this method
+			var config = new RealmConfiguration()
+			{
+				SchemaVersion = 2,
+			};
+			Realm = Realm.GetInstance(config);
+			RealmSync = SyncServiceFactory.CreateUsingPolling(Realm, new System.Uri("http://192.168.38.1:44980/realmupload")
+											 , new System.Uri("http://192.168.38.1:44980/realmdownload")
+												  , typeof(ChatMessage));
 
-			Realm = Realm.GetInstance();
-			RealmSync = new RealmSyncService(Realm, new System.Uri("http://192.168.38.1:44980/realmupload")
-			                                 , new System.Uri("http://192.168.38.1:44980/realmdownload")
-			                                 , typeof(ChatMessage));
+			//RealmSync = SyncServiceFactory.CreateUsingSignalR(Realm, new System.Uri("http://192.168.38.1:44980/realmsyncsignalr")
+			//									  , typeof(ChatMessage));
 
 			return true;
 		}
