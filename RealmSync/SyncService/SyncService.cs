@@ -72,7 +72,7 @@ namespace RealmSync.SyncService
             foreach (var type in _typesToSync.Values)
             {
                 if (!syncObjectInterface.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
-                    throw new InvalidOperationException($"Type {type} does not implement IRealmSyncObject, unable to continue");
+                    throw new InvalidOperationException($"Type {type} does not implement IRealmSyncObjectClient, unable to continue");
 
                 var filter = (IQueryable<RealmObject>)realm.All(type.Name);
                 filter.AsRealmCollection().SubscribeForNotifications(ObjectChanged);

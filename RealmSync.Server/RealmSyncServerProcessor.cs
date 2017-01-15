@@ -23,7 +23,7 @@ namespace RealmSync.Server
             foreach (var type in _syncedTypes.Values)
             {
                 if (!syncObjectInterface.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
-                    throw new InvalidOperationException($"Type {type} does not implement IRealmSyncObject, unable to continue");
+                    throw new InvalidOperationException($"Type {type} does not implement IRealmSyncObjectServer, unable to continue");
             }
             _serializer = new JsonSerializer();
         }
@@ -56,10 +56,11 @@ namespace RealmSync.Server
                         {
                             //revert all changes
                             ef.Entry(dbEntity).Reload();
+                            objectInfo.Error = "Object failed security checks";
                         }
                         else
                         {
-                            objectInfo.Error = "Object failed security checks";
+                            ((IRealmSyncObjectServer)dbEntity).LastChangeServer = DateTime.UtcNow;
                         }
                     }
                     else
@@ -68,6 +69,7 @@ namespace RealmSync.Server
                         var deserialized = JsonConvert.DeserializeObject(item.SerializedObject, type);
                         if (CheckAndProcess(deserialized))
                         {
+                            ((IRealmSyncObjectServer)deserialized).LastChangeServer = DateTime.UtcNow;
                             //add to the database
                             dbSet.Attach(deserialized);
                             ef.Entry(deserialized).State = EntityState.Added;
@@ -106,12 +108,18 @@ namespace RealmSync.Server
         {
             var ef = _dbContextFactoryFunc();
 
-            var response = new DownloadDataResponse();
+            var response = new DownloadDataResponse()
+            {
+                LastChange = DateTime.UtcNow,
+            };
 
             foreach (var typeName in request.Types)
             {
                 var type = _syncedTypes[typeName];
-                var dbSet = ef.Set(type).Cast<IRealmSyncObjectServer>();
+
+                var setMethod = ef.GetType().GetMethod("Set", new Type[0]).MakeGenericMethod(type);
+                var dbSet = (IQueryable<IRealmSyncObjectServer>)setMethod.Invoke(ef, new object[] { });
+                //.AsNoTracking().Select(x => x);
 
                 var updatedItems = GetUpdatedItems(type, dbSet, request.LastChangeTime);
                 foreach (var realmSyncObject in updatedItems)
@@ -128,7 +136,7 @@ namespace RealmSync.Server
             return response;
         }
 
-        protected virtual IEnumerable<IRealmSyncObjectServer> GetUpdatedItems(Type type, DbSet<IRealmSyncObjectServer> dbSet, DateTimeOffset lastChanged)
+        protected virtual IEnumerable<IRealmSyncObjectServer> GetUpdatedItems(Type type, IQueryable<IRealmSyncObjectServer> dbSet, DateTimeOffset lastChanged)
         {
             return dbSet.Where(x => x.LastChangeServer > lastChanged)
                 .OrderByDescending(x => x.LastChangeServer);
