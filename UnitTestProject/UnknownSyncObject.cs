@@ -4,7 +4,7 @@ using RealmSync.SyncService;
 
 namespace UnitTestProject
 {
-    public class UnknownSyncObject : RealmObject, IRealmSyncObjectClient
+    public class UnknownSyncObject : RealmObject, IRealmSyncObjectClient, IRealmSyncObjectServer
     {
         #region IRealmSyncObject
         [PrimaryKey]
@@ -12,7 +12,7 @@ namespace UnitTestProject
 
         public int SyncState { get; set; }
         public DateTimeOffset LastChangeClient { get; set; }
-        public DateTimeOffset LastChangeServer { get; set; }
+        public DateTime LastChangeServer { get; set; }
         public string MobilePrimaryKey { get { return Id; } }
         [Ignored]
         public string LastSynchronizedVersion { get; set; }

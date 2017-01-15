@@ -13,11 +13,11 @@ using Z.EntityFramework.Plus;
 namespace UnitTestProject
 {
     [TestFixture]
-    public class RealmSyncControllerTests
+    public class RealmSyncControllerUploadTests
     {
         private Func<LocalDbContext> _contextFunc;
 
-        public RealmSyncControllerTests()
+        public RealmSyncControllerUploadTests()
         {
             _contextFunc = () => new LocalDbContext();
 
