@@ -9,7 +9,14 @@ using System.Reflection;
 
 namespace RealmSync.Server
 {
-    public class RealmSyncServerProcessor
+    public class RealmSyncServerProcessor : RealmSyncServerProcessor<string>
+    {
+        public RealmSyncServerProcessor(Func<DbContext> dbContextFactoryFunc, params Type[] syncedTypes) : base(dbContextFactoryFunc, syncedTypes)
+        {
+        }
+    }
+
+    public class RealmSyncServerProcessor<TUser>
     {
         private readonly Func<DbContext> _dbContextFactoryFunc;
         private readonly Dictionary<string, Type> _syncedTypes;
@@ -34,7 +41,7 @@ namespace RealmSync.Server
             _serializer = new JsonSerializer();
         }
 
-        public UploadDataResponse Upload(UploadDataRequest request)
+        public UploadDataResponse Upload(UploadDataRequest request, TUser user)
         {
             var result = new UploadDataResponse();
 
@@ -60,7 +67,7 @@ namespace RealmSync.Server
                         //entity exists in DB, UPDATE it
                         _serializer.Populate(new StringReader(item.SerializedObject), dbEntity);
 
-                        if (!CheckAndProcess(dbEntity))
+                        if (!CheckAndProcess(dbEntity, user))
                         {
                             //revert all changes
                             ef.Entry(dbEntity).Reload();
@@ -75,7 +82,7 @@ namespace RealmSync.Server
                     {
                         //entity does not exist in DB, CREATE it
                         dbEntity = (IRealmSyncObjectServer)JsonConvert.DeserializeObject(item.SerializedObject, type);
-                        if (CheckAndProcess(dbEntity))
+                        if (CheckAndProcess(dbEntity, user))
                         {
                             dbEntity.LastChangeServer = DateTime.UtcNow;
                             //add to the database
@@ -116,7 +123,7 @@ namespace RealmSync.Server
             return result;
         }
 
-        public DownloadDataResponse Download(DownloadDataRequest request)
+        public DownloadDataResponse Download(DownloadDataRequest request, TUser user)
         {
             var ef = _dbContextFactoryFunc();
 
@@ -133,7 +140,7 @@ namespace RealmSync.Server
                 var dbSet = (IQueryable<IRealmSyncObjectServer>)setMethod.Invoke(ef, new object[] { });
                 //.AsNoTracking().Select(x => x);
 
-                var updatedItems = GetUpdatedItems(type, dbSet, request.LastChangeTime);
+                var updatedItems = GetUpdatedItems(type, dbSet, request.LastChangeTime, user);
                 foreach (var realmSyncObject in updatedItems)
                 {
                     response.ChangedObjects.Add(new DownloadResponseItem()
@@ -152,7 +159,7 @@ namespace RealmSync.Server
         /// returns items of a given type that were updated since lastChanged
         /// </summary>
         /// <returns></returns>
-        protected virtual IEnumerable<IRealmSyncObjectServer> GetUpdatedItems(Type type, IQueryable<IRealmSyncObjectServer> dbSet, DateTimeOffset lastChanged)
+        protected virtual IEnumerable<IRealmSyncObjectServer> GetUpdatedItems(Type type, IQueryable<IRealmSyncObjectServer> dbSet, DateTimeOffset lastChanged, TUser user)
         {
             return dbSet.Where(x => x.LastChangeServer > lastChanged)
                 .OrderByDescending(x => x.LastChangeServer);
@@ -163,7 +170,7 @@ namespace RealmSync.Server
         /// returns True if it's ok to save the object, False oterwise
         /// </summary>
         /// <returns></returns>
-        protected virtual bool CheckAndProcess(IRealmSyncObjectServer deserialized)
+        protected virtual bool CheckAndProcess(IRealmSyncObjectServer deserialized, TUser user)
         {
             return true;
         }
@@ -172,7 +179,7 @@ namespace RealmSync.Server
         /// returns True if the user has access to the passed object, otherwise false
         /// </summary>
         /// <returns></returns>
-        public virtual bool UserHasAccessToObject(IRealmSyncObjectServer deserialized)
+        public virtual bool UserHasAccessToObject(IRealmSyncObjectServer deserialized, TUser user)
         {
             return true;
         }

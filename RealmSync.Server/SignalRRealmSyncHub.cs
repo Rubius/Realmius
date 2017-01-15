@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
@@ -8,31 +9,41 @@ using RealmSync.SyncService;
 
 namespace RealmSync.Server
 {
-    public class UserInfo
-    {
 
+    public class SignalRRealmSyncShareEverythingHub : SignalRRealmSyncHub<string>
+    {
+        public SignalRRealmSyncShareEverythingHub(Func<DbContext> dbContextFactoryFunc, params Type[] syncedTypes) :
+            base(new RealmSyncServerProcessor<string>(dbContextFactoryFunc, syncedTypes))
+        {
+        }
+
+        protected override string CreateUserInfo(HubCallerContext context)
+        {
+            return "";
+        }
     }
 
-    public abstract class SignalRRealmSyncHub : Hub
+    public abstract class SignalRRealmSyncHub<TUser> : Hub
     {
-        private readonly RealmSyncServerProcessor _processor;
+        private readonly RealmSyncServerProcessor<TUser> _processor;
 
-        protected SignalRRealmSyncHub(RealmSyncServerProcessor processor)
+        protected SignalRRealmSyncHub(RealmSyncServerProcessor<TUser> processor)
         {
             _processor = processor;
             _processor.DataUpdated += (sender, request) =>
             {
-                foreach (var connectionId in _connections.Keys)
+                foreach (var connectionInfo in _connections)
                 {
                     var download = new DownloadDataResponse()
                     {
                     };
 
-                    var userConnection = this.Clients.User(connectionId);
+                    var userConnection = this.Clients.User(connectionInfo.Key);
+                    var userData = connectionInfo.Value;
 
                     foreach (var item in request.Items)
                     {
-                        if (_processor.UserHasAccessToObject(item.DeserializedObject))
+                        if (_processor.UserHasAccessToObject(item.DeserializedObject, userData))
                             download.ChangedObjects.Add(item.Change);
                     }
                     download.LastChange = DateTimeOffset.UtcNow;
@@ -44,7 +55,7 @@ namespace RealmSync.Server
         }
         public UploadDataResponse UploadData(UploadDataRequest request)
         {
-            return _processor.Upload(request);
+            return _processor.Upload(request, _connections[Context.ConnectionId]);
         }
 
         public void HandleDataChanges()
@@ -52,20 +63,16 @@ namespace RealmSync.Server
 
         }
 
-        private readonly static Dictionary<string, UserInfo> _connections = new Dictionary<string, UserInfo>();
+        private readonly static Dictionary<string, TUser> _connections = new Dictionary<string, TUser>();
         public override Task OnConnected()
         {
-            string name = Context.User.Identity.Name;
-
-            _connections[Context.ConnectionId] = new UserInfo();
+            _connections[Context.ConnectionId] = CreateUserInfo(Context);
 
             return base.OnConnected();
         }
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            string name = Context.User.Identity.Name;
-
             var connectionId = Context.ConnectionId;
             if (_connections.ContainsKey(connectionId))
                 _connections.Remove(connectionId);
@@ -75,9 +82,11 @@ namespace RealmSync.Server
 
         public override Task OnReconnected()
         {
-            _connections[Context.ConnectionId] = new UserInfo();
+            _connections[Context.ConnectionId] = CreateUserInfo(Context);
 
             return base.OnReconnected();
         }
+
+        protected abstract TUser CreateUserInfo(HubCallerContext context);
     }
 }

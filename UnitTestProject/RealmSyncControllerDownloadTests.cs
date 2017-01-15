@@ -37,7 +37,7 @@ namespace UnitTestProject
             {
                 LastChangeTime = new DateTimeOffset(DateTime.Now),
                 Types = new[] { nameof(DbSyncObject) },
-            });
+            }, null);
 
             result.ChangedObjects.Should().BeEmpty();
         }
@@ -60,7 +60,7 @@ namespace UnitTestProject
             {
                 LastChangeTime = new DateTimeOffset(DateTime.Now),
                 Types = new[] { nameof(DbSyncObject) },
-            });
+            }, null);
 
             result.ChangedObjects.Should().BeEmpty();
         }
@@ -84,7 +84,7 @@ namespace UnitTestProject
             {
                 LastChangeTime = new DateTimeOffset(DateTime.Now.AddDays(-2)),
                 Types = new[] { nameof(DbSyncObject) },
-            });
+            }, null);
 
             result.ChangedObjects.Select(x => x.MobilePrimaryKey).Should().BeEquivalentTo(new[] { obj.Id });
 
@@ -100,7 +100,7 @@ namespace UnitTestProject
             {
                 LastChangeTime = new DateTimeOffset(DateTime.Now),
                 Types = new[] { nameof(UnknownSyncObject) },
-            })).ShouldThrow<Exception>()
+            }, null)).ShouldThrow<Exception>()
                 ;
         }
     }

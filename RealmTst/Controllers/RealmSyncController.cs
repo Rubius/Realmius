@@ -21,14 +21,14 @@ namespace RealmTst.Controllers
         [HttpPost]
         public UploadDataResponse Upload([FromBody]UploadDataRequest request)
         {
-            return _sync.Upload(request);
+            return _sync.Upload(request, null);
         }
 
         [Route("realmdownload")]
         [HttpPost]
         public DownloadDataResponse Download([FromBody]DownloadDataRequest request)
         {
-            return _sync.Download(request);
+            return _sync.Download(request, null);
         }
 
         // GET api/<controller>

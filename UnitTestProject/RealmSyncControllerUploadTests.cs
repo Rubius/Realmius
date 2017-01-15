@@ -43,7 +43,7 @@ namespace UnitTestProject
                          SerializedObject = JsonConvert.SerializeObject(new UnknownSyncObject()),
                      }
                 }
-            });
+            }, null);
             result.Results.Count.Should().Be(1);
             result.Results[0].Error.Should().ContainEquivalentOf("The entity type UnknownSyncObject is not part of the model for the current context");
         }
@@ -62,7 +62,7 @@ namespace UnitTestProject
                          SerializedObject = JsonConvert.SerializeObject(new UnknownSyncObject()),
                      }
                 }
-            });
+            }, null);
             result.Results.Count.Should().Be(0);
         }
 
@@ -88,7 +88,7 @@ namespace UnitTestProject
                          SerializedObject = JsonConvert.SerializeObject(objectToSave),
                      }
                 }
-            });
+            }, null);
             result.Results.Count.Should().Be(1);
             CheckNoError(result);
             result.Results[0].MobilePrimaryKey.Should().Be(objectToSave.MobilePrimaryKey);
@@ -119,7 +119,7 @@ namespace UnitTestProject
                          SerializedObject = JsonConvert.SerializeObject(objectToSave),
                      }
                 }
-            });
+            }, null);
             CheckNoError(result);
             _contextFunc().DbSyncObjects.Find(objectToSave.Id).Text.Should().BeEquivalentTo("123123123");
 
@@ -135,7 +135,7 @@ namespace UnitTestProject
                          SerializedObject = JsonConvert.SerializeObject(objectToSave),
                      }
                 }
-            });
+            }, null);
             CheckNoError(result);
             _contextFunc().DbSyncObjects.Find(objectToSave.Id).Text.Should().BeEquivalentTo("zxc");
             _contextFunc().DbSyncObjects.Count().Should().Be(1);
@@ -164,7 +164,7 @@ namespace UnitTestProject
                          SerializedObject = JsonConvert.SerializeObject(objectToSave),
                      }
                 }
-            });
+            }, null);
             CheckNoError(result);
 
             result = controller.Upload(new UploadDataRequest()
@@ -178,7 +178,7 @@ namespace UnitTestProject
                          SerializedObject = "{Text: 'asd'}",
                      }
                 }
-            });
+            }, null);
             CheckNoError(result);
             _contextFunc().DbSyncObjects.Find(objectToSave.Id).Text.Should().BeEquivalentTo("asd");
             _contextFunc().DbSyncObjects.Count().Should().Be(1);

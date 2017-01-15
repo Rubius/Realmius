@@ -6,10 +6,10 @@ using RealmSync.Server;
 namespace RealmTst.Controllers
 {
     [HubName(Constants.SignalRHubName)]
-    public class SyncHub : SignalRRealmSyncHub
+    public class SyncHub : SignalRRealmSyncShareEverythingHub
     {
         public SyncHub()
-            : base(new RealmSyncServerProcessor(() => new SyncDbContext(), typeof(ChatMessage)))
+            : base(() => new SyncDbContext(), typeof(ChatMessage))
         {
 
         }
