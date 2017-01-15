@@ -69,9 +69,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConnectionMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RealmSyncServerProcessor.cs" />
     <Compile Include="SignalRRealmSyncHub.cs" />
+    <Compile Include="UpdatedDataBatch.cs" />
+    <Compile Include="UpdatedDataItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

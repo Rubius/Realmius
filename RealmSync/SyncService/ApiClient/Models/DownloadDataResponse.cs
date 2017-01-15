@@ -5,12 +5,12 @@ namespace RealmSync.SyncService
 {
     public class DownloadDataResponse
     {
-        public List<DownloadRequestItem> ChangedObjects { get; set; }
+        public List<DownloadResponseItem> ChangedObjects { get; set; }
 		public DateTimeOffset LastChange { get; set; }
 
         public DownloadDataResponse()
         {
-            ChangedObjects = new List<DownloadRequestItem>();
+            ChangedObjects = new List<DownloadResponseItem>();
         }
     }
 }

@@ -9,16 +9,14 @@ using System.Reflection;
 
 namespace RealmSync.Server
 {
-
-
     public class RealmSyncServerProcessor
     {
         private readonly Func<DbContext> _dbContextFactoryFunc;
         private readonly Dictionary<string, Type> _syncedTypes;
         private readonly JsonSerializer _serializer;
 
-        public event EventHandler<UploadDataRequest> DataUpdated;
-        protected virtual void OnDataUpdated(UploadDataRequest e)
+        public event EventHandler<UpdatedDataBatch> DataUpdated;
+        protected virtual void OnDataUpdated(UpdatedDataBatch e)
         {
             DataUpdated?.Invoke(this, e);
         }
@@ -39,6 +37,8 @@ namespace RealmSync.Server
         public UploadDataResponse Upload(UploadDataRequest request)
         {
             var result = new UploadDataResponse();
+
+            var updatedResult = new UpdatedDataBatch();
 
             var ef = _dbContextFactoryFunc();
             foreach (var item in request.ChangeNotifications)
@@ -74,19 +74,30 @@ namespace RealmSync.Server
                     else
                     {
                         //entity does not exist in DB, CREATE it
-                        var deserialized = (IRealmSyncObjectServer)JsonConvert.DeserializeObject(item.SerializedObject, type);
-                        if (CheckAndProcess(deserialized))
+                        dbEntity = (IRealmSyncObjectServer)JsonConvert.DeserializeObject(item.SerializedObject, type);
+                        if (CheckAndProcess(dbEntity))
                         {
-                            deserialized.LastChangeServer = DateTime.UtcNow;
+                            dbEntity.LastChangeServer = DateTime.UtcNow;
                             //add to the database
-                            dbSet.Attach(deserialized);
-                            ef.Entry(deserialized).State = EntityState.Added;
+                            dbSet.Attach(dbEntity);
+                            ef.Entry(dbEntity).State = EntityState.Added;
                         }
                         else
                         {
                             objectInfo.Error = "Object failed security checks";
                         }
                     }
+
+                    updatedResult.Items.Add(new UpdatedDataItem()
+                    {
+                        DeserializedObject = dbEntity,
+                        Change = new DownloadResponseItem()
+                        {
+                            MobilePrimaryKey = item.PrimaryKey,
+                            Type = item.Type,
+                            SerializedObject = item.SerializedObject,
+                        },
+                    });
                 }
                 catch (Exception e)
                 {
@@ -99,6 +110,8 @@ namespace RealmSync.Server
                 }
             }
             ef.SaveChanges();
+
+            OnDataUpdated(updatedResult);
 
             return result;
         }
@@ -123,7 +136,7 @@ namespace RealmSync.Server
                 var updatedItems = GetUpdatedItems(type, dbSet, request.LastChangeTime);
                 foreach (var realmSyncObject in updatedItems)
                 {
-                    response.ChangedObjects.Add(new DownloadRequestItem()
+                    response.ChangedObjects.Add(new DownloadResponseItem()
                     {
                         Type = typeName,
                         MobilePrimaryKey = realmSyncObject.MobilePrimaryKey,
@@ -159,7 +172,7 @@ namespace RealmSync.Server
         /// returns True if the user has access to the passed object, otherwise false
         /// </summary>
         /// <returns></returns>
-        protected virtual bool UserHasAccessToObject(IRealmSyncObjectServer deserialized)
+        public virtual bool UserHasAccessToObject(IRealmSyncObjectServer deserialized)
         {
             return true;
         }

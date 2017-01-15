@@ -43,7 +43,7 @@
     <Compile Include="SyncService\ApiClient\IApiClient.cs" />
     <Compile Include="SyncService\ApiClient\Models\DownloadDataRequest.cs" />
     <Compile Include="SyncService\ApiClient\Models\DownloadDataResponse.cs" />
-    <Compile Include="SyncService\ApiClient\Models\DownloadRequestItem.cs" />
+    <Compile Include="SyncService\ApiClient\Models\DownloadResponseItem.cs" />
     <Compile Include="SyncService\ApiClient\SignalRSyncApiClient.cs" />
     <Compile Include="SyncService\IRealmSyncObjectClient.cs" />
     <Compile Include="SyncService\ApiClient\PollingSyncApiClient.cs" />
