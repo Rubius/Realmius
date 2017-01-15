@@ -12,11 +12,13 @@ namespace RealmSync.SyncService
 		private IHubProxy _hubProxy;
 		private HubConnection _hubConnection;
 		private ApiClientStartOptions _startOptions;
+		public string HubName { get; set; }
 		public Uri Uri { get; set; }
 
-		public SignalRSyncApiClient(Uri uri)
+		public SignalRSyncApiClient(Uri uri, string hubName)
 		{
 			Uri = uri;
+			HubName = hubName;
 		}
 
 		public event EventHandler<DownloadDataResponse> NewDataDownloaded;
@@ -45,7 +47,7 @@ namespace RealmSync.SyncService
 				_hubUnsubscribe = () => { };
 				_hubConnection = new HubConnection(Uri.ToString());
 
-				_hubProxy = _hubConnection.CreateHubProxy(Constants.SignalRHubName);
+				_hubProxy = _hubConnection.CreateHubProxy(HubName);
 				var downloadHandler = _hubProxy.On<DownloadDataResponse>("DataDownloaded", OnNewDataDownloaded);
 
 				_hubUnsubscribe += () =>
@@ -97,12 +99,16 @@ namespace RealmSync.SyncService
 		{
 			try
 			{
+				if (_hubConnection.State != ConnectionState.Connected)
+					return new UploadDataResponse();
+				
 				var response = await _hubProxy.Invoke<UploadDataResponse>("UploadData", request);
 
 				return response;
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
+				Debug.WriteLine($"{e}");
 				return new UploadDataResponse();
 			}
 		}

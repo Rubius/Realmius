@@ -35,7 +35,7 @@ namespace RealmIos
 			//								 , new System.Uri("http://192.168.38.1:44980/realmdownload")
 			//									  , typeof(ChatMessage));
 
-			RealmSync = SyncServiceFactory.CreateUsingSignalR(() => Realm.GetInstance(config), new System.Uri("http://192.168.38.1:44980/signalr")
+			RealmSync = SyncServiceFactory.CreateUsingSignalR(() => Realm.GetInstance(config), new System.Uri("http://192.168.38.1:44980/signalr"), Constants.SignalRHubName
 												  , typeof(ChatMessage));
 
 			return true;
