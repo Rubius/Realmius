@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -15,7 +16,6 @@ namespace RealmSync.SyncService
         private IApiClient _apiClient;
 
         private JsonSerializerSettings _jsonSerializerSettings;
-        private Realm _realmSyncData;
 
         public Uri ServerUri { get; set; }
         private SyncConfiguration _syncOptions;
@@ -24,10 +24,7 @@ namespace RealmSync.SyncService
         {
             _realm = realm;
             _apiClient = apiClient;
-            _realmSyncData = Realm.GetInstance(new RealmConfiguration("realm.sync")
-            {
-                ShouldDeleteIfMigrationNeeded = true,
-            });
+			var realmSyncData = CreateRealmSync();
 
             _typesToSync = typesToSync.ToDictionary(x => x.Name, x => x);
             _jsonSerializerSettings = new JsonSerializerSettings
@@ -35,16 +32,16 @@ namespace RealmSync.SyncService
                 ContractResolver = new RealmObjectResolver()
             };
 
-            _syncOptions = _realmSyncData.Find<SyncConfiguration>(1);
+            _syncOptions = realmSyncData.Find<SyncConfiguration>(1);
             if (_syncOptions == null)
             {
                 _syncOptions = new SyncConfiguration()
                 {
                     Id = 1,
                 };
-                _realmSyncData.Write(() =>
+                realmSyncData.Write(() =>
                 {
-                    _realmSyncData.Add(_syncOptions);
+                    realmSyncData.Add(_syncOptions);
                 });
             }
 
@@ -53,6 +50,14 @@ namespace RealmSync.SyncService
 
             _apiClient.NewDataDownloaded += HandleDownloadedData;
         }
+
+		private Realm CreateRealmSync()
+		{
+			return Realm.GetInstance(new RealmConfiguration("realm.sync")
+			{
+				ShouldDeleteIfMigrationNeeded = true,
+			});
+		}
 
         private void HandleDownloadedData(object sender, DownloadDataResponse e)
         {
@@ -72,7 +77,7 @@ namespace RealmSync.SyncService
 
             }
 
-            _realmSyncData.All<UploadRequestItemRealm>().AsRealmCollection().SubscribeForNotifications(UploadRequestItemChanged);
+			CreateRealmSync().All<UploadRequestItemRealm>().AsRealmCollection().SubscribeForNotifications(UploadRequestItemChanged);
         }
 
         private void UploadRequestItemChanged(IRealmCollection<RealmObject> sender, ChangeSet changes, Exception error)
@@ -85,15 +90,17 @@ namespace RealmSync.SyncService
             if (changes == null)
                 return;
 
+			var realmSyncData = CreateRealmSync();
+
             foreach (var changesInsertedIndex in changes.InsertedIndices)
             {
                 var obj = (IRealmSyncObjectClient)sender[changesInsertedIndex];
                 var serializedCurrent = JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
                 var className = obj.GetType().Name;
 
-                _realmSyncData.Write(() =>
+                realmSyncData.Write(() =>
                 {
-                    _realmSyncData.Add(new UploadRequestItemRealm()
+                    realmSyncData.Add(new UploadRequestItemRealm()
                     {
                         Type = className,
                         PrimaryKey = obj.MobilePrimaryKey,
@@ -123,9 +130,9 @@ namespace RealmSync.SyncService
                 {
                     var className = obj.GetType().Name;
 
-                    _realmSyncData.Write(() =>
+                    realmSyncData.Write(() =>
                     {
-                        _realmSyncData.Add(new UploadRequestItemRealm()
+                        realmSyncData.Add(new UploadRequestItemRealm()
                         {
                             Type = className,
                             PrimaryKey = obj.MobilePrimaryKey,
@@ -155,76 +162,86 @@ namespace RealmSync.SyncService
             if (_uploadInProgress)
                 return;
 
+			var realmSyncData = CreateRealmSync();
+
             _uploadInProgress = true;
             var uploadSucceeeded = false;
-            try
-            {
-                var objectsToUpload = GetObjectsToUpload().Take(10).ToDictionary(x => x.PrimaryKey, x => x);
+			try
+			{
+				var objectsToUpload = GetObjectsToUpload().Take(10).ToDictionary(x => x.PrimaryKey, x => x);
 
-                if (objectsToUpload.Count == 0)
-                    return;
+				if (objectsToUpload.Count == 0)
+					return;
 
-                var sendObjectsTime = DateTime.Now;
-                var changes = new UploadDataRequest();
-                foreach (UploadRequestItemRealm uploadRequestItemRealm in objectsToUpload.Values)
-                {
-                    var changeNotification = new UploadRequestItem()
-                    {
-                        SerializedObject = uploadRequestItemRealm.SerializedObject,
-                        PrimaryKey = uploadRequestItemRealm.PrimaryKey,
-                        Type = uploadRequestItemRealm.Type,
-                    };
-                    changes.ChangeNotifications.Add(changeNotification);
-                }
-                try
-                {
-                    var result = await _apiClient.UploadData(changes);
+				var sendObjectsTime = DateTime.Now;
+				var changes = new UploadDataRequest();
+				foreach (UploadRequestItemRealm uploadRequestItemRealm in objectsToUpload.Values)
+				{
+					var changeNotification = new UploadRequestItem()
+					{
+						SerializedObject = uploadRequestItemRealm.SerializedObject,
+						PrimaryKey = uploadRequestItemRealm.PrimaryKey,
+						Type = uploadRequestItemRealm.Type,
+					};
+					changes.ChangeNotifications.Add(changeNotification);
+				}
+				try
+				{
+					var result = await _apiClient.UploadData(changes);
 
-                    _realm.Write(() =>
-                    {
-                        foreach (var realmSyncObject in result.Results)
-                        {
-                            var obj = (IRealmSyncObjectClient)_realm.Find(realmSyncObject.Type, realmSyncObject.MobilePrimaryKey);
-                            _realmSyncData.Remove(objectsToUpload[realmSyncObject.MobilePrimaryKey]);
+					_realm.Write(() =>
+					{
+						foreach (var realmSyncObject in result.Results)
+						{
+							var obj = (IRealmSyncObjectClient)_realm.Find(realmSyncObject.Type, realmSyncObject.MobilePrimaryKey);
+							realmSyncData.Remove(objectsToUpload[realmSyncObject.MobilePrimaryKey]);
 
-                            obj.SetSyncState(SyncState.Synced);
-                            //if (obj.DateTime > sendObjectsTime)
-                            //{
-                            //    //object has changed since we sent the result, will not change the SyncState
-                            //}
-                            //else
-                            //{
+							obj.SetSyncState(SyncState.Synced);
+							//if (obj.DateTime > sendObjectsTime)
+							//{
+							//    //object has changed since we sent the result, will not change the SyncState
+							//}
+							//else
+							//{
 
-                            //    obj.SetSyncState(SyncState.Synced);
-                            //}
-                        }
-                    });
-                    uploadSucceeeded = result.Results.Any();
-                }
-                catch (Exception ex)
-                {
+							//    obj.SetSyncState(SyncState.Synced);
+							//}
+						}
+					});
+					uploadSucceeeded = result.Results.Any();
+				}
+				catch (Exception ex)
+				{
+				}
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine($"{ex}");
+			}
+			finally
+			{
+				_uploadInProgress = false;
+			}
 
-                }
-            }
-            finally
-            {
-                _uploadInProgress = false;
-            }
-
-#pragma warning disable 4014
             Task.Factory.StartNew(async () =>
-#pragma warning restore 4014
             {
-                if (!uploadSucceeeded)
-                    await Task.Delay(2000);
+				try
+				{
+					if (!uploadSucceeeded)
+						await Task.Delay(2000);
 
-                await Upload();
+					await Upload();
+				}
+				catch (Exception ex)
+				{
+
+				}
             });
         }
 
         private IEnumerable<UploadRequestItemRealm> GetObjectsToUpload()
         {
-            return _realmSyncData.All<UploadRequestItemRealm>().OrderBy(x => x.DateTime);
+			return CreateRealmSync().All<UploadRequestItemRealm>().OrderBy(x => x.DateTime);
         }
 
         private async Task HandleDownloadedData(DownloadDataResponse result)
