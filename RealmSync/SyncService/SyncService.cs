@@ -49,6 +49,7 @@ namespace RealmSync.SyncService
             Initialize();
 
             _apiClient.NewDataDownloaded += HandleDownloadedData;
+			_apiClient.Start(new ApiClientStartOptions(_syncOptions.LastDownloaded, _typesToSync.Keys));
         }
 
         private Realm CreateRealmSync()
@@ -197,8 +198,10 @@ namespace RealmSync.SyncService
                         foreach (var realmSyncObject in result.Results)
                         {
                             var obj = (IRealmSyncObjectClient)realm.Find(realmSyncObject.Type, realmSyncObject.MobilePrimaryKey);
-                            realmSyncData.Remove(objectsToUpload[realmSyncObject.MobilePrimaryKey]);
-
+							realmSyncData.Write(() =>
+							{
+								realmSyncData.Remove(objectsToUpload[realmSyncObject.MobilePrimaryKey]);
+							});
                             obj.SetSyncState(SyncState.Synced);
                             //if (obj.DateTime > sendObjectsTime)
                             //{
@@ -215,6 +218,7 @@ namespace RealmSync.SyncService
                 }
                 catch (Exception ex)
                 {
+					Debug.WriteLine($"{ex}");
                 }
             }
             catch (Exception ex)
@@ -231,7 +235,7 @@ namespace RealmSync.SyncService
                 try
                 {
                     if (!uploadSucceeeded)
-                        await Task.Delay(2000);
+                        await Task.Delay(2000); //ToDo: delays might be increased in case of consequent errors
 
                     await Upload();
                 }
