@@ -15,10 +15,10 @@ namespace RealmSync.Model
 
         public int SyncState { get; set; }
 
-        [Realms.Ignored]
-        public string MobilePrimaryKey => Id;
+		[Realms.Ignored]
+		public string MobilePrimaryKey { get { return Id;} set { Id = value;} }
 
-        [JsonIgnore]
+		[JsonIgnore]
         public string LastSynchronizedVersion { get; set; }
     }
 }
