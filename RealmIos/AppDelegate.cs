@@ -31,7 +31,7 @@ namespace RealmIos
 				SchemaVersion = 2,
 			};
 			Realm = Realm.GetInstance(config);
-			RealmSync = SyncServiceFactory.CreateUsingPolling(Realm, new System.Uri("http://192.168.38.1:44980/realmupload")
+			RealmSync = SyncServiceFactory.CreateUsingPolling(()=>Realm.GetInstance(config), new System.Uri("http://192.168.38.1:44980/realmupload")
 											 , new System.Uri("http://192.168.38.1:44980/realmdownload")
 												  , typeof(ChatMessage));
 
