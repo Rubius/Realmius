@@ -9,11 +9,19 @@ using System.Reflection;
 
 namespace RealmSync.Server
 {
+
+
     public class RealmSyncServerProcessor
     {
         private readonly Func<DbContext> _dbContextFactoryFunc;
         private readonly Dictionary<string, Type> _syncedTypes;
-        private JsonSerializer _serializer;
+        private readonly JsonSerializer _serializer;
+
+        public event EventHandler<UploadDataRequest> DataUpdated;
+        protected virtual void OnDataUpdated(UploadDataRequest e)
+        {
+            DataUpdated?.Invoke(this, e);
+        }
 
         public RealmSyncServerProcessor(Func<DbContext> dbContextFactoryFunc, params Type[] syncedTypes)
         {
@@ -46,7 +54,7 @@ namespace RealmSync.Server
                     result.Results.Add(objectInfo);
 
                     var dbSet = ef.Set(type);
-                    var dbEntity = dbSet.Find(item.PrimaryKey);
+                    var dbEntity = (IRealmSyncObjectServer)dbSet.Find(item.PrimaryKey);
                     if (dbEntity != null)
                     {
                         //entity exists in DB, UPDATE it
@@ -60,16 +68,16 @@ namespace RealmSync.Server
                         }
                         else
                         {
-                            ((IRealmSyncObjectServer)dbEntity).LastChangeServer = DateTime.UtcNow;
+                            dbEntity.LastChangeServer = DateTime.UtcNow;
                         }
                     }
                     else
                     {
                         //entity does not exist in DB, CREATE it
-                        var deserialized = JsonConvert.DeserializeObject(item.SerializedObject, type);
+                        var deserialized = (IRealmSyncObjectServer)JsonConvert.DeserializeObject(item.SerializedObject, type);
                         if (CheckAndProcess(deserialized))
                         {
-                            ((IRealmSyncObjectServer)deserialized).LastChangeServer = DateTime.UtcNow;
+                            deserialized.LastChangeServer = DateTime.UtcNow;
                             //add to the database
                             dbSet.Attach(deserialized);
                             ef.Entry(deserialized).State = EntityState.Added;
@@ -93,15 +101,6 @@ namespace RealmSync.Server
             ef.SaveChanges();
 
             return result;
-        }
-
-        /// <summary>
-        /// returns True if it's ok to save the object, False oterwise
-        /// </summary>
-        /// <returns></returns>
-        protected virtual bool CheckAndProcess(object deserialized)
-        {
-            return true;
         }
 
         public DownloadDataResponse Download(DownloadDataRequest request)
@@ -136,10 +135,34 @@ namespace RealmSync.Server
             return response;
         }
 
+        /// <summary>
+        /// returns items of a given type that were updated since lastChanged
+        /// </summary>
+        /// <returns></returns>
         protected virtual IEnumerable<IRealmSyncObjectServer> GetUpdatedItems(Type type, IQueryable<IRealmSyncObjectServer> dbSet, DateTimeOffset lastChanged)
         {
             return dbSet.Where(x => x.LastChangeServer > lastChanged)
                 .OrderByDescending(x => x.LastChangeServer);
         }
+
+
+        /// <summary>
+        /// returns True if it's ok to save the object, False oterwise
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool CheckAndProcess(IRealmSyncObjectServer deserialized)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// returns True if the user has access to the passed object, otherwise false
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool UserHasAccessToObject(IRealmSyncObjectServer deserialized)
+        {
+            return true;
+        }
+
     }
 }
