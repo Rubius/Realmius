@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RealmSync.SyncService
+﻿namespace RealmSync.SyncService
 {
     public interface IRealmSyncObjectClient
     {
@@ -10,11 +8,5 @@ namespace RealmSync.SyncService
         int SyncState { get; set; }
         string MobilePrimaryKey { get; }
         string LastSynchronizedVersion { get; set; }
-    }
-
-    public interface IRealmSyncObjectServer
-    {
-        DateTime LastChangeServer { get; set; }
-        string MobilePrimaryKey { get; }
     }
 }

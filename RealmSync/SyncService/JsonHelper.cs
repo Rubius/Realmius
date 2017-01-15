@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace RealmSync.SyncService
 {
-    public class JsonHelper
+    internal class JsonHelper
     {
 
         public static string GetJsonDiff(object existing, object modified)

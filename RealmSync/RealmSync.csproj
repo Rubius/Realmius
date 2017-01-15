@@ -36,12 +36,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SyncServiceFactory.cs" />
+    <Compile Include="SyncService\ApiClient\ApiClientStartOptions.cs" />
+    <Compile Include="SyncService\ApiClient\IApiClient.cs" />
     <Compile Include="SyncService\ApiClient\Models\DownloadDataRequest.cs" />
     <Compile Include="SyncService\ApiClient\Models\DownloadDataResponse.cs" />
     <Compile Include="SyncService\ApiClient\Models\DownloadRequestItem.cs" />
+    <Compile Include="SyncService\ApiClient\SignalRSyncApiClient.cs" />
     <Compile Include="SyncService\IRealmSyncObjectClient.cs" />
-    <Compile Include="SyncService\ApiClient\SyncApiClient.cs" />
+    <Compile Include="SyncService\ApiClient\PollingSyncApiClient.cs" />
+    <Compile Include="SyncService\IRealmSyncObjectServer.cs" />
     <Compile Include="SyncService\JsonHelper.cs" />
     <Compile Include="SyncService\RealmObjectResolver.cs" />
     <Compile Include="SyncService\RealmSyncObjectExtenstions.cs" />
@@ -51,10 +57,16 @@
     <Compile Include="SyncService\ApiClient\Models\UploadDataResponse.cs" />
     <Compile Include="SyncService\ApiClient\Models\UploadRequestItem.cs" />
     <Compile Include="SyncService\ApiClient\Models\UploadDataResponseItem.cs" />
+    <Compile Include="SyncService\SyncConfiguration.cs" />
+    <Compile Include="Infrastructure\Timer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="DotNetCross.Memory.Unsafe, Version=0.2.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetCross.Memory.Unsafe.0.2.2\lib\DotNetCross.Memory.Unsafe.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Client, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Client.2.2.1\lib\portable-net45+sl50+win+wpa81+wp80\Microsoft.AspNet.SignalR.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -71,6 +83,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -128,7 +128,7 @@ namespace RealmSync.Server
             return response;
         }
 
-        protected virtual IEnumerable<IRealmSyncObjectServer> GetUpdatedItems(Type type, DbSet<IRealmSyncObjectServer> dbSet, DateTime lastChanged)
+        protected virtual IEnumerable<IRealmSyncObjectServer> GetUpdatedItems(Type type, DbSet<IRealmSyncObjectServer> dbSet, DateTimeOffset lastChanged)
         {
             return dbSet.Where(x => x.LastChangeServer > lastChanged)
                 .OrderByDescending(x => x.LastChangeServer);

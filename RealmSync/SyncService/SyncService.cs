@@ -8,33 +8,22 @@ using Realms;
 
 namespace RealmSync.SyncService
 {
-
-    public class SyncStateOptions : RealmObject
-    {
-        [PrimaryKey]
-        public int Id { get; set; }
-        public DateTimeOffset LastDownloaded
-        {
-            get;
-            set;
-        } = new DateTimeOffset(new DateTime(1970, 1, 1));
-    }
-
-    public class RealmSyncService
+    public class RealmSyncService : IDisposable
     {
         private readonly Realm _realm;
         private readonly Dictionary<string, Type> _typesToSync;
-        private SyncApiClient _syncApiClient;
+        private IApiClient _apiClient;
 
         private JsonSerializerSettings _jsonSerializerSettings;
         private Realm _realmSyncData;
 
         public Uri ServerUri { get; set; }
-        private SyncStateOptions _syncOptions;
+        private SyncConfiguration _syncOptions;
 
-        public RealmSyncService(Realm realm, Uri serverUploadUri, Uri serverDownloadUri, params Type[] typesToSync)
+        public RealmSyncService(Realm realm, IApiClient apiClient, params Type[] typesToSync)
         {
             _realm = realm;
+            _apiClient = apiClient;
             _realmSyncData = Realm.GetInstance(new RealmConfiguration("realm.sync")
             {
                 ShouldDeleteIfMigrationNeeded = true,
@@ -46,12 +35,10 @@ namespace RealmSync.SyncService
                 ContractResolver = new RealmObjectResolver()
             };
 
-            _syncApiClient = new SyncApiClient(serverUploadUri, serverDownloadUri);
-
-            _syncOptions = _realmSyncData.Find<SyncStateOptions>(1);
+            _syncOptions = _realmSyncData.Find<SyncConfiguration>(1);
             if (_syncOptions == null)
             {
-                _syncOptions = new SyncStateOptions()
+                _syncOptions = new SyncConfiguration()
                 {
                     Id = 1,
                 };
@@ -60,7 +47,16 @@ namespace RealmSync.SyncService
                     _realmSyncData.Add(_syncOptions);
                 });
             }
+
+
             Initialize();
+
+            _apiClient.NewDataDownloaded += HandleDownloadedData;
+        }
+
+        private void HandleDownloadedData(object sender, DownloadDataResponse e)
+        {
+            HandleDownloadedData(e);
         }
 
         private void Initialize()
@@ -182,9 +178,7 @@ namespace RealmSync.SyncService
                 }
                 try
                 {
-
-
-                    var result = await _syncApiClient.UploadData(changes);
+                    var result = await _apiClient.UploadData(changes);
 
                     _realm.Write(() =>
                     {
@@ -216,39 +210,25 @@ namespace RealmSync.SyncService
             {
                 _uploadInProgress = false;
             }
+
+#pragma warning disable 4014
             Task.Factory.StartNew(async () =>
+#pragma warning restore 4014
             {
                 if (!uploadSucceeeded)
                     await Task.Delay(2000);
 
-                Upload();
+                await Upload();
             });
         }
 
         private IEnumerable<UploadRequestItemRealm> GetObjectsToUpload()
         {
             return _realmSyncData.All<UploadRequestItemRealm>().OrderBy(x => x.DateTime);
-            //List<IRealmSyncObject> objectsToUpload = new List<IRealmSyncObject>();
-            //foreach (var type in _typesToSync.Keys)
-            //{
-            //    var filter = (IQueryable<RealmObject>)_realm.All(type).Where(x => (x as IRealmSyncObject).SyncState == (int)SyncState.Unsynced);
-            //    objectsToUpload.AddRange(filter.Cast<IRealmSyncObject>());
-            //}
-
-            ////objectsToUpload.OrderBy(x => x.LastChangeClient);
-            //return objectsToUpload;
         }
 
-        public virtual async Task Download()
+        private async Task HandleDownloadedData(DownloadDataResponse result)
         {
-            //doesn't work for now
-
-            var result = await _syncApiClient.DownloadData(new DownloadDataRequest()
-            {
-                LastChangeTime = _syncOptions.LastDownloaded.DateTime,
-                Types = _typesToSync.Keys,
-            });
-
             await _realm.WriteAsync((realm) =>
             {
                 foreach (var changeObject in result.ChangedObjects)
@@ -273,6 +253,11 @@ namespace RealmSync.SyncService
                     _syncOptions.LastDownloaded = result.LastChange;
                 });
             }
+        }
+
+        public void Dispose()
+        {
+            _apiClient.NewDataDownloaded -= HandleDownloadedData;
         }
     }
 }
