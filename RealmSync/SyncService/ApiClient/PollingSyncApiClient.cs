@@ -13,6 +13,7 @@ namespace RealmSync.SyncService
 		private ApiClientStartOptions _startOptions;
 		public Uri DownloadServerUri { get; set; }
 		public Uri UploadServerUri { get; set; }
+		public Action<HttpClient> HttpClientConfigurationCallback { get; set; } = (x) => { };
 
 		public event EventHandler<DownloadDataResponse> NewDataDownloaded;
 		protected virtual void OnNewDataDownloaded(DownloadDataResponse e)
@@ -29,7 +30,11 @@ namespace RealmSync.SyncService
 
 		private HttpClient GetHttpClient()
 		{
-			return new HttpClient();
+			var client = new HttpClient();
+
+			HttpClientConfigurationCallback(client);
+
+			return client;
 		}
 
 		public async Task<UploadDataResponse> UploadData(UploadDataRequest request)
