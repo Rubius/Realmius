@@ -31,12 +31,12 @@ namespace RealmIos
 				SchemaVersion = 2,
 			};
 			Realm = Realm.GetInstance(config);
-			RealmSync = SyncServiceFactory.CreateUsingPolling(()=>Realm.GetInstance(config), new System.Uri("http://192.168.38.1:44980/realmupload")
-											 , new System.Uri("http://192.168.38.1:44980/realmdownload")
-												  , typeof(ChatMessage));
-
-			//RealmSync = SyncServiceFactory.CreateUsingSignalR(Realm, new System.Uri("http://192.168.38.1:44980/realmsyncsignalr")
+			//RealmSync = SyncServiceFactory.CreateUsingPolling(()=>Realm.GetInstance(config), new System.Uri("http://192.168.38.1:44980/realmupload")
+			//								 , new System.Uri("http://192.168.38.1:44980/realmdownload")
 			//									  , typeof(ChatMessage));
+
+			RealmSync = SyncServiceFactory.CreateUsingSignalR(() => Realm.GetInstance(config), new System.Uri("http://192.168.38.1:44980/signalr")
+												  , typeof(ChatMessage));
 
 			return true;
 		}

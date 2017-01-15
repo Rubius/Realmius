@@ -2,6 +2,6 @@
 {
     public class Constants
     {
-        public const string SignalRHubName = "";
+        public const string SignalRHubName = "SignalRSyncHub";
     }
 }
