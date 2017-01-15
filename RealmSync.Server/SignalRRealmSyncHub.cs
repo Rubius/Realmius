@@ -1,16 +1,16 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using RealmSync.SyncService;
 
 namespace RealmSync.Server
 {
-    [HubName(Constants.SignalRHubName)]
-    public class SignalRRealmSyncHub : Hub
+    public abstract class SignalRRealmSyncHub : Hub
     {
         private readonly RealmSyncServerProcessor _processor;
 
-        public SignalRRealmSyncHub(RealmSyncServerProcessor processor)
+        protected SignalRRealmSyncHub(RealmSyncServerProcessor processor)
         {
             _processor = processor;
         }
@@ -21,12 +21,11 @@ namespace RealmSync.Server
 
         public void HandleDataChanges()
         {
-            
+
         }
 
         public override Task OnConnected()
         {
-            //Clients.
             return base.OnConnected();
         }
 
