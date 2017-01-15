@@ -14,9 +14,9 @@ namespace RealmSync
             return syncService;
         }
 
-        public static RealmSyncService CreateUsingSignalR(Func<Realm> realmFactoryMethod, Uri uri, params Type[] typesToSync)
+        public static RealmSyncService CreateUsingSignalR(Func<Realm> realmFactoryMethod, Uri uri, string hubName, params Type[] typesToSync)
         {
-            var apiClient = new SignalRSyncApiClient(uri);
+            var apiClient = new SignalRSyncApiClient(uri, hubName);
             var syncService = new RealmSyncService(realmFactoryMethod, apiClient, typesToSync);
 
             return syncService;
