@@ -44,6 +44,9 @@
     <Compile Include="SyncService\ApiClient\Models\DownloadDataRequest.cs" />
     <Compile Include="SyncService\ApiClient\Models\DownloadDataResponse.cs" />
     <Compile Include="SyncService\ApiClient\Models\DownloadResponseItem.cs" />
+    <Compile Include="SyncService\IRealmSyncService.cs" />
+    <Compile Include="SyncService\RealmModels\UploadRequestItemRealm.cs" />
+    <Compile Include="SyncService\RealmModels\ObjectSyncStatusRealm.cs" />
     <Compile Include="SyncService\ApiClient\SignalRSyncApiClient.cs" />
     <Compile Include="SyncService\IRealmSyncObjectClient.cs" />
     <Compile Include="SyncService\ApiClient\PollingSyncApiClient.cs" />
@@ -52,7 +55,7 @@
     <Compile Include="SyncService\RealmObjectResolver.cs" />
     <Compile Include="SyncService\RealmSyncObjectExtenstions.cs" />
     <Compile Include="SyncService\SyncService.cs" />
-    <Compile Include="SyncService\SyncState.cs" />
+    <Compile Include="SyncService\RealmModels\SyncState.cs" />
     <Compile Include="SyncService\ApiClient\Models\UploadDataRequest.cs" />
     <Compile Include="SyncService\ApiClient\Models\UploadDataResponse.cs" />
     <Compile Include="SyncService\ApiClient\Models\UploadRequestItem.cs" />

@@ -2,11 +2,11 @@
 {
     public static class RealmSyncObjectExtenstions
     {
-        public static SyncState GetSyncState(this IRealmSyncObjectClient obj)
+        public static SyncState GetSyncState(this ObjectSyncStatusRealm obj)
         {
             return (SyncState)obj.SyncState;
         }
-        public static void SetSyncState(this IRealmSyncObjectClient obj, SyncState syncState)
+        public static void SetSyncState(this ObjectSyncStatusRealm obj, SyncState syncState)
         {
             obj.SyncState = (int)syncState;
         }

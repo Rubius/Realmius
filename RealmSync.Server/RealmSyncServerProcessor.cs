@@ -75,7 +75,7 @@ namespace RealmSync.Server
                         }
                         else
                         {
-                            dbEntity.LastChangeServer = DateTime.UtcNow;
+                            //dbEntity.LastChangeServer = DateTime.UtcNow;
                         }
                     }
                     else
@@ -84,7 +84,7 @@ namespace RealmSync.Server
                         dbEntity = (IRealmSyncObjectServer)JsonConvert.DeserializeObject(item.SerializedObject, type);
                         if (CheckAndProcess(dbEntity, user))
                         {
-                            dbEntity.LastChangeServer = DateTime.UtcNow;
+                            //dbEntity.LastChangeServer = DateTime.UtcNow;
                             //add to the database
                             dbSet.Attach(dbEntity);
                             ef.Entry(dbEntity).State = EntityState.Added;
@@ -125,45 +125,62 @@ namespace RealmSync.Server
 
         public DownloadDataResponse Download(DownloadDataRequest request, TUser user)
         {
-            var ef = _dbContextFactoryFunc();
+            //var ef = _dbContextFactoryFunc();
 
             var response = new DownloadDataResponse()
             {
                 LastChange = DateTime.UtcNow,
             };
 
-            foreach (var typeName in request.Types)
+            var types = request.Types.Except(_syncedTypes.Keys).ToList();
+            if (types.Count > 0)
             {
-                var type = _syncedTypes[typeName];
-
-                var setMethod = ef.GetType().GetMethod("Set", new Type[0]).MakeGenericMethod(type);
-                var dbSet = (IQueryable<IRealmSyncObjectServer>)setMethod.Invoke(ef, new object[] { });
-                //.AsNoTracking().Select(x => x);
-
-                var updatedItems = GetUpdatedItems(type, dbSet, request.LastChangeTime, user);
-                foreach (var realmSyncObject in updatedItems)
-                {
-                    response.ChangedObjects.Add(new DownloadResponseItem()
-                    {
-                        Type = typeName,
-                        MobilePrimaryKey = realmSyncObject.MobilePrimaryKey,
-                        SerializedObject = JsonConvert.SerializeObject(realmSyncObject),
-                    });
-                }
+                throw new Exception("Some types are not configured to be synced: " + string.Join(",", types));
             }
+
+            var context = new ChangeTrackingDbContext();
+            var changes = context.SyncStatusServerObjects.AsNoTracking()
+                .Where(x => x.LastChange > request.LastChangeTime && types.Contains(x.Type));
+
+            response.ChangedObjects.AddRange(changes.Select(x => new DownloadResponseItem()
+            {
+                Type = x.Type,
+                MobilePrimaryKey = x.MobilePrimaryKey,
+                SerializedObject = x.SerializedObject,
+            }));
+
+            //foreach (var typeName in request.Types)
+            //{
+            //    var type = _syncedTypes[typeName];
+
+            //    var setMethod = ef.GetType().GetMethod("Set", new Type[0]).MakeGenericMethod(type);
+            //    var dbSet = (IQueryable<IRealmSyncObjectServer>)setMethod.Invoke(ef, new object[] { });
+            //    //.AsNoTracking().Select(x => x);
+
+            //    var updatedItems = GetUpdatedItems(type, dbSet, request.LastChangeTime, user);
+            //    foreach (var realmSyncObject in updatedItems)
+            //    {
+            //        response.ChangedObjects.Add(new DownloadResponseItem()
+            //        {
+            //            Type = typeName,
+            //            MobilePrimaryKey = realmSyncObject.MobilePrimaryKey,
+            //            SerializedObject = JsonConvert.SerializeObject(realmSyncObject),
+            //        });
+            //    }
+            //}
 
             return response;
         }
 
-        /// <summary>
-        /// returns items of a given type that were updated since lastChanged
-        /// </summary>
-        /// <returns></returns>
-        protected virtual IEnumerable<IRealmSyncObjectServer> GetUpdatedItems(Type type, IQueryable<IRealmSyncObjectServer> dbSet, DateTimeOffset lastChanged, TUser user)
-        {
-            return dbSet.Where(x => x.LastChangeServer > lastChanged)
-                .OrderByDescending(x => x.LastChangeServer);
-        }
+        ///// <summary>
+        ///// returns items of a given type that were updated since lastChanged
+        ///// </summary>
+        ///// <returns></returns>
+        //protected virtual IEnumerable<IRealmSyncObjectServer> GetUpdatedItems(Type type, IQueryable<IRealmSyncObjectServer> dbSet, DateTimeOffset lastChanged, TUser user)
+        //{
+        //    return dbSet.Where(x => x.LastChangeServer > lastChanged)
+        //        .OrderByDescending(x => x.LastChangeServer);
+        //}
 
 
         /// <summary>

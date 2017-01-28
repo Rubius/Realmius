@@ -2,9 +2,7 @@
 
 namespace RealmSync.SyncService
 {
-    public interface IRealmSyncObjectServer
+    public interface IRealmSyncObjectServer : IRealmSyncObjectClient
     {
-        DateTime LastChangeServer { get; set; }
-        string MobilePrimaryKey { get; }
     }
 }

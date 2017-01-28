@@ -9,7 +9,7 @@ using Realms;
 
 namespace RealmSync.SyncService
 {
-    public class RealmSyncService : IDisposable
+    public class RealmSyncService : IRealmSyncService
     {
         private readonly Func<Realm> _realmFactoryMethod;
         private readonly Dictionary<string, Type> _typesToSync;
@@ -18,6 +18,11 @@ namespace RealmSync.SyncService
         private JsonSerializerSettings _jsonSerializerSettings;
 
         public Uri ServerUri { get; set; }
+        public SyncState GetSyncState(string mobilePrimaryKey)
+        {
+            return _realmFactoryMethod().Find<ObjectSyncStatusRealm>(mobilePrimaryKey).GetSyncState();
+        }
+
         private SyncConfiguration _syncOptions;
 
         public RealmSyncService(Func<Realm> realmFactoryMethod, IApiClient apiClient, params Type[] typesToSync)
@@ -49,7 +54,7 @@ namespace RealmSync.SyncService
             Initialize();
 
             _apiClient.NewDataDownloaded += HandleDownloadedData;
-			_apiClient.Start(new ApiClientStartOptions(_syncOptions.LastDownloaded, _typesToSync.Keys));
+            _apiClient.Start(new ApiClientStartOptions(_syncOptions.LastDownloaded, _typesToSync.Keys));
         }
 
         private Realm CreateRealmSync()
@@ -109,18 +114,13 @@ namespace RealmSync.SyncService
                         PrimaryKey = obj.MobilePrimaryKey,
                         SerializedObject = serializedCurrent,
                     });
-                });
-                var obj2 = (IRealmSyncObjectClient)realm.Find(className, obj.MobilePrimaryKey);
-                realm.Write(() =>
-                {
-                    try
+
+                    realmSyncData.Add(new ObjectSyncStatusRealm()
                     {
-                        obj2.LastSynchronizedVersion = serializedCurrent;
-                    }
-                    catch (Exception ex)
-                    {
-                        //Console.WriteLine(ex.ToString());
-                    }
+                        Type = className,
+                        MobilePrimaryKey = obj.MobilePrimaryKey,
+                        SerializedObject = serializedCurrent,
+                    });
                 });
             }
 
@@ -128,7 +128,9 @@ namespace RealmSync.SyncService
             {
                 var obj = (IRealmSyncObjectClient)sender[changesModifiedIndex];
                 var serializedCurrent = JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
-                var serializedDiff = JsonHelper.GetJsonDiff(obj.LastSynchronizedVersion ?? "{}", serializedCurrent);
+                var syncStatusObject = realmSyncData.Find<ObjectSyncStatusRealm>(obj.MobilePrimaryKey);
+
+                var serializedDiff = JsonHelper.GetJsonDiff(syncStatusObject.SerializedObject ?? "{}", serializedCurrent);
                 if (serializedDiff != "{}")
                 {
                     var className = obj.GetType().Name;
@@ -142,17 +144,9 @@ namespace RealmSync.SyncService
                             SerializedObject = serializedDiff,
                         });
                     });
-                    var obj2 = (IRealmSyncObjectClient)realm.Find(className, obj.MobilePrimaryKey);
-                    realm.Write(() =>
+                    realmSyncData.Write(() =>
                     {
-                        try
-                        {
-                            obj2.LastSynchronizedVersion = serializedCurrent;
-                        }
-                        catch (Exception ex)
-                        {
-                            //Console.WriteLine(ex.ToString());
-                        }
+                        syncStatusObject.SerializedObject = serializedCurrent;
                     });
                 }
             }
@@ -193,32 +187,32 @@ namespace RealmSync.SyncService
                 {
                     var result = await _apiClient.UploadData(changes);
 
-                    realm.Write(() =>
+                    foreach (var realmSyncObject in result.Results)
                     {
-                        foreach (var realmSyncObject in result.Results)
-                        {
-                            var obj = (IRealmSyncObjectClient)realm.Find(realmSyncObject.Type, realmSyncObject.MobilePrimaryKey);
-							realmSyncData.Write(() =>
-							{
-								realmSyncData.Remove(objectsToUpload[realmSyncObject.MobilePrimaryKey]);
-							});
-                            obj.SetSyncState(SyncState.Synced);
-                            //if (obj.DateTime > sendObjectsTime)
-                            //{
-                            //    //object has changed since we sent the result, will not change the SyncState
-                            //}
-                            //else
-                            //{
+                        var syncStateObject =
+                            realmSyncData.Find<ObjectSyncStatusRealm>(realmSyncObject.MobilePrimaryKey);
 
-                            //    obj.SetSyncState(SyncState.Synced);
-                            //}
-                        }
-                    });
+                        realmSyncData.Write(() =>
+                        {
+                            realmSyncData.Remove(objectsToUpload[realmSyncObject.MobilePrimaryKey]);
+                            syncStateObject.SetSyncState(SyncState.Synced);
+                        });
+
+                        //if (obj.DateTime > sendObjectsTime)
+                        //{
+                        //    //object has changed since we sent the result, will not change the SyncState
+                        //}
+                        //else
+                        //{
+
+                        //    obj.SetSyncState(SyncState.Synced);
+                        //}
+                    }
                     uploadSucceeeded = result.Results.Any();
                 }
                 catch (Exception ex)
                 {
-					Debug.WriteLine($"{ex}");
+                    Debug.WriteLine($"{ex}");
                 }
             }
             catch (Exception ex)
