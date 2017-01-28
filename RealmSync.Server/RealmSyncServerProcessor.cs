@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using RealmSync.SyncService;
 using System.Reflection;
+using RealmSync.Server.Models;
 
 namespace RealmSync.Server
 {
@@ -138,9 +139,9 @@ namespace RealmSync.Server
                 throw new Exception("Some types are not configured to be synced: " + string.Join(",", types));
             }
 
-            var context = new ChangeTrackingDbContext();
+            var context = new SyncStatusDbContext();
             var changes = context.SyncStatusServerObjects.AsNoTracking()
-                .Where(x => x.LastChange > request.LastChangeTime && types.Contains(x.Type));
+                .Where(x => x.LastChange > request.LastChangeTime && request.Types.Contains(x.Type));
 
             response.ChangedObjects.AddRange(changes.Select(x => new DownloadResponseItem()
             {

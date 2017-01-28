@@ -1,0 +1,78 @@
+﻿using System;
+using System.Data.Entity.Migrations;
+using System.Linq;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using NUnit.Framework;
+using RealmSync.Server;
+using RealmSync.Server.Models;
+using RealmSync.SyncService;
+using RealmTst.Controllers;
+using Z.EntityFramework.Plus;
+
+namespace UnitTestProject
+{
+    [TestFixture]
+    public class ChangeTrackingTests
+    {
+        private Func<LocalDbContext> _contextFunc;
+
+        public ChangeTrackingTests()
+        {
+            _contextFunc = () => new LocalDbContext();
+
+        }
+
+        [SetUp]
+        public void Setup()
+        {
+            _contextFunc().DbSyncObjects.Delete();
+            new SyncStatusDbContext().SyncStatusServerObjects.Delete();
+        }
+
+        [Test]
+        public void AddData()
+        {
+            new SyncStatusDbContext().SyncStatusServerObjects.Count().Should().Be(0);
+
+            var db = _contextFunc();
+            var obj = new DbSyncObject()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Text = "asd"
+            };
+            db.DbSyncObjects.Add(obj);
+            db.SaveChanges();
+
+            new SyncStatusDbContext().SyncStatusServerObjects.Count().Should().Be(1);
+            var syncObject = new SyncStatusDbContext().SyncStatusServerObjects.First();
+            var res = JsonConvert.DeserializeObject<DbSyncObject>(syncObject.SerializedObject);
+            res.MobilePrimaryKey.Should().Be(obj.Id);
+            res.Text.Should().Be("asd");
+        }
+
+        [Test]
+        public void UpdateData()
+        {
+            new SyncStatusDbContext().SyncStatusServerObjects.Count().Should().Be(0);
+
+            var db = _contextFunc();
+            var obj = new DbSyncObject()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Text = "asd"
+            };
+            db.DbSyncObjects.Add(obj);
+            db.SaveChanges();
+
+            obj.Text = "qwe";
+            db.SaveChanges();
+
+            new SyncStatusDbContext().SyncStatusServerObjects.Count().Should().Be(2);
+            var syncObject = new SyncStatusDbContext().SyncStatusServerObjects.ToList()[1];
+            syncObject.SerializedObject.Should().BeEquivalentTo("{\"Text\":\"qwe\"}");
+        }
+    }
+
+}

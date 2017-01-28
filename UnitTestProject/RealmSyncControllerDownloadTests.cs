@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using RealmSync.Server;
+using RealmSync.Server.Models;
 using RealmSync.SyncService;
 using RealmTst.Controllers;
 using Z.EntityFramework.Plus;
@@ -27,6 +28,7 @@ namespace UnitTestProject
         public void Setup()
         {
             _contextFunc().DbSyncObjects.Delete();
+            new SyncStatusDbContext().SyncStatusServerObjects.Delete();
         }
 
         [Test]

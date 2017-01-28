@@ -96,6 +96,7 @@
     <Compile Include="DbSyncObject.cs" />
     <Compile Include="LocalDbContext.cs" />
     <Compile Include="JsonHelperTests.cs" />
+    <Compile Include="ChangeTrackingTests.cs" />
     <Compile Include="RealmSyncControllerDownloadTests.cs" />
     <Compile Include="RealmSyncControllerUploadTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -118,6 +119,9 @@
       <Project>{9769C0B5-C2C1-4B12-92E3-98288BE1F77A}</Project>
       <Name>RealmWeb</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NewFolder1\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
