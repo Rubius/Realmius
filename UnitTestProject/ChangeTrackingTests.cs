@@ -47,7 +47,7 @@ namespace UnitTestProject
 
             new SyncStatusDbContext().SyncStatusServerObjects.Count().Should().Be(1);
             var syncObject = new SyncStatusDbContext().SyncStatusServerObjects.First();
-            var res = JsonConvert.DeserializeObject<DbSyncObject>(syncObject.SerializedObject);
+            var res = JsonConvert.DeserializeObject<DbSyncObject>(syncObject.ChangesAsJson);
             res.MobilePrimaryKey.Should().Be(obj.Id);
             res.Text.Should().Be("asd");
         }
@@ -71,7 +71,7 @@ namespace UnitTestProject
 
             new SyncStatusDbContext().SyncStatusServerObjects.Count().Should().Be(2);
             var syncObject = new SyncStatusDbContext().SyncStatusServerObjects.ToList()[1];
-            syncObject.SerializedObject.Should().BeEquivalentTo("{\"Text\":\"qwe\"}");
+            syncObject.ChangesAsJson.Should().BeEquivalentTo("{\"Text\":\"qwe\"}");
         }
     }
 

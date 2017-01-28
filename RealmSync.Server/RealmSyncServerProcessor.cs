@@ -147,7 +147,7 @@ namespace RealmSync.Server
             {
                 Type = x.Type,
                 MobilePrimaryKey = x.MobilePrimaryKey,
-                SerializedObject = x.SerializedObject,
+                SerializedObject = x.ChangesAsJson,
             }));
 
             //foreach (var typeName in request.Types)
@@ -165,7 +165,7 @@ namespace RealmSync.Server
             //        {
             //            Type = typeName,
             //            MobilePrimaryKey = realmSyncObject.MobilePrimaryKey,
-            //            SerializedObject = JsonConvert.SerializeObject(realmSyncObject),
+            //            ChangesAsJson = JsonConvert.SerializeObject(realmSyncObject),
             //        });
             //    }
             //}

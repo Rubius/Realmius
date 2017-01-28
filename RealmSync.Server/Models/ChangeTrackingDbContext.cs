@@ -43,7 +43,8 @@ namespace RealmSync.Server.Models
                         LastChange = DateTime.UtcNow,
                         Type = typeName,
                         MobilePrimaryKey = obj.MobilePrimaryKey,
-                        SerializedObject = JsonConvert.SerializeObject(diff),
+                        ChangesAsJson = JsonConvert.SerializeObject(diff),
+                        FullObjectAsJson = JsonConvert.SerializeObject(obj),
                     });
                 }
             }
@@ -60,7 +61,7 @@ namespace RealmSync.Server.Models
                         LastChange = DateTime.UtcNow,
                         Type = typeName,
                         MobilePrimaryKey = obj.MobilePrimaryKey,
-                        SerializedObject = JsonConvert.SerializeObject(obj),
+                        FullObjectAsJson = JsonConvert.SerializeObject(obj),
                     });
                 }
             }

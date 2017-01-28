@@ -13,6 +13,7 @@ namespace RealmSync.Server.Models
         public int Version { get; set; }
 
         public DateTimeOffset LastChange { get; set; }
-        public string SerializedObject { get; set; }
+        public string ChangesAsJson { get; set; }
+        public string FullObjectAsJson { get; set; }
     }
 }
