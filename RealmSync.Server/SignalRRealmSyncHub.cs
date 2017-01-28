@@ -9,21 +9,21 @@ using RealmSync.SyncService;
 
 namespace RealmSync.Server
 {
-
-    public class SignalRRealmSyncShareEverythingHub : SignalRRealmSyncHub<string>
+    public class SignalRRealmSyncShareEverythingHub : SignalRRealmSyncHub<SyncUser>
     {
         public SignalRRealmSyncShareEverythingHub(Func<DbContext> dbContextFactoryFunc, params Type[] syncedTypes) :
-            base(new RealmSyncServerProcessor<string>(dbContextFactoryFunc, syncedTypes))
+            base(new RealmSyncServerProcessor<SyncUser>(dbContextFactoryFunc, syncedTypes))
         {
         }
 
-        protected override string CreateUserInfo(HubCallerContext context)
+        protected override SyncUser CreateUserInfo(HubCallerContext context)
         {
-            return "";
+            return new SyncUser();
         }
     }
 
     public abstract class SignalRRealmSyncHub<TUser> : Hub
+        where TUser : ISyncUser
     {
         private readonly RealmSyncServerProcessor<TUser> _processor;
 

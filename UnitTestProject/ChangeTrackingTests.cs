@@ -47,7 +47,7 @@ namespace UnitTestProject
 
             new SyncStatusDbContext().SyncStatusServerObjects.Count().Should().Be(1);
             var syncObject = new SyncStatusDbContext().SyncStatusServerObjects.First();
-            var res = JsonConvert.DeserializeObject<DbSyncObject>(syncObject.ChangesAsJson);
+            var res = JsonConvert.DeserializeObject<DbSyncObject>(syncObject.FullObjectAsJson);
             res.MobilePrimaryKey.Should().Be(obj.Id);
             res.Text.Should().Be("asd");
         }

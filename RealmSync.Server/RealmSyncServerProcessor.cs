@@ -10,7 +10,7 @@ using RealmSync.Server.Models;
 
 namespace RealmSync.Server
 {
-    public class RealmSyncServerProcessor : RealmSyncServerProcessor<string>
+    public class RealmSyncServerProcessor : RealmSyncServerProcessor<ISyncUser>
     {
         public RealmSyncServerProcessor(Func<DbContext> dbContextFactoryFunc, params Type[] syncedTypes) : base(dbContextFactoryFunc, syncedTypes)
         {
@@ -18,6 +18,7 @@ namespace RealmSync.Server
     }
 
     public class RealmSyncServerProcessor<TUser>
+        where TUser : ISyncUser
     {
         private readonly Func<DbContext> _dbContextFactoryFunc;
         private readonly Dictionary<string, Type> _syncedTypes;
@@ -127,6 +128,8 @@ namespace RealmSync.Server
         public DownloadDataResponse Download(DownloadDataRequest request, TUser user)
         {
             //var ef = _dbContextFactoryFunc();
+            if (user == null)
+                throw new NullReferenceException("user arg cannot be null");
 
             var response = new DownloadDataResponse()
             {
@@ -141,7 +144,9 @@ namespace RealmSync.Server
 
             var context = new SyncStatusDbContext();
             var changes = context.SyncStatusServerObjects.AsNoTracking()
-                .Where(x => x.LastChange > request.LastChangeTime && request.Types.Contains(x.Type));
+                .Where(x => x.LastChange > request.LastChangeTime &&
+                request.Types.Contains(x.Type)
+                && (user.Tags.Contains(x.Tag0) || user.Tags.Contains(x.Tag1) || user.Tags.Contains(x.Tag2) || user.Tags.Contains(x.Tag3)));
 
             response.ChangedObjects.AddRange(changes.Select(x => new DownloadResponseItem()
             {
@@ -150,39 +155,8 @@ namespace RealmSync.Server
                 SerializedObject = x.ChangesAsJson,
             }));
 
-            //foreach (var typeName in request.Types)
-            //{
-            //    var type = _syncedTypes[typeName];
-
-            //    var setMethod = ef.GetType().GetMethod("Set", new Type[0]).MakeGenericMethod(type);
-            //    var dbSet = (IQueryable<IRealmSyncObjectServer>)setMethod.Invoke(ef, new object[] { });
-            //    //.AsNoTracking().Select(x => x);
-
-            //    var updatedItems = GetUpdatedItems(type, dbSet, request.LastChangeTime, user);
-            //    foreach (var realmSyncObject in updatedItems)
-            //    {
-            //        response.ChangedObjects.Add(new DownloadResponseItem()
-            //        {
-            //            Type = typeName,
-            //            MobilePrimaryKey = realmSyncObject.MobilePrimaryKey,
-            //            ChangesAsJson = JsonConvert.SerializeObject(realmSyncObject),
-            //        });
-            //    }
-            //}
-
             return response;
         }
-
-        ///// <summary>
-        ///// returns items of a given type that were updated since lastChanged
-        ///// </summary>
-        ///// <returns></returns>
-        //protected virtual IEnumerable<IRealmSyncObjectServer> GetUpdatedItems(Type type, IQueryable<IRealmSyncObjectServer> dbSet, DateTimeOffset lastChanged, TUser user)
-        //{
-        //    return dbSet.Where(x => x.LastChangeServer > lastChanged)
-        //        .OrderByDescending(x => x.LastChangeServer);
-        //}
-
 
         /// <summary>
         /// returns True if it's ok to save the object, False oterwise

@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ISyncUser.cs" />
     <Compile Include="Models\ChangeTrackingDbContext.cs" />
     <Compile Include="Models\IDbEntityWithVersionSupport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="SignalRRealmSyncHub.cs" />
     <Compile Include="Models\SyncStatusDbContext.cs" />
     <Compile Include="Models\SyncStatusServerObject.cs" />
+    <Compile Include="SyncUser.cs" />
     <Compile Include="UpdatedDataBatch.cs" />
     <Compile Include="UpdatedDataItem.cs" />
   </ItemGroup>
