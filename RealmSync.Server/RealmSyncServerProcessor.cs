@@ -12,7 +12,7 @@ namespace RealmSync.Server
 {
     public class RealmSyncServerProcessor : RealmSyncServerProcessor<ISyncUser>
     {
-        public RealmSyncServerProcessor(Func<DbContext> dbContextFactoryFunc,
+        public RealmSyncServerProcessor(Func<ChangeTrackingDbContext> dbContextFactoryFunc,
             IRealmSyncServerConfiguration<ISyncUser> configuration)
             : base(dbContextFactoryFunc, configuration)
         {
@@ -21,7 +21,7 @@ namespace RealmSync.Server
         /// <summary>
         /// this will all the types between all users!
         /// </summary>
-        public RealmSyncServerProcessor(Func<DbContext> dbContextFactoryFunc, Type typeToSync, params Type[] typesToSync)
+        public RealmSyncServerProcessor(Func<ChangeTrackingDbContext> dbContextFactoryFunc, Type typeToSync, params Type[] typesToSync)
             : base(dbContextFactoryFunc, new ShareEverythingRealmSyncServerConfiguration(typeToSync, typesToSync))
         {
         }
@@ -30,18 +30,18 @@ namespace RealmSync.Server
     public class RealmSyncServerProcessor<TUser>
         where TUser : ISyncUser
     {
-        private readonly Func<DbContext> _dbContextFactoryFunc;
+        private readonly Func<ChangeTrackingDbContext> _dbContextFactoryFunc;
         public IRealmSyncServerConfiguration<TUser> Configuration { get; }
         private readonly Dictionary<string, Type> _syncedTypes;
         private readonly JsonSerializer _serializer;
 
-        public event EventHandler<UpdatedDataBatch> DataUpdated;
-        protected virtual void OnDataUpdated(UpdatedDataBatch e)
-        {
-            DataUpdated?.Invoke(this, e);
-        }
+        //public event EventHandler<UpdatedDataBatch> DataUpdated;
+        //protected virtual void OnDataUpdated(UpdatedDataBatch e)
+        //{
+        //    DataUpdated?.Invoke(this, e);
+        //}
 
-        public RealmSyncServerProcessor(Func<DbContext> dbContextFactoryFunc, IRealmSyncServerConfiguration<TUser> configuration)
+        public RealmSyncServerProcessor(Func<ChangeTrackingDbContext> dbContextFactoryFunc, IRealmSyncServerConfiguration<TUser> configuration)
         {
             _dbContextFactoryFunc = dbContextFactoryFunc;
             Configuration = configuration;
@@ -59,7 +59,7 @@ namespace RealmSync.Server
         {
             var result = new UploadDataResponse();
 
-            var updatedResult = new UpdatedDataBatch();
+            //var updatedResult = new UpdatedDataBatch();
 
             var ef = _dbContextFactoryFunc();
             foreach (var item in request.ChangeNotifications)
@@ -107,16 +107,16 @@ namespace RealmSync.Server
                         }
                     }
 
-                    updatedResult.Items.Add(new UpdatedDataItem()
-                    {
-                        DeserializedObject = dbEntity,
-                        Change = new DownloadResponseItem()
-                        {
-                            MobilePrimaryKey = item.PrimaryKey,
-                            Type = item.Type,
-                            SerializedObject = item.SerializedObject,
-                        },
-                    });
+                    //updatedResult.Items.Add(new UpdatedDataItem()
+                    //{
+                    //    DeserializedObject = dbEntity,
+                    //    Change = new DownloadResponseItem()
+                    //    {
+                    //        MobilePrimaryKey = item.PrimaryKey,
+                    //        Type = item.Type,
+                    //        SerializedObject = item.SerializedObject,
+                    //    },
+                    //});
                 }
                 catch (Exception e)
                 {
@@ -130,7 +130,7 @@ namespace RealmSync.Server
             }
             ef.SaveChanges();
 
-            OnDataUpdated(updatedResult);
+            //OnDataUpdated(updatedResult);
 
             return result;
         }

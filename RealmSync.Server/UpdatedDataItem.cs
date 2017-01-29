@@ -1,10 +1,13 @@
-﻿using RealmSync.SyncService;
+﻿using System.Collections.Generic;
+using RealmSync.SyncService;
 
 namespace RealmSync.Server
 {
-    public class UpdatedDataItem
+    internal class UpdatedDataItem
     {
         public IRealmSyncObjectServer DeserializedObject { get; set; }
         public DownloadResponseItem Change { get; set; }
+        public IList<string> Tags { get; set; }
+
     }
 }

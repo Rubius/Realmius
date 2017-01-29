@@ -11,22 +11,39 @@ namespace RealmSync.Server.Models
 {
     public class ChangeTrackingDbContext : DbContext
     {
+        public static event EventHandler<UpdatedDataBatch> DataUpdated;
+        protected virtual void OnDataUpdated(UpdatedDataBatch e)
+        {
+            DataUpdated?.Invoke(this, e);
+        }
+
         private readonly IRealmSyncServerDbConfiguration _syncConfiguration;
         private readonly Dictionary<Type, string> _syncedTypes;
-        public ChangeTrackingDbContext(IRealmSyncServerDbConfiguration syncConfiguration)
+
+        public ChangeTrackingDbContext(string nameOrConnectionString, IRealmSyncServerDbConfiguration syncConfiguration)
         {
             _syncConfiguration = syncConfiguration;
             _syncedTypes = _syncConfiguration.TypesToSync.ToDictionary(x => x, x => x.Name);
+        }
+        public ChangeTrackingDbContext(IRealmSyncServerDbConfiguration syncConfiguration) : this(null, syncConfiguration)
+        {
         }
 
         /// <summary>
         /// this will share everything!
         /// </summary>
-        public ChangeTrackingDbContext(Type typeToSync, params Type[] typesToSync)
+        public ChangeTrackingDbContext(string nameOrConnectionString, Type typeToSync, params Type[] typesToSync)
         {
             _syncConfiguration = new ShareEverythingRealmSyncServerConfiguration(typeToSync, typesToSync);
             _syncedTypes = _syncConfiguration.TypesToSync.ToDictionary(x => x, x => x.Name);
         }
+        /// <summary>
+        /// this will share everything!
+        /// </summary>
+        public ChangeTrackingDbContext(Type typeToSync, params Type[] typesToSync) : this(null, typeToSync, typesToSync)
+        {
+        }
+
 
         protected virtual IList<string> GetTagsForObject(IRealmSyncObjectServer obj)
         {
@@ -41,6 +58,8 @@ namespace RealmSync.Server.Models
         protected virtual void ProcessChanges()
         {
             var syncStatusContext = new SyncStatusDbContext();
+
+            var updatedResult = new UpdatedDataBatch();
 
             foreach (var entity in ChangeTracker.Entries().Where(e => e.State == EntityState.Modified))
             {
@@ -64,6 +83,9 @@ namespace RealmSync.Server.Models
                     };
                     Process(syncObj, obj);
                     syncStatusContext.SyncStatusServerObjects.Add(syncObj);
+
+
+                    updatedResult.Items.Add(syncObj);
                 }
             }
 
@@ -75,9 +97,14 @@ namespace RealmSync.Server.Models
                     var syncObj = new SyncStatusServerObject();
                     Process(syncObj, obj);
                     syncStatusContext.SyncStatusServerObjects.Add(syncObj);
+
+                    updatedResult.Items.Add(syncObj);
                 }
             }
             syncStatusContext.SaveChanges();
+
+            if (updatedResult.Items.Count > 0)
+                OnDataUpdated(updatedResult);
         }
 
         protected virtual void Process(SyncStatusServerObject syncObj, IRealmSyncObjectServer obj)

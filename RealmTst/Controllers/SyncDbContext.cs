@@ -1,12 +1,13 @@
 ﻿using System.Data.Entity;
 using RealmSync.Model;
+using RealmSync.Server.Models;
 using RealmWeb.Migrations;
 
 //using RealmTst.Migrations;
 
 namespace RealmTst.Controllers
 {
-    public class SyncDbContext : DbContext
+    public class SyncDbContext : ChangeTrackingDbContext
     {
         static SyncDbContext()
         {
@@ -14,7 +15,7 @@ namespace RealmTst.Controllers
             //System.Data.Entity.Database.SetInitializer<SyncDbContext>(new DropCreateDatabaseAlways<SyncDbContext>());
         }
 
-        public SyncDbContext() : base("DefaultConnection")
+        public SyncDbContext() : base("DefaultConnection", typeof(ChatMessage))
         {
 
         }
