@@ -19,8 +19,6 @@ namespace RealmTst.Controllers
         {
 
         }
-        public DbSet<ChatMessage> ChatMessages { get; set; }
-        //public DbSet<ToDoItem> ToDoItems { get; set; }
-        //public DbSet<Project> Projects { get; set; }
+        public DbSet<ChatMessage> ChatMessages3 { get; set; }
     }
 }

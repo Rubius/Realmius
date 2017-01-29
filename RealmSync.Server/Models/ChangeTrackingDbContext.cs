@@ -116,10 +116,14 @@ namespace RealmSync.Server.Models
                     updatedResult.Items.Add(syncObj);
                 }
             }
-            syncStatusContext.SaveChanges();
+
 
             if (updatedResult.Items.Count > 0)
+            {
+                syncStatusContext.SaveChanges();
+
                 OnDataUpdated(updatedResult);
+            }
         }
 
         protected virtual void Process(SyncStatusServerObject syncObj, IRealmSyncObjectServer obj)

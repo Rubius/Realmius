@@ -2,6 +2,7 @@
 using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 using Owin;
+using RealmSync.Server.Models;
 using RealmTst.Controllers;
 
 [assembly: OwinStartupAttribute(typeof(RealmTst.Startup))]
@@ -25,7 +26,10 @@ namespace RealmTst
         private void WarmUpDatabase()
         {
             var db = new SyncDbContext();
-            var count = db.ChatMessages.Count();
+            var count = db.ChatMessages3.Count();
+
+            var syncStatus = new SyncStatusDbContext(db.Database.Connection.ConnectionString);
+            var count2 = syncStatus.SyncStatusServerObjects.Count();
         }
     }
 }

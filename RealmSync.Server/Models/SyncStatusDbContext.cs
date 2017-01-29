@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using RealmSync.Server.Migrations;
 
 namespace RealmSync.Server.Models
 {
@@ -8,7 +9,11 @@ namespace RealmSync.Server.Models
 
         static SyncStatusDbContext()
         {
-            Database.SetInitializer<SyncStatusDbContext>(new DropCreateDatabaseIfModelChanges<SyncStatusDbContext>());
+            Database.SetInitializer<SyncStatusDbContext>(new MigrateDatabaseToLatestVersion<SyncStatusDbContext, Configuration>(true));
+        }
+
+        public SyncStatusDbContext()
+        {
         }
 
         public SyncStatusDbContext(string connectionString) : base(connectionString)
