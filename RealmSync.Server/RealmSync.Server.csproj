@@ -69,7 +69,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ISyncUser.cs" />
+    <Compile Include="QuickStart\ShareEverythingRealmSyncServerConfiguration.cs" />
+    <Compile Include="ServerConfiguration\RealmSyncServerConfiguration.cs" />
+    <Compile Include="ServerConfiguration\IRealmSyncServerConfiguration.cs" />
+    <Compile Include="ServerConfiguration\ISyncUser.cs" />
     <Compile Include="Models\ChangeTrackingDbContext.cs" />
     <Compile Include="Models\IDbEntityWithVersionSupport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -77,7 +80,9 @@
     <Compile Include="SignalRRealmSyncHub.cs" />
     <Compile Include="Models\SyncStatusDbContext.cs" />
     <Compile Include="Models\SyncStatusServerObject.cs" />
-    <Compile Include="SyncUser.cs" />
+    <Compile Include="ServerConfiguration\SyncUserTagged.cs" />
+    <Compile Include="ServerConfiguration\SyncUser.cs" />
+    <Compile Include="QuickStart\SignalRRealmSyncShareEverythingHub.cs" />
     <Compile Include="UpdatedDataBatch.cs" />
     <Compile Include="UpdatedDataItem.cs" />
   </ItemGroup>
@@ -95,6 +100,7 @@
       <Name>RealmSync</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

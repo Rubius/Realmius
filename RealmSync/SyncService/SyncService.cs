@@ -23,6 +23,16 @@ namespace RealmSync.SyncService
             return _realmFactoryMethod().Find<ObjectSyncStatusRealm>(mobilePrimaryKey).GetSyncState();
         }
 
+        public SyncState GetFileSyncState(string mobilePrimaryKey)
+        {
+            return SyncState.Unsynced;
+        }
+
+        public void QueueFileUpload(UploadFileInfo fileInfo)
+        {
+            throw new NotImplementedException();
+        }
+
         private SyncConfiguration _syncOptions;
 
         public RealmSyncService(Func<Realm> realmFactoryMethod, IApiClient apiClient, params Type[] typesToSync)

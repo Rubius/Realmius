@@ -16,10 +16,12 @@ namespace UnitTestProject
     public class RealmSyncControllerUploadTests
     {
         private Func<LocalDbContext> _contextFunc;
+        private ShareEverythingRealmSyncServerConfiguration _config;
 
         public RealmSyncControllerUploadTests()
         {
-            _contextFunc = () => new LocalDbContext();
+            _config = new ShareEverythingRealmSyncServerConfiguration(typeof(DbSyncObject));
+            _contextFunc = () => new LocalDbContext(_config);
 
         }
 
@@ -32,7 +34,7 @@ namespace UnitTestProject
         [Test]
         public void UnknownType_Exception()
         {
-            var controller = new RealmSyncServerProcessor(() => new LocalDbContext(), typeof(UnknownSyncObject));
+            var controller = new RealmSyncServerProcessor(_contextFunc, new ShareEverythingRealmSyncServerConfiguration(typeof(UnknownSyncObject)));
             var result = controller.Upload(new UploadDataRequest()
             {
                 ChangeNotifications =
@@ -40,6 +42,7 @@ namespace UnitTestProject
                      new UploadRequestItem()
                      {
                          Type = "UnknownSyncObject",
+                         PrimaryKey = "123",
                          SerializedObject = JsonConvert.SerializeObject(new UnknownSyncObject()),
                      }
                 }
@@ -51,7 +54,7 @@ namespace UnitTestProject
         [Test]
         public void UnknownType_NotInDb_TypeDoesNotExist()
         {
-            var controller = new RealmSyncServerProcessor(_contextFunc);
+            var controller = new RealmSyncServerProcessor(_contextFunc, typeof(DbSyncObject));
             var result = controller.Upload(new UploadDataRequest()
             {
                 ChangeNotifications =
@@ -59,6 +62,7 @@ namespace UnitTestProject
                      new UploadRequestItem()
                      {
                          Type = "UnknownSyncObject",
+                         PrimaryKey = "123",
                          SerializedObject = JsonConvert.SerializeObject(new UnknownSyncObject()),
                      }
                 }

@@ -11,15 +11,26 @@ namespace RealmSync.Server.Models
 {
     public class ChangeTrackingDbContext : DbContext
     {
+        private readonly IRealmSyncServerDbConfiguration _syncConfiguration;
         private readonly Dictionary<Type, string> _syncedTypes;
-        public ChangeTrackingDbContext(Type[] syncedTypes)
+        public ChangeTrackingDbContext(IRealmSyncServerDbConfiguration syncConfiguration)
         {
-            _syncedTypes = syncedTypes.ToDictionary(x => x, x => x.Name);
+            _syncConfiguration = syncConfiguration;
+            _syncedTypes = _syncConfiguration.TypesToSync.ToDictionary(x => x, x => x.Name);
+        }
+
+        /// <summary>
+        /// this will share everything!
+        /// </summary>
+        public ChangeTrackingDbContext(Type typeToSync, params Type[] typesToSync)
+        {
+            _syncConfiguration = new ShareEverythingRealmSyncServerConfiguration(typeToSync, typesToSync);
+            _syncedTypes = _syncConfiguration.TypesToSync.ToDictionary(x => x, x => x.Name);
         }
 
         protected virtual IList<string> GetTagsForObject(IRealmSyncObjectServer obj)
         {
-            return new[] { "all" };
+            return _syncConfiguration.GetTagsForObject(obj);
         }
         public override int SaveChanges()
         {
@@ -27,7 +38,7 @@ namespace RealmSync.Server.Models
             return base.SaveChanges();
         }
 
-        private void ProcessChanges()
+        protected virtual void ProcessChanges()
         {
             var syncStatusContext = new SyncStatusDbContext();
 
@@ -60,12 +71,8 @@ namespace RealmSync.Server.Models
             {
                 if (_syncedTypes.ContainsKey(entity.Entity.GetType()))
                 {
-
-
                     var obj = (IRealmSyncObjectServer)entity.Entity;
-                    var syncObj = new SyncStatusServerObject()
-                    {
-                    };
+                    var syncObj = new SyncStatusServerObject();
                     Process(syncObj, obj);
                     syncStatusContext.SyncStatusServerObjects.Add(syncObj);
                 }
@@ -73,7 +80,7 @@ namespace RealmSync.Server.Models
             syncStatusContext.SaveChanges();
         }
 
-        private void Process(SyncStatusServerObject syncObj, IRealmSyncObjectServer obj)
+        protected virtual void Process(SyncStatusServerObject syncObj, IRealmSyncObjectServer obj)
         {
             var typeName = obj.GetType().Name;
             var tags = GetTagsForObject(obj);

@@ -62,6 +62,7 @@
     <Compile Include="SyncService\ApiClient\Models\UploadDataResponseItem.cs" />
     <Compile Include="SyncService\SyncConfiguration.cs" />
     <Compile Include="Infrastructure\Timer.cs" />
+    <Compile Include="SyncService\UploadFileInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="DotNetCross.Memory.Unsafe, Version=0.2.2.0, Culture=neutral, processorArchitecture=MSIL">

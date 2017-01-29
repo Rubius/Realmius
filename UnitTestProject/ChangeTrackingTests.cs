@@ -17,10 +17,12 @@ namespace UnitTestProject
     public class ChangeTrackingTests
     {
         private Func<LocalDbContext> _contextFunc;
+        private ShareEverythingRealmSyncServerConfiguration _config;
 
         public ChangeTrackingTests()
         {
-            _contextFunc = () => new LocalDbContext();
+            _config = new ShareEverythingRealmSyncServerConfiguration(typeof(DbSyncObject));
+            _contextFunc = () => new LocalDbContext(_config);
 
         }
 

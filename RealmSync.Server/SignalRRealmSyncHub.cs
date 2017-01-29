@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
@@ -9,19 +8,6 @@ using RealmSync.SyncService;
 
 namespace RealmSync.Server
 {
-    public class SignalRRealmSyncShareEverythingHub : SignalRRealmSyncHub<SyncUser>
-    {
-        public SignalRRealmSyncShareEverythingHub(Func<DbContext> dbContextFactoryFunc, params Type[] syncedTypes) :
-            base(new RealmSyncServerProcessor<SyncUser>(dbContextFactoryFunc, syncedTypes))
-        {
-        }
-
-        protected override SyncUser CreateUserInfo(HubCallerContext context)
-        {
-            return new SyncUser();
-        }
-    }
-
     public abstract class SignalRRealmSyncHub<TUser> : Hub
         where TUser : ISyncUser
     {
@@ -30,28 +16,28 @@ namespace RealmSync.Server
         protected SignalRRealmSyncHub(RealmSyncServerProcessor<TUser> processor)
         {
             _processor = processor;
-            _processor.DataUpdated += (sender, request) =>
-            {
-                foreach (var connectionInfo in _connections)
-                {
-                    var download = new DownloadDataResponse()
-                    {
-                    };
+            //_processor.DataUpdated += (sender, request) =>
+            //{
+            //    foreach (var connectionInfo in _connections)
+            //    {
+            //        var download = new DownloadDataResponse()
+            //        {
+            //        };
 
-                    var userConnection = this.Clients.User(connectionInfo.Key);
-                    var userData = connectionInfo.Value;
+            //        var userConnection = this.Clients.User(connectionInfo.Key);
+            //        var userData = connectionInfo.Value;
 
-                    foreach (var item in request.Items)
-                    {
-                        if (_processor.UserHasAccessToObject(item.DeserializedObject, userData))
-                            download.ChangedObjects.Add(item.Change);
-                    }
-                    download.LastChange = DateTimeOffset.UtcNow;
+            //        foreach (var item in request.Items)
+            //        {
+            //            if (_processor.UserHasAccessToObject(item.DeserializedObject, userData))
+            //                download.ChangedObjects.Add(item.Change);
+            //        }
+            //        download.LastChange = DateTimeOffset.UtcNow;
 
-                    userConnection.DataDownloaded(download);
-                }
+            //        userConnection.DataDownloaded(download);
+            //    }
 
-            };
+            //};
         }
         public UploadDataResponse UploadData(UploadDataRequest request)
         {

@@ -97,6 +97,7 @@
     <Compile Include="LocalDbContext.cs" />
     <Compile Include="JsonHelperTests.cs" />
     <Compile Include="ChangeTrackingTests.cs" />
+    <Compile Include="TagsRealmSyncControllerDownloadTests.cs" />
     <Compile Include="RealmSyncControllerDownloadTests.cs" />
     <Compile Include="RealmSyncControllerUploadTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

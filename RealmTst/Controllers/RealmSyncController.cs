@@ -14,7 +14,7 @@ namespace RealmTst.Controllers
 
         public RealmSyncController()
         {
-            _sync = new RealmSyncServerProcessor(() => new SyncDbContext(), typeof(ChatMessage));
+            _sync = new RealmSyncServerProcessor(() => new SyncDbContext(), new ShareEverythingRealmSyncServerConfiguration(typeof(ChatMessage)));
         }
 
         [Route("realmupload")]

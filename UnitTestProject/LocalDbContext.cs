@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using RealmSync.Server;
 using RealmSync.Server.Models;
 
 namespace UnitTestProject
@@ -10,10 +11,10 @@ namespace UnitTestProject
             Database.SetInitializer<LocalDbContext>(new DropCreateDatabaseAlways<LocalDbContext>());
         }
 
-        public LocalDbContext() : base(new[] { typeof(DbSyncObject) })
+        public LocalDbContext(IRealmSyncServerDbConfiguration config) : base(config)
         {
-
         }
+
         public DbSet<DbSyncObject> DbSyncObjects { get; set; }
     }
 }

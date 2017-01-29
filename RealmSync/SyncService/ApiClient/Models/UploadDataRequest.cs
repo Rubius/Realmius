@@ -4,7 +4,7 @@ namespace RealmSync.SyncService
 {
     public class UploadDataRequest
     {
-        public List<UploadRequestItem> ChangeNotifications { get; set; }
+        public IList<UploadRequestItem> ChangeNotifications { get; set; }
 
         public UploadDataRequest()
         {

@@ -6,5 +6,8 @@ namespace RealmSync.SyncService
     {
         Uri ServerUri { get; set; }
         SyncState GetSyncState(string mobilePrimaryKey);
+
+        SyncState GetFileSyncState(string mobilePrimaryKey);
+        void QueueFileUpload(UploadFileInfo fileInfo);
     }
 }

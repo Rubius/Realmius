@@ -12,7 +12,17 @@ namespace RealmSync.Server
 {
     public class RealmSyncServerProcessor : RealmSyncServerProcessor<ISyncUser>
     {
-        public RealmSyncServerProcessor(Func<DbContext> dbContextFactoryFunc, params Type[] syncedTypes) : base(dbContextFactoryFunc, syncedTypes)
+        public RealmSyncServerProcessor(Func<DbContext> dbContextFactoryFunc,
+            IRealmSyncServerConfiguration<ISyncUser> configuration)
+            : base(dbContextFactoryFunc, configuration)
+        {
+        }
+
+        /// <summary>
+        /// this will all the types between all users!
+        /// </summary>
+        public RealmSyncServerProcessor(Func<DbContext> dbContextFactoryFunc, Type typeToSync, params Type[] typesToSync)
+            : base(dbContextFactoryFunc, new ShareEverythingRealmSyncServerConfiguration(typeToSync, typesToSync))
         {
         }
     }
@@ -21,6 +31,7 @@ namespace RealmSync.Server
         where TUser : ISyncUser
     {
         private readonly Func<DbContext> _dbContextFactoryFunc;
+        public IRealmSyncServerConfiguration<TUser> Configuration { get; }
         private readonly Dictionary<string, Type> _syncedTypes;
         private readonly JsonSerializer _serializer;
 
@@ -30,10 +41,11 @@ namespace RealmSync.Server
             DataUpdated?.Invoke(this, e);
         }
 
-        public RealmSyncServerProcessor(Func<DbContext> dbContextFactoryFunc, params Type[] syncedTypes)
+        public RealmSyncServerProcessor(Func<DbContext> dbContextFactoryFunc, IRealmSyncServerConfiguration<TUser> configuration)
         {
             _dbContextFactoryFunc = dbContextFactoryFunc;
-            _syncedTypes = syncedTypes.ToDictionary(x => x.Name, x => x);
+            Configuration = configuration;
+            _syncedTypes = Configuration.TypesToSync.ToDictionary(x => x.Name, x => x);
             var syncObjectInterface = typeof(IRealmSyncObjectServer);
             foreach (var type in _syncedTypes.Values)
             {
@@ -57,9 +69,7 @@ namespace RealmSync.Server
                 try
                 {
                     var type = _syncedTypes[item.Type];
-                    objectInfo = new UploadDataResponseItem(item.PrimaryKey, item.Type)
-                    {
-                    };
+                    objectInfo = new UploadDataResponseItem(item.PrimaryKey, item.Type);
                     result.Results.Add(objectInfo);
 
                     var dbSet = ef.Set(type);
@@ -164,16 +174,7 @@ namespace RealmSync.Server
         /// <returns></returns>
         protected virtual bool CheckAndProcess(IRealmSyncObjectServer deserialized, TUser user)
         {
-            return true;
-        }
-
-        /// <summary>
-        /// returns True if the user has access to the passed object, otherwise false
-        /// </summary>
-        /// <returns></returns>
-        public virtual bool UserHasAccessToObject(IRealmSyncObjectServer deserialized, TUser user)
-        {
-            return true;
+            return Configuration.CheckAndProcess(deserialized, user);
         }
 
     }
