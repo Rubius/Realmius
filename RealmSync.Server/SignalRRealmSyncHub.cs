@@ -47,17 +47,32 @@ namespace RealmSync.Server
             }
         }
 
-        private readonly static Dictionary<string, TUser> _connections = new Dictionary<string, TUser>();
+        private static readonly Dictionary<string, TUser> _connections = new Dictionary<string, TUser>();
         public override Task OnConnected()
+        {
+            UserConnected();
+
+            return base.OnConnected();
+        }
+
+        protected virtual void UserConnected()
         {
             var user = CreateUserInfo(Context);
             _connections[Context.ConnectionId] = user;
+
+            var lastDownload = Context.QueryString[Constants.LastDownloadParameterName];
+            var types = Context.QueryString[Constants.SyncTypesParameterName];
+            var data = _processor.Download(new DownloadDataRequest()
+            {
+                LastChangeTime = DateTimeOffset.Parse(lastDownload),
+                Types = types.Split(','),
+            }, user);
+            Clients.Caller.DataDownloaded(data);
+
             foreach (var userTag in user.Tags)
             {
                 this.Groups.Add(Context.ConnectionId, userTag);
             }
-
-            return base.OnConnected();
         }
 
         public override Task OnDisconnected(bool stopCalled)
@@ -69,11 +84,11 @@ namespace RealmSync.Server
             return base.OnDisconnected(stopCalled);
         }
 
-        public override Task OnReconnected()
+        public override async Task OnReconnected()
         {
-            _connections[Context.ConnectionId] = CreateUserInfo(Context);
+            UserConnected();
 
-            return base.OnReconnected();
+            await base.OnReconnected();
         }
 
         protected override void Dispose(bool disposing)

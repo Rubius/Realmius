@@ -46,7 +46,7 @@ namespace UnitTestProject
         public void Setup()
         {
             _contextFunc().DbSyncObjects.Delete();
-            new SyncStatusDbContext().SyncStatusServerObjects.Delete();
+            new SyncStatusDbContext(_contextFunc().Database.Connection.ConnectionString).SyncStatusServerObjects.Delete();
             _processor = new RealmSyncServerProcessor(_contextFunc, _config);
         }
 

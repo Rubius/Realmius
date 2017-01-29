@@ -11,8 +11,8 @@ namespace RealmTst.Controllers
     {
         static SyncDbContext()
         {
-            System.Data.Entity.Database.SetInitializer<SyncDbContext>(new MigrateDatabaseToLatestVersion<SyncDbContext, Configuration>());
-            //System.Data.Entity.Database.SetInitializer<SyncDbContext>(new DropCreateDatabaseAlways<SyncDbContext>());
+            //System.Data.Entity.Database.SetInitializer<SyncDbContext>(new MigrateDatabaseToLatestVersion<SyncDbContext, Configuration>());
+            System.Data.Entity.Database.SetInitializer<SyncDbContext>(new DropCreateDatabaseAlways<SyncDbContext>());
         }
 
         public SyncDbContext() : base("DefaultConnection", typeof(ChatMessage))

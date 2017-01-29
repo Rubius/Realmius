@@ -34,12 +34,7 @@ namespace RealmSync.Server
         public IRealmSyncServerConfiguration<TUser> Configuration { get; }
         private readonly Dictionary<string, Type> _syncedTypes;
         private readonly JsonSerializer _serializer;
-
-        //public event EventHandler<UpdatedDataBatch> DataUpdated;
-        //protected virtual void OnDataUpdated(UpdatedDataBatch e)
-        //{
-        //    DataUpdated?.Invoke(this, e);
-        //}
+        private string _connectionString;
 
         public RealmSyncServerProcessor(Func<ChangeTrackingDbContext> dbContextFactoryFunc, IRealmSyncServerConfiguration<TUser> configuration)
         {
@@ -53,6 +48,9 @@ namespace RealmSync.Server
                     throw new InvalidOperationException($"Type {type} does not implement IRealmSyncObjectServer, unable to continue");
             }
             _serializer = new JsonSerializer();
+
+            _connectionString = dbContextFactoryFunc().Database.Connection.ConnectionString;
+
         }
 
         public UploadDataResponse Upload(UploadDataRequest request, TUser user)
@@ -137,7 +135,7 @@ namespace RealmSync.Server
 
         public DownloadDataResponse Download(DownloadDataRequest request, TUser user)
         {
-            //var ef = _dbContextFactoryFunc();
+            var ef = _dbContextFactoryFunc();
             if (user == null)
                 throw new NullReferenceException("user arg cannot be null");
 
@@ -152,7 +150,7 @@ namespace RealmSync.Server
                 throw new Exception("Some types are not configured to be synced: " + string.Join(",", types));
             }
 
-            var context = new SyncStatusDbContext();
+            var context = new SyncStatusDbContext(_connectionString);
             var changes = context.SyncStatusServerObjects.AsNoTracking()
                 .Where(x => x.LastChange > request.LastChangeTime &&
                 request.Types.Contains(x.Type)

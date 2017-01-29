@@ -18,11 +18,13 @@ namespace UnitTestProject
     {
         private Func<LocalDbContext> _contextFunc;
         private ShareEverythingRealmSyncServerConfiguration _config;
+        private Func<SyncStatusDbContext> _syncContextFunc;
 
         public ChangeTrackingTests()
         {
             _config = new ShareEverythingRealmSyncServerConfiguration(typeof(DbSyncObject));
             _contextFunc = () => new LocalDbContext(_config);
+            _syncContextFunc = () => new SyncStatusDbContext(_contextFunc().Database.Connection.ConnectionString);
 
         }
 
@@ -30,13 +32,14 @@ namespace UnitTestProject
         public void Setup()
         {
             _contextFunc().DbSyncObjects.Delete();
-            new SyncStatusDbContext().SyncStatusServerObjects.Delete();
+
+            _syncContextFunc().SyncStatusServerObjects.Delete();
         }
 
         [Test]
         public void AddData()
         {
-            new SyncStatusDbContext().SyncStatusServerObjects.Count().Should().Be(0);
+            _syncContextFunc().SyncStatusServerObjects.Count().Should().Be(0);
 
             var db = _contextFunc();
             var obj = new DbSyncObject()
@@ -47,8 +50,8 @@ namespace UnitTestProject
             db.DbSyncObjects.Add(obj);
             db.SaveChanges();
 
-            new SyncStatusDbContext().SyncStatusServerObjects.Count().Should().Be(1);
-            var syncObject = new SyncStatusDbContext().SyncStatusServerObjects.First();
+            _syncContextFunc().SyncStatusServerObjects.Count().Should().Be(1);
+            var syncObject = _syncContextFunc().SyncStatusServerObjects.First();
             var res = JsonConvert.DeserializeObject<DbSyncObject>(syncObject.FullObjectAsJson);
             res.MobilePrimaryKey.Should().Be(obj.Id);
             res.Text.Should().Be("asd");
@@ -57,7 +60,7 @@ namespace UnitTestProject
         [Test]
         public void UpdateData()
         {
-            new SyncStatusDbContext().SyncStatusServerObjects.Count().Should().Be(0);
+            _syncContextFunc().SyncStatusServerObjects.Count().Should().Be(0);
 
             var db = _contextFunc();
             var obj = new DbSyncObject()
@@ -71,8 +74,8 @@ namespace UnitTestProject
             obj.Text = "qwe";
             db.SaveChanges();
 
-            new SyncStatusDbContext().SyncStatusServerObjects.Count().Should().Be(2);
-            var syncObject = new SyncStatusDbContext().SyncStatusServerObjects.ToList()[1];
+            _syncContextFunc().SyncStatusServerObjects.Count().Should().Be(2);
+            var syncObject = _syncContextFunc().SyncStatusServerObjects.ToList()[1];
             syncObject.ChangesAsJson.Should().BeEquivalentTo("{\"Text\":\"qwe\"}");
         }
     }

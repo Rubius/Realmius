@@ -17,31 +17,45 @@ namespace RealmSync.Server.Models
             DataUpdated?.Invoke(this, e);
         }
 
-        private readonly IRealmSyncServerDbConfiguration _syncConfiguration;
-        private readonly Dictionary<Type, string> _syncedTypes;
+        private IRealmSyncServerDbConfiguration _syncConfiguration;
+        private Dictionary<Type, string> _syncedTypes;
 
         public ChangeTrackingDbContext(string nameOrConnectionString, IRealmSyncServerDbConfiguration syncConfiguration)
+            : base(nameOrConnectionString)
         {
-            _syncConfiguration = syncConfiguration;
-            _syncedTypes = _syncConfiguration.TypesToSync.ToDictionary(x => x, x => x.Name);
+            Initialize(syncConfiguration);
         }
-        public ChangeTrackingDbContext(IRealmSyncServerDbConfiguration syncConfiguration) : this(null, syncConfiguration)
+        public ChangeTrackingDbContext(IRealmSyncServerDbConfiguration syncConfiguration)
         {
+            Initialize(syncConfiguration);
         }
 
         /// <summary>
         /// this will share everything!
         /// </summary>
         public ChangeTrackingDbContext(string nameOrConnectionString, Type typeToSync, params Type[] typesToSync)
+            : base(nameOrConnectionString)
         {
-            _syncConfiguration = new ShareEverythingRealmSyncServerConfiguration(typeToSync, typesToSync);
-            _syncedTypes = _syncConfiguration.TypesToSync.ToDictionary(x => x, x => x.Name);
+            Initialize(typeToSync, typesToSync);
         }
         /// <summary>
         /// this will share everything!
         /// </summary>
-        public ChangeTrackingDbContext(Type typeToSync, params Type[] typesToSync) : this(null, typeToSync, typesToSync)
+        public ChangeTrackingDbContext(Type typeToSync, params Type[] typesToSync)
         {
+            Initialize(typeToSync, typesToSync);
+        }
+
+        private void Initialize(Type typeToSync, Type[] typesToSync)
+        {
+            var syncConfiguration = new ShareEverythingRealmSyncServerConfiguration(typeToSync, typesToSync);
+            Initialize(syncConfiguration);
+        }
+
+        private void Initialize(IRealmSyncServerDbConfiguration syncConfiguration)
+        {
+            _syncConfiguration = syncConfiguration;
+            _syncedTypes = _syncConfiguration.TypesToSync.ToDictionary(x => x, x => x.Name);
         }
 
 
@@ -57,7 +71,8 @@ namespace RealmSync.Server.Models
 
         protected virtual void ProcessChanges()
         {
-            var syncStatusContext = new SyncStatusDbContext();
+            var connectionString = this.Database.Connection.ConnectionString;
+            var syncStatusContext = new SyncStatusDbContext(connectionString);
 
             var updatedResult = new UpdatedDataBatch();
 

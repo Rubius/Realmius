@@ -243,10 +243,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201701140912240_Init.cs" />
-    <Compile Include="Migrations\201701140912240_Init.Designer.cs">
-      <DependentUpon>201701140912240_Init.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -339,11 +335,6 @@
       <Project>{b1651a06-7cec-4529-b8ee-e594d26a62d3}</Project>
       <Name>RealmSync</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201701140912240_Init.resx">
-      <DependentUpon>201701140912240_Init.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

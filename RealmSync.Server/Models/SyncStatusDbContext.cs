@@ -10,5 +10,9 @@ namespace RealmSync.Server.Models
         {
             Database.SetInitializer<SyncStatusDbContext>(new DropCreateDatabaseIfModelChanges<SyncStatusDbContext>());
         }
+
+        public SyncStatusDbContext(string connectionString) : base(connectionString)
+        {
+        }
     }
 }
