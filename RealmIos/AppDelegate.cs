@@ -14,7 +14,7 @@ namespace RealmIos
 	{
 		// class-level declarations
 
-		public static RealmSyncService RealmSync;
+		public static IRealmSyncService RealmSync;
 		public static Realm Realm;
 		public override UIWindow Window
 		{
@@ -28,7 +28,9 @@ namespace RealmIos
 			// If not required for your application you can safely delete this method
 			var config = new RealmConfiguration()
 			{
-				SchemaVersion = 2,
+				SchemaVersion = 3,
+				MigrationCallback = (migration, oldSchemaVersion) => {
+				},
 			};
 			Realm = Realm.GetInstance(config);
 			//RealmSync = SyncServiceFactory.CreateUsingPolling(()=>Realm.GetInstance(config), new System.Uri("http://192.168.38.1:44980/realmupload")
