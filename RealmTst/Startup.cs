@@ -26,7 +26,7 @@ namespace RealmTst
         private void WarmUpDatabase()
         {
             var db = new SyncDbContext();
-            var count = db.ChatMessages3.Count();
+            var count = db.ChatMessages.Count();
 
             var syncStatus = new SyncStatusDbContext(db.Database.Connection.ConnectionString);
             var count2 = syncStatus.SyncStatusServerObjects.Count();

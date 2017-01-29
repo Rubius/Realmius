@@ -11,14 +11,14 @@ namespace RealmTst.Controllers
     {
         static SyncDbContext()
         {
-            //System.Data.Entity.Database.SetInitializer<SyncDbContext>(new MigrateDatabaseToLatestVersion<SyncDbContext, Configuration>());
-            System.Data.Entity.Database.SetInitializer<SyncDbContext>(new DropCreateDatabaseAlways<SyncDbContext>());
+            System.Data.Entity.Database.SetInitializer<SyncDbContext>(new MigrateDatabaseToLatestVersion<SyncDbContext, Configuration>());
+            //System.Data.Entity.Database.SetInitializer<SyncDbContext>(new DropCreateDatabaseAlways<SyncDbContext>());
         }
 
         public SyncDbContext() : base("DefaultConnection", typeof(ChatMessage))
         {
 
         }
-        public DbSet<ChatMessage> ChatMessages3 { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
     }
 }
