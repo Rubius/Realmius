@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Realms;
@@ -13,8 +15,8 @@ namespace RealmSync.SyncService
     {
         private class TypeInfo
         {
-            public Type Type { get; set; }
-            public bool ImplementsSyncState { get; set; }
+            public Type Type { get; private set; }
+            public bool ImplementsSyncState { get; private set; }
 
             private static Type syncObjectWithSyncStatusInterface = typeof(IRealmSyncObjectWithSyncStatusClient);
             public TypeInfo(Type type)
@@ -30,6 +32,20 @@ namespace RealmSync.SyncService
 
         private JsonSerializerSettings _jsonSerializerSettings;
 
+        private bool _uploadInProgress1;
+        public bool UploadInProgress
+        {
+            get { return _uploadInProgress1; }
+            private set
+            {
+                if (_uploadInProgress1 == value)
+                    return;
+
+                _uploadInProgress1 = value;
+                OnPropertyChanged();
+            }
+        }
+
         public Uri ServerUri { get; set; }
         public SyncState GetSyncState(string mobilePrimaryKey)
         {
@@ -39,11 +55,6 @@ namespace RealmSync.SyncService
         public SyncState GetFileSyncState(string mobilePrimaryKey)
         {
             return SyncState.Unsynced;
-        }
-
-        public void QueueFileUpload(UploadFileInfo fileInfo)
-        {
-
         }
 
         private SyncConfiguration _syncOptions;
@@ -126,11 +137,11 @@ namespace RealmSync.SyncService
             foreach (var changesInsertedIndex in changes.InsertedIndices)
             {
                 var obj = (IRealmSyncObjectClient)sender[changesInsertedIndex];
-                var serializedCurrent = JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
                 var className = obj.GetType().Name;
                 if (_typesToSync.ContainsKey(className))
                     continue;
 
+                var serializedCurrent = JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
                 realmSyncData.Write(() =>
                 {
                     realmSyncData.Add(new UploadRequestItemRealm()
@@ -155,12 +166,13 @@ namespace RealmSync.SyncService
             foreach (var changesModifiedIndex in changes.ModifiedIndices)
             {
                 var obj = (IRealmSyncObjectClient)sender[changesModifiedIndex];
-                var serializedCurrent = JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
-                var syncStatusObject = realmSyncData.Find<ObjectSyncStatusRealm>(obj.MobilePrimaryKey);
-
                 var className = obj.GetType().Name;
                 if (_typesToSync.ContainsKey(className))
                     continue;
+
+
+                var serializedCurrent = JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
+                var syncStatusObject = realmSyncData.Find<ObjectSyncStatusRealm>(obj.MobilePrimaryKey);
 
                 var serializedDiff = JsonHelper.GetJsonDiff(syncStatusObject.SerializedObject ?? "{}", serializedCurrent);
                 if (serializedDiff != "{}")
@@ -213,9 +225,14 @@ namespace RealmSync.SyncService
                 var objectsToUpload = GetObjectsToUpload().Take(10).ToDictionary(x => x.PrimaryKey, x => x);
 
                 if (objectsToUpload.Count == 0)
+                {
+                    UploadInProgress = false;
                     return;
+                }
 
-                var sendObjectsTime = DateTime.Now;
+                UploadInProgress = true;
+
+                //var sendObjectsTime = DateTime.Now;
                 var changes = new UploadDataRequest();
                 foreach (UploadRequestItemRealm uploadRequestItemRealm in objectsToUpload.Values)
                 {
@@ -332,6 +349,12 @@ namespace RealmSync.SyncService
         public void Dispose()
         {
             _apiClient.NewDataDownloaded -= HandleDownloadedData;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
