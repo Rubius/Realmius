@@ -44,6 +44,7 @@
     <Compile Include="SyncService\ApiClient\Models\DownloadDataRequest.cs" />
     <Compile Include="SyncService\ApiClient\Models\DownloadDataResponse.cs" />
     <Compile Include="SyncService\ApiClient\Models\DownloadResponseItem.cs" />
+    <Compile Include="SyncService\IRealmSyncObjectWithSyncStatusClient.cs" />
     <Compile Include="SyncService\IRealmSyncService.cs" />
     <Compile Include="SyncService\RealmModels\UploadRequestItemRealm.cs" />
     <Compile Include="SyncService\RealmModels\ObjectSyncStatusRealm.cs" />

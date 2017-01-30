@@ -11,8 +11,21 @@ namespace RealmSync.SyncService
 {
     public class RealmSyncService : IRealmSyncService
     {
+        private class TypeInfo
+        {
+            public Type Type { get; set; }
+            public bool ImplementsSyncState { get; set; }
+
+            private static Type syncObjectWithSyncStatusInterface = typeof(IRealmSyncObjectWithSyncStatusClient);
+            public TypeInfo(Type type)
+            {
+                Type = type;
+                ImplementsSyncState =
+                    syncObjectWithSyncStatusInterface.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
+            }
+        }
         private readonly Func<Realm> _realmFactoryMethod;
-        private readonly Dictionary<string, Type> _typesToSync;
+        private readonly Dictionary<string, TypeInfo> _typesToSync;
         private IApiClient _apiClient;
 
         private JsonSerializerSettings _jsonSerializerSettings;
@@ -30,7 +43,7 @@ namespace RealmSync.SyncService
 
         public void QueueFileUpload(UploadFileInfo fileInfo)
         {
-            throw new NotImplementedException();
+
         }
 
         private SyncConfiguration _syncOptions;
@@ -41,7 +54,7 @@ namespace RealmSync.SyncService
             _apiClient = apiClient;
             var realmSyncData = CreateRealmSync();
 
-            _typesToSync = typesToSync.ToDictionary(x => x.Name, x => x);
+            _typesToSync = typesToSync.ToDictionary(x => x.Name, x => new TypeInfo(x));
             _jsonSerializerSettings = new JsonSerializerSettings
             {
                 ContractResolver = new RealmObjectResolver()
@@ -86,10 +99,10 @@ namespace RealmSync.SyncService
             var syncObjectInterface = typeof(IRealmSyncObjectClient);
             foreach (var type in _typesToSync.Values)
             {
-                if (!syncObjectInterface.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
+                if (!syncObjectInterface.GetTypeInfo().IsAssignableFrom(type.Type.GetTypeInfo()))
                     throw new InvalidOperationException($"Type {type} does not implement IRealmSyncObjectClient, unable to continue");
 
-                var filter = (IQueryable<RealmObject>)realm.All(type.Name);
+                var filter = (IQueryable<RealmObject>)realm.All(type.Type.Name);
                 filter.AsRealmCollection().SubscribeForNotifications(ObjectChanged);
 
             }
@@ -115,6 +128,8 @@ namespace RealmSync.SyncService
                 var obj = (IRealmSyncObjectClient)sender[changesInsertedIndex];
                 var serializedCurrent = JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
                 var className = obj.GetType().Name;
+                if (_typesToSync.ContainsKey(className))
+                    continue;
 
                 realmSyncData.Write(() =>
                 {
@@ -130,7 +145,10 @@ namespace RealmSync.SyncService
                         Type = className,
                         MobilePrimaryKey = obj.MobilePrimaryKey,
                         SerializedObject = serializedCurrent,
+                        SyncState = (int)SyncState.Unsynced,
                     });
+
+                    SetSyncState(realm, obj, SyncState.Unsynced);
                 });
             }
 
@@ -140,11 +158,13 @@ namespace RealmSync.SyncService
                 var serializedCurrent = JsonConvert.SerializeObject(obj, _jsonSerializerSettings);
                 var syncStatusObject = realmSyncData.Find<ObjectSyncStatusRealm>(obj.MobilePrimaryKey);
 
+                var className = obj.GetType().Name;
+                if (_typesToSync.ContainsKey(className))
+                    continue;
+
                 var serializedDiff = JsonHelper.GetJsonDiff(syncStatusObject.SerializedObject ?? "{}", serializedCurrent);
                 if (serializedDiff != "{}")
                 {
-                    var className = obj.GetType().Name;
-
                     realmSyncData.Write(() =>
                     {
                         realmSyncData.Add(new UploadRequestItemRealm()
@@ -153,14 +173,28 @@ namespace RealmSync.SyncService
                             PrimaryKey = obj.MobilePrimaryKey,
                             SerializedObject = serializedDiff,
                         });
-                    });
-                    realmSyncData.Write(() =>
-                    {
                         syncStatusObject.SerializedObject = serializedCurrent;
+                        syncStatusObject.SyncState = (int)SyncState.Unsynced;
                     });
+
+                    if (_typesToSync[className].ImplementsSyncState)
+                        SetSyncState(realm, obj, SyncState.Unsynced);
+
                 }
             }
 
+        }
+
+        private void SetSyncState(Realm realm, IRealmSyncObjectClient obj, SyncState syncState)
+        {
+            var objWithSyncState = obj as IRealmSyncObjectWithSyncStatusClient;
+            if (objWithSyncState != null)
+            {
+                realm.Write(() =>
+                {
+                    objWithSyncState.SyncStatus = (int)syncState;
+                });
+            }
         }
 
         private bool _uploadInProgress;
@@ -208,6 +242,17 @@ namespace RealmSync.SyncService
                             syncStateObject.SetSyncState(SyncState.Synced);
                         });
 
+                        if (_typesToSync[realmSyncObject.Type].ImplementsSyncState)
+                        {
+                            var obj =
+                                (IRealmSyncObjectWithSyncStatusClient)
+                                realm.Find(realmSyncObject.Type, realmSyncObject.MobilePrimaryKey);
+
+                            realm.Write(() =>
+                            {
+                                obj.SyncStatus = (int)SyncState.Synced;
+                            });
+                        }
                         //if (obj.DateTime > sendObjectsTime)
                         //{
                         //    //object has changed since we sent the result, will not change the SyncState
@@ -265,7 +310,7 @@ namespace RealmSync.SyncService
                     var objInDb = realmLocal.Find(changeObject.Type, changeObject.MobilePrimaryKey);
                     if (objInDb == null)
                     {
-                        var obj = (RealmObject)JsonConvert.DeserializeObject(changeObject.SerializedObject, _typesToSync[changeObject.Type]);
+                        var obj = (RealmObject)JsonConvert.DeserializeObject(changeObject.SerializedObject, _typesToSync[changeObject.Type].Type);
                         realm.Add(obj);
                     }
                     else
