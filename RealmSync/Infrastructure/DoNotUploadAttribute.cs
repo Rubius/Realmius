@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RealmSync
+namespace Realmius.Infrastructure
 {
     public class DoNotUploadAttribute : Attribute
     {

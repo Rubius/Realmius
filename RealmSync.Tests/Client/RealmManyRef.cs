@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-
-using Realms;
-using RealmSync.SyncService;
-
 using Newtonsoft.Json;
+using Realmius.Infrastructure;
+using Realmius.SyncService;
+using Realms;
 
-namespace RealmSync.Tests.Client
+namespace Realmius.Tests.Client
 {
     public class RealmManyRef : RealmObject, IRealmSyncObjectClient
     {

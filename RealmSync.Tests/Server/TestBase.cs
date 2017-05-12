@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-
-using RealmSync.Server;
-using RealmSync.Tests.Server.Models;
-
 using NUnit.Framework;
+using Realmius.Server.QuickStart;
+using Realmius.Tests.Server.Models;
 using Z.EntityFramework.Plus;
 
-namespace RealmSync.Tests.Server
+namespace Realmius.Tests.Server
 {
     public static class TestsExtensions
     {

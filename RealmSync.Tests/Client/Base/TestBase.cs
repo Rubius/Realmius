@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace RealmSync.Tests.Client.Base
+namespace Realmius.Tests.Client.Base
 {
     public class TestBase
     {

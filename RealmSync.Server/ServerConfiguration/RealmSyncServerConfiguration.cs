@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using RealmSync.Server.Models;
-using RealmSync.SyncService;
+using Realmius.Server.Models;
 
-namespace RealmSync.Server
+namespace Realmius.Server.ServerConfiguration
 {
     public class RealmSyncServerConfiguration : SyncConfigurationBase<SyncUser>
     {

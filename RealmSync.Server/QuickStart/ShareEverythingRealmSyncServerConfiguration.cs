@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using RealmSync.Server.Models;
-using RealmSync.SyncService;
+using Realmius.Server.Models;
+using Realmius.Server.ServerConfiguration;
 
-namespace RealmSync.Server
+namespace Realmius.Server.QuickStart
 {
     public class ShareEverythingRealmSyncServerConfiguration : ShareEverythingRealmSyncServerConfiguration<ISyncUser>
     {

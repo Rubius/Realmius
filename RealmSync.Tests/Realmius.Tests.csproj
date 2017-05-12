@@ -6,8 +6,8 @@
     <ProjectGuid>{2C4A00F9-0B66-4CBA-BBD0-601172B00278}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RealmSync.Tests</RootNamespace>
-    <AssemblyName>RealmSync.Tests</AssemblyName>
+    <RootNamespace>Realmius.Tests</RootNamespace>
+    <AssemblyName>Realmius.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -195,17 +195,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RealmSync.Contracts\RealmSync.Contracts.csproj">
+    <ProjectReference Include="..\RealmSync.Contracts\Realmius.Contracts.csproj">
       <Project>{eec4eb66-de49-47b1-b29c-3f20edce2178}</Project>
-      <Name>RealmSync.Contracts</Name>
+      <Name>Realmius.Contracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RealmSync.Server\RealmSync.Server.csproj">
+    <ProjectReference Include="..\RealmSync.Server\Realmius.Server.csproj">
       <Project>{197EEC4A-5985-4422-B76F-887281D7BC04}</Project>
-      <Name>RealmSync.Server</Name>
+      <Name>Realmius.Server</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RealmSync\RealmSync.csproj">
+    <ProjectReference Include="..\RealmSync\Realmius.csproj">
       <Project>{B1651A06-7CEC-4529-B8EE-E594D26A62D3}</Project>
-      <Name>RealmSync</Name>
+      <Name>Realmius</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

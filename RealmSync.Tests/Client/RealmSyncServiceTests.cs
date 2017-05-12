@@ -4,21 +4,20 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Realms;
-using RealmSync.SyncService;
-using RealmSync.Tests.Server;
-
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using Realmius.Contracts.Models;
+using Realmius.SyncService;
+using Realmius.SyncService.ApiClient;
+using Realmius.SyncService.RealmModels;
+using Realmius.Tests.Server;
+using Realms;
 
-using TestBase = RealmSync.Tests.Client.Base.TestBase;
-
-namespace RealmSync.Tests.Client
+namespace Realmius.Tests.Client
 {
     [TestFixture]
-    public class RealmSyncServiceTests : TestBase
+    public class RealmSyncServiceTests : Base.TestBase
     {
         private Mock<IApiClient> _apiClientMock;
         private string _realmFileName;

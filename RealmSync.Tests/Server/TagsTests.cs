@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using RealmSync.Server;
-using RealmSync.Server.Models;
-using RealmSync.SyncService;
-using RealmSync.Tests.Server.Models;
-
 using FluentAssertions;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Realmius.Contracts.Models;
+using Realmius.Server;
+using Realmius.Server.Models;
+using Realmius.Server.ServerConfiguration;
+using Realmius.Tests.Server.Models;
 
-namespace RealmSync.Tests.Server
+namespace Realmius.Tests.Server
 {
     [TestFixture]
     public class TagsTests : TestBase

@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using Realmius.Server;
 using Realms;
-using RealmSync.SyncService;
 
-namespace RealmSync.Tests.Server.Models
+namespace Realmius.Tests.Server.Models
 {
     public class DbSyncObject : IRealmSyncObjectServer
     {

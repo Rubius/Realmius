@@ -4,8 +4,10 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Realmius.Contracts.Models;
+using Realmius.Infrastructure;
 
-namespace RealmSync.SyncService
+namespace Realmius.SyncService.ApiClient
 {
     public class PollingSyncApiClient : IApiClient
     {

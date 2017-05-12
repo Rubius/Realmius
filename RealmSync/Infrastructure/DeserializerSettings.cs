@@ -1,8 +1,7 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+﻿using Newtonsoft.Json.Serialization;
 using Realms;
 
-namespace RealmSync
+namespace Realmius.Infrastructure
 {
     public class DeserializationBinder: DefaultSerializationBinder
     {

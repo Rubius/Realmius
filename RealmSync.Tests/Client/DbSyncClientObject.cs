@@ -1,9 +1,9 @@
 using System;
-
+using Realmius.Infrastructure;
+using Realmius.SyncService;
 using Realms;
-using RealmSync.SyncService;
 
-namespace RealmSync.Tests.Client
+namespace Realmius.Tests.Client
 {
     public class DbSyncClientObject : RealmObject, IRealmSyncObjectClient
     {

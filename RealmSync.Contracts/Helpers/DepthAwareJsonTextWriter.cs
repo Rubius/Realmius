@@ -1,7 +1,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace RealmSync.Contracts.Helpers
+namespace Realmius.Contracts.Helpers
 {
     internal class DepthAwareJsonTextWriter : JsonTextWriter
     {

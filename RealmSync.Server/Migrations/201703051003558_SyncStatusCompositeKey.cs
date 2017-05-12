@@ -1,8 +1,7 @@
-namespace RealmSync.Server.Migrations
+using System.Data.Entity.Migrations;
+
+namespace Realmius.Server.Migrations
 {
-    using System;
-    using System.Data.Entity.Migrations;
-    
     public partial class SyncStatusCompositeKey : DbMigration
     {
         public override void Up()

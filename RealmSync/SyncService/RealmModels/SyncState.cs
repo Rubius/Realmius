@@ -1,4 +1,4 @@
-﻿namespace RealmSync.SyncService
+﻿namespace Realmius.SyncService.RealmModels
 {
     public enum SyncState
     {

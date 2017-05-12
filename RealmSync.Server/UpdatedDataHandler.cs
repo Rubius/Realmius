@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.SignalR;
-using RealmSync.SyncService;
+using Realmius.Contracts;
+using Realmius.Contracts.Models;
 
-namespace RealmSync.Server
+namespace Realmius.Server
 {
     internal class UpdatedDataHandler
     {

@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Realmius.Server;
 
-using RealmSync.SyncService;
-
-namespace RealmSync.Tests
+namespace Realmius.Tests
 {
-    public class IdIntObject :
-        IRealmSyncObjectServer
+    public class IdIntObject : IRealmSyncObjectServer
     {
         public string Text { get; set; }
         public string Tags { get; set; }

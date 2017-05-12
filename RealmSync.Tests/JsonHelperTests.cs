@@ -1,9 +1,8 @@
-﻿using RealmSync.SyncService;
-
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
+using Realmius.Contracts.Helpers;
 
-namespace RealmSync.Tests
+namespace Realmius.Tests
 {
     [TestFixture]
     public class JsonHelperTests

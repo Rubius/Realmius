@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace RealmSync.SyncService
+namespace Realmius.SyncService
 {
     internal class RealmObjectTypeInfo
     {

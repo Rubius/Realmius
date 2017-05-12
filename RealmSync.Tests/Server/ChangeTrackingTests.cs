@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
-
-using RealmSync.Server;
-using RealmSync.Server.Models;
-using RealmSync.Tests.Server.Models;
-
 using FluentAssertions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using Realmius.Server.Models;
+using Realmius.Server.QuickStart;
+using Realmius.Tests.Server.Models;
 
-namespace RealmSync.Tests.Server
+namespace Realmius.Tests.Server
 {
     [TestFixture]
     public class ChangeTrackingTests : TestBase

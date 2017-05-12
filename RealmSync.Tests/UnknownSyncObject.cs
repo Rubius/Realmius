@@ -1,7 +1,8 @@
-﻿using Realms;
-using RealmSync.SyncService;
+﻿using Realmius.Server;
+using Realmius.SyncService;
+using Realms;
 
-namespace RealmSync.Tests
+namespace Realmius.Tests
 {
     public class UnknownSyncObjectServer : IRealmSyncObjectServer
     {

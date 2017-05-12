@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace RealmSync.Server.Expressions
+namespace Realmius.Server.Expressions
 {
     public class ParameterRebinder : ExpressionVisitor
     {

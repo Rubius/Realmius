@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 
-namespace RealmSync.Server.Models
+namespace Realmius.Server.Models
 {
     public class EfEntityInfo
     {

@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
-using Realms;
-using RealmSync.SyncService;
-
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using Realmius.Contracts.Models;
+using Realmius.SyncService;
+using Realmius.SyncService.ApiClient;
+using Realms;
 
-namespace RealmSync.Tests.Client
+namespace Realmius.Tests.Client
 {
     [TestFixture]
     public class RealmReferenceTests

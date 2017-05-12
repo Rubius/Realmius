@@ -1,17 +1,21 @@
-using System.Data.Entity;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Infrastructure;
+using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RealmSync.SyncService;
+using Realmius.Contracts.Helpers;
+using Realmius.Contracts.Models;
+using Realmius.Server.Infrastructure;
+using Realmius.Server.QuickStart;
+using Realmius.Server.ServerConfiguration;
 
-namespace RealmSync.Server.Models
+namespace Realmius.Server.Models
 {
     public class ChangeTrackingDbContext : DbContext
     {
@@ -219,7 +223,7 @@ namespace RealmSync.Server.Models
 
         public static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
         {
-            ContractResolver = new RealmSync.Server.Infrastructure.RealmServerObjectResolver(),
+            ContractResolver = new RealmServerObjectResolver(),
         };
         internal virtual string SerializeObject(IRealmSyncObjectServer obj)
         {

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace RealmSync.Server.Expressions
+namespace Realmius.Server.Expressions
 {
     public static class Utility
     {

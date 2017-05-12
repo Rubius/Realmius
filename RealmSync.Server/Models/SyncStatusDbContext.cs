@@ -1,9 +1,9 @@
 ﻿using System.Data.Entity;
-using RealmSync.Server.Migrations;
+using Realmius.Server.Migrations;
 
 //using RealmSync.Server.Migrations;
 
-namespace RealmSync.Server.Models
+namespace Realmius.Server.Models
 {
     public class SyncStatusDbContext : DbContext
     {

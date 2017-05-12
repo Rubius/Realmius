@@ -10,12 +10,16 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using PCLStorage;
+using Realmius.Contracts.Helpers;
+using Realmius.Contracts.Models;
+using Realmius.Infrastructure;
+using Realmius.SyncService.ApiClient;
+using Realmius.SyncService.RealmModels;
 using Realms;
 using Realms.Schema;
 
-namespace RealmSync.SyncService
+namespace Realmius.SyncService
 {
 
     public class RealmSyncService : IRealmSyncService

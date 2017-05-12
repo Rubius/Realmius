@@ -2,18 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using Newtonsoft.Json;
-using RealmSync.SyncService;
 using System.Reflection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RealmSync.Server.Expressions;
-using RealmSync.Server.Infrastructure;
-using RealmSync.Server.Models;
+using Realmius.Contracts.Models;
+using Realmius.Server.Expressions;
+using Realmius.Server.Infrastructure;
+using Realmius.Server.Models;
+using Realmius.Server.QuickStart;
+using Realmius.Server.ServerConfiguration;
 
-namespace RealmSync.Server
+namespace Realmius.Server
 {
     public class RealmSyncServerProcessor : RealmSyncServerProcessor<ISyncUser>
     {

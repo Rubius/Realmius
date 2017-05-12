@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Realmius.SyncService;
+using Realmius.SyncService.ApiClient;
 using Realms;
-using RealmSync.SyncService;
 
-namespace RealmSync
+namespace Realmius
 {
     public class SyncServiceFactory
     {

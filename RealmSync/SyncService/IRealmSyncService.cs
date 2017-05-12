@@ -1,8 +1,9 @@
 using System;
 using System.ComponentModel;
-using Realms;
+using Realmius.Contracts.Models;
+using Realmius.SyncService.RealmModels;
 
-namespace RealmSync.SyncService
+namespace Realmius.SyncService
 {
     public interface IRealmSyncService : IDisposable, INotifyPropertyChanged
     {

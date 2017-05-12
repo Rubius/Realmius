@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Realmius.Contracts.Models;
 
-namespace RealmSync.SyncService
+namespace Realmius.SyncService.ApiClient
 {
     public interface IApiClient
     {
