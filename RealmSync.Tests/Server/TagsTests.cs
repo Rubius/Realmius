@@ -44,7 +44,7 @@ namespace RealmSync.Tests.Server
         }
 
         [SetUp]
-        public void Setup()
+        public override void Setup()
         {
             base.Setup();
             _processor = new RealmSyncServerProcessor(_contextFunc, _config);

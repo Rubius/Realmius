@@ -491,8 +491,9 @@ namespace RealmSync.SyncService
                 }
             }
 
-            Task.Factory.StartNew(async () =>
+            await Task.Factory.StartNew(async () =>
             {
+                // TODO: TartunovVA - check this
                 if (!uploadSucceeded)
                     await Task.Delay(2000); //ToDo: delays might be increased in case of consequent errors
 
@@ -610,10 +611,11 @@ namespace RealmSync.SyncService
                                         {
                                             var uploadRequestItemRealm =
                                                 realmSyncData.Find<UploadRequestItemRealm>(key);
-                                            if (uploadRequestItemRealm == null)
-                                            {
-                                                var q = 1;
-                                            }
+                                            // TODO: TartunovVA - Delete this!
+                                            //if (uploadRequestItemRealm == null)
+                                            //{
+                                            //    var q = 1;
+                                            //}
                                             Logger.Log.Debug(
                                                 $"Removed UploadRequest {uploadRequestItemRealm?.Id} for {realmSyncObject.Type}:{realmSyncObject.MobilePrimaryKey}");
 
@@ -636,6 +638,8 @@ namespace RealmSync.SyncService
                                             obj.SyncStatus = (int)SyncState.Synced;
                                         });
                                 }
+
+                                // TODO: TartunovVA - Delete this!
                                 //if (obj.DateTime > sendObjectsTime)
                                 //{
                                 //    //object has changed since we sent the result, will not change the SyncState

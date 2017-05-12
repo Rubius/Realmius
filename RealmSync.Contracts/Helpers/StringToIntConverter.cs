@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 
 namespace RealmSync.Contracts.Helpers
 {
-
     public class StringToIntConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

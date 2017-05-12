@@ -795,7 +795,7 @@ namespace RealmSync.Tests.Server
             {
                 obj2Entry.State = EntityState.Modified;
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 db2.Entry(obj3).State = EntityState.Detached;
                 obj2Entry.State = EntityState.Modified;

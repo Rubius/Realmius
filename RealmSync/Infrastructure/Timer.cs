@@ -29,7 +29,7 @@ namespace RealmSync
                     if (waitForCallbackBeforeNextPeriod)
                         await tuple.Item1(tuple.Item2);
                     else
-                        Task.Run(() => tuple.Item1(tuple.Item2));
+                        await Task.Run(() => tuple.Item1(tuple.Item2));
 
                     await Task.Delay(millisecondsPeriod, Token).ConfigureAwait(false);
                 }

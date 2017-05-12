@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("RealmSync.Server")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Rubius")]
 [assembly: AssemblyProduct("RealmSync.Server")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCopyright("Copyright © 2017 Rubius")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
