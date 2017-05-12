@@ -61,16 +61,12 @@ namespace Realmius
                 {
                     syncService?.SkipUpload(obj);
                 });
-
         }
 
-        private static void ForAllServices(Realm realm, Action<RealmiusService> action)
         {
             var databasePath = realm.Config.DatabasePath;
-            IList<RealmiusService> syncServices;
             if (SyncServiceFactory.SyncServices.TryGetValue(databasePath, out syncServices))
             {
-                foreach (RealmiusService syncService in syncServices)
                 {
                     action(syncService);
                 }

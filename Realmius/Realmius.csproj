@@ -47,7 +47,7 @@
     <Compile Include="SyncService\ApiClient\IApiClient.cs" />
     <Compile Include="SyncService\FileUploadedEventArgs.cs" />
     <Compile Include="SyncService\IRealmiusObjectWithSyncStatusClient.cs" />
-    <Compile Include="SyncService\IRealmiusService.cs" />
+    <Compile Include="SyncService\IRealmiusSyncService.cs" />
     <Compile Include="SyncService\RealmModels\UploadRequestItemRealm.cs" />
     <Compile Include="SyncService\RealmModels\ObjectSyncStatusRealm.cs" />
     <Compile Include="SyncService\ApiClient\SignalRSyncApiClient.cs" />
@@ -56,7 +56,7 @@
     <Compile Include="SyncService\RealmObjectResolver.cs" />
     <Compile Include="SyncService\RealmObjectTypeInfo.cs" />
     <Compile Include="SyncService\RealmiusObjectExtenstions.cs" />
-    <Compile Include="SyncService\SyncService.cs" />
+    <Compile Include="SyncService\RealmiusSyncService.cs" />
     <Compile Include="SyncService\RealmModels\SyncState.cs" />
     <Compile Include="SyncService\SyncConfiguration.cs" />
     <Compile Include="Infrastructure\Timer.cs" />

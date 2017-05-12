@@ -51,7 +51,7 @@ namespace Realmius.Server
         }
     }
 
-    public class RealmiusServerProcessor<TUser>
+    public class RealmiusServerProcessor<TUser> 
         where TUser : ISyncUser
     {
         private readonly Func<ChangeTrackingDbContext> _dbContextFactoryFunc;
@@ -251,13 +251,13 @@ namespace Realmius.Server
 
             var changes = CreateQuery(request, user, context);
 
-            foreach (var syncStatusServerObject in changes)
+            foreach (var changedObject in changes)
             {
-                var lastChangeTime = FindLastChangeTime(request, syncStatusServerObject);
+                var lastChangeTime = FindLastChangeTime(request, changedObject);
 
-                var jObject = JObject.Parse(syncStatusServerObject.FullObjectAsJson);
+                var jObject = JObject.Parse(changedObject.FullObjectAsJson);
                 var changedColumns =
-                    syncStatusServerObject.ColumnChangeDates.Where(x => x.Value > lastChangeTime)
+                    changedObject.ColumnChangeDates.Where(x => x.Value > lastChangeTime)
                         .ToDictionary(x => x.Key);
 
                 foreach (var property in jObject.Properties().ToList())
@@ -268,11 +268,11 @@ namespace Realmius.Server
                     }
                 }
                 ;
-                var downloadResponseItem = new DownloadResponseItem()
+                var downloadResponseItem = new DownloadResponseItem
                 {
-                    Type = syncStatusServerObject.Type,
-                    MobilePrimaryKey = syncStatusServerObject.MobilePrimaryKey,
-                    IsDeleted = syncStatusServerObject.IsDeleted,
+                    Type = changedObject.Type,
+                    MobilePrimaryKey = changedObject.MobilePrimaryKey,
+                    IsDeleted = changedObject.IsDeleted,
                     SerializedObject = jObject.ToString(),
                 };
                 response.ChangedObjects.Add(downloadResponseItem);
@@ -306,7 +306,7 @@ namespace Realmius.Server
 
         internal IQueryable<SyncStatusServerObject> CreateQuery(DownloadDataRequest request, TUser user, SyncStatusDbContext context)
         {
-            Expression<Func<SyncStatusServerObject, bool>> where = null;
+            Expression<Func<SyncStatusServerObject, bool>> whereExpression = null;
             foreach (string userTag in user.Tags)
             {
                 DateTimeOffset lastChange;
@@ -326,26 +326,22 @@ namespace Realmius.Server
 
                 if (condition != null)
                 {
-                    if (where == null)
-                        where = condition;
-                    else
-                        where = where.Or(condition);
+                    whereExpression = whereExpression == null ? condition : whereExpression.Or(condition);
                 }
             }
 
-            if (where == null)
-                where = x => false;
+            if (whereExpression == null)
+                whereExpression = x => false;
 
             var changes = context.SyncStatusServerObjects.AsNoTracking()
-                .Where(x => request.Types.Contains(x.Type)).Where(where);
+                .Where(x => request.Types.Contains(x.Type)).Where(whereExpression);
 
             //var changes = context.SyncStatusServerObjects.AsNoTracking()
             //    .Where(x => x.LastChange > request.LastChangeTime &&
             //    request.Types.Contains(x.Type)
             //    && (user.Tags.Contains(x.Tag0) || user.Tags.Contains(x.Tag1) || user.Tags.Contains(x.Tag2) || user.Tags.Contains(x.Tag3)))
             //    .OrderBy(x => x.LastChange);
-
-
+            
             return changes;
         }
 

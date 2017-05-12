@@ -36,8 +36,8 @@ namespace Realmius.Tests.Client
     {
         private Mock<IApiClient> _apiClientMock;
         private string _realmFileName;
-        private RealmiusService _syncService;
-        private Mock<RealmiusService> _syncServiceMock;
+        private RealmiusSyncService _realmiusSyncService;
+        private Mock<RealmiusSyncService> _syncServiceMock;
         protected UploadDataRequest _lastUploadRequest;
         protected List<UploadDataRequest> _uploadRequests;
         private int _uploadDataCounter = 0;
@@ -59,7 +59,7 @@ namespace Realmius.Tests.Client
                 }).ReturnsAsync(new UploadDataResponse());
 
             _realmFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            RealmiusService.RealmiusDbPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + "sync");
+            RealmiusSyncService.RealmiusDbPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + "sync");
 
             _syncServiceMock = CreateSyncService();
             _syncServiceMock.Setup(x => x.StartUploadTask()).Callback(
@@ -70,15 +70,15 @@ namespace Realmius.Tests.Client
                         _syncServiceMock.Object.Upload();
                     });
                 });
-            _syncService = _syncServiceMock.Object;
+            _realmiusSyncService = _syncServiceMock.Object;
             _uploadDataCounter = 0;
             _uploadTask = null;
         }
 
-        private Mock<RealmiusService> CreateSyncService()
+        private Mock<RealmiusSyncService> CreateSyncService()
         {
             Func<Realm> func = GetRealm;
-            return new Mock<RealmiusService>(func, _apiClientMock.Object, false, new[] { typeof(DbSyncClientObject), typeof(DbSyncClientObject2), typeof(RealmRef), typeof(RealmManyRef) })
+            return new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, new[] { typeof(DbSyncClientObject), typeof(DbSyncClientObject2), typeof(RealmRef), typeof(RealmManyRef) })
             {
                 CallBase = true,
             };
@@ -94,17 +94,17 @@ namespace Realmius.Tests.Client
         {
             var realm = GetRealm();
 
-            var ref1 = new RealmRef()
+            var ref1 = new RealmRef
             {
                 Text = "123",
                 Id = "1",
             };
-            var ref2 = new RealmRef()
+            var ref2 = new RealmRef
             {
                 Text = "456",
                 Id = "2",
             };
-            var refParent = new RealmManyRef()
+            var refParent = new RealmManyRef
             {
                 Id = "3",
                 Text = "zxc",
@@ -120,11 +120,10 @@ namespace Realmius.Tests.Client
                     realm.Add(refParent);
                 });
 
-
-            var s1 = _syncService.SerializeObject(ref1);
+            var s1 = _realmiusSyncService.SerializeObject(ref1);
             s1.Should().BeEquivalentTo($"{{\"Id\":\"1\",\"Text\":\"123\",\"Parent\":null,\"MobilePrimaryKey\":\"1\"}}");
 
-            var s2 = _syncService.SerializeObject(refParent);
+            var s2 = _realmiusSyncService.SerializeObject(refParent);
             s2.Should().BeEquivalentTo("{\"Id\":\"3\",\"Text\":\"zxc\",\"Children\":[\"1\",\"2\"],\"MobilePrimaryKey\":\"3\"}");
 
             realm.Write(
@@ -133,12 +132,11 @@ namespace Realmius.Tests.Client
                     realm.Remove(refParent);
                 });
 
-
             var ref11 = new RealmManyRef();
             realm.Write(
                 () =>
                 {
-                    _syncService.Populate(s2, ref11, realm);
+                    _realmiusSyncService.Populate(s2, ref11, realm);
                 });
 
             ref11.Text.Should().Be("zxc");
@@ -147,25 +145,23 @@ namespace Realmius.Tests.Client
             string.Join(", ", ref11.Children.Select(x => x.Id)).Should().BeEquivalentTo("1, 2");
         }
 
-
         [Test]
         public void ManyRef_DownloadData_ReferencesCorrectOrder()
         {
             var realm = GetRealm();
-
 
             _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
             {
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmRef),
                         MobilePrimaryKey = "1",
                         SerializedObject = "{ 'Id': '1', Text:'123', Parent: null}",
                     },
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmManyRef),
                         MobilePrimaryKey = "2",
@@ -180,19 +176,17 @@ namespace Realmius.Tests.Client
             string.Join(", ", parent.Children.Select(x => x.Id)).Should().BeEquivalentTo("1");
         }
 
-
         [Test]
         public void ManyRef_DownloadData_NoChildren()
         {
             var realm = GetRealm();
-
-
+            
             _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
             {
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmManyRef),
                         MobilePrimaryKey = "2",
@@ -207,7 +201,6 @@ namespace Realmius.Tests.Client
             string.Join(", ", parent.Children.Select(x => x.Id)).Should().BeEquivalentTo("");
         }
 
-
         [Test]
         public void ManyRef_DownloadData_Update()
         {
@@ -220,19 +213,19 @@ namespace Realmius.Tests.Client
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmRef),
                         MobilePrimaryKey = "1",
                         SerializedObject = "{ 'Id': '1', Text:'123', Parent: null}",
                     },
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmRef),
                         MobilePrimaryKey = "2",
                         SerializedObject = "{ 'Id': '2', Text:'456', Parent: null}",
                     },
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmManyRef),
                         MobilePrimaryKey = "3",
@@ -250,7 +243,7 @@ namespace Realmius.Tests.Client
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmManyRef),
                         MobilePrimaryKey = "3",
@@ -268,7 +261,7 @@ namespace Realmius.Tests.Client
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmManyRef),
                         MobilePrimaryKey = "3",
@@ -286,7 +279,7 @@ namespace Realmius.Tests.Client
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmManyRef),
                         MobilePrimaryKey = "3",
@@ -305,13 +298,13 @@ namespace Realmius.Tests.Client
         {
             var realm = GetRealm();
 
-            var ref1 = new RealmRef()
+            var ref1 = new RealmRef
             {
                 Text = "123",
                 Id = "1",
             };
 
-            var ref2 = new RealmRef()
+            var ref2 = new RealmRef
             {
                 Id = "2",
                 Text = "zxc",
@@ -325,11 +318,10 @@ namespace Realmius.Tests.Client
                     realm.Add(ref2);
                 });
 
-
-            var s1 = _syncService.SerializeObject(ref1);
+            var s1 = _realmiusSyncService.SerializeObject(ref1);
             s1.Should().BeEquivalentTo($"{{\"Id\":\"1\",\"Text\":\"123\",\"Parent\":null,\"MobilePrimaryKey\":\"1\"}}");
 
-            var s2 = _syncService.SerializeObject(ref2);
+            var s2 = _realmiusSyncService.SerializeObject(ref2);
             s2.Should().BeEquivalentTo($"{{\"Id\":\"2\",\"Text\":\"zxc\",\"Parent\":\"1\",\"MobilePrimaryKey\":\"2\"}}");
 
             realm.Write(
@@ -339,13 +331,12 @@ namespace Realmius.Tests.Client
                     realm.Remove(ref2);
                 });
 
-
             var ref11 = new RealmRef();
             realm.Write(
                 () =>
                 {
                     realm.Add(ref11);
-                    _syncService.Populate(s1, ref11, realm);
+                    _realmiusSyncService.Populate(s1, ref11, realm);
                 });
 
             ref11.Text.Should().Be("123");
@@ -357,7 +348,7 @@ namespace Realmius.Tests.Client
                 () =>
                 {
                     realm.Add(ref21);
-                    _syncService.Populate(s2, ref21, realm);
+                    _realmiusSyncService.Populate(s2, ref21, realm);
                 });
 
             ref21.Text.Should().Be("zxc");
@@ -366,25 +357,23 @@ namespace Realmius.Tests.Client
             ref21.Parent.Id.Should().Be("1");
         }
 
-
         [Test]
         public void DownloadData_ReferencesCorrectOrder()
         {
             var realm = GetRealm();
-
 
             _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
             {
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmRef),
                         MobilePrimaryKey = "1",
                         SerializedObject = "{ 'Id': '1', Text:'123', Parent: null}",
                     },
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmRef),
                         MobilePrimaryKey = "2",
@@ -398,30 +387,29 @@ namespace Realmius.Tests.Client
             string.Join(", ", objects.Select(x => $"{x.Id}: {x.Text} - {x.Parent?.Id}"))
                 .Should().BeEquivalentTo("1: 123 - , 2: 345 - 1");
         }
+
         [Test]
         public void DownloadData_ReferencesWrongOrder()
         {
             var realm = GetRealm();
-
 
             _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
             {
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmRef),
                         MobilePrimaryKey = "2",
                         SerializedObject = "{ 'Id': '2', Text:'345', Parent: '1'}",
                     },
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(RealmRef),
                         MobilePrimaryKey = "1",
                         SerializedObject = "{ 'Id': '1', Text:'123', Parent: null}",
-                    },
-
+                    }
                 }
             });
 

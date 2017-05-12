@@ -35,12 +35,12 @@ using Realms;
 namespace Realmius.Tests.Client
 {
     [TestFixture]
-    public class RealmiusServiceTests : Base.TestBase
+    public class RealmiusSyncServiceTests : Base.TestBase
     {
         private Mock<IApiClient> _apiClientMock;
         private string _realmFileName;
-        private RealmiusService _syncService;
-        private Mock<RealmiusService> _syncServiceMock;
+        private RealmiusSyncService _realmiusSyncService;
+        private Mock<RealmiusSyncService> _syncServiceMock;
         protected UploadDataRequest _lastUploadRequest;
         protected List<UploadDataRequest> _uploadRequests;
         private int _uploadDataCounter = 0;
@@ -62,26 +62,26 @@ namespace Realmius.Tests.Client
                 }).ReturnsAsync(new UploadDataResponse());
 
             _realmFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            RealmiusService.RealmiusDbPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + "sync");
+            RealmiusSyncService.RealmiusDbPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + "sync");
 
             _syncServiceMock = CreateSyncService();
 
-            _syncService = _syncServiceMock.Object;
+            _realmiusSyncService = _syncServiceMock.Object;
             _uploadDataCounter = 0;
             _uploadTask = null;
-            RealmiusService.DelayWhenUploadRequestFailed = 10;
+            RealmiusSyncService.DelayWhenUploadRequestFailed = 10;
         }
 
         [TearDown]
         public void TearDown()
         {
-            _syncService.Dispose();
+            _realmiusSyncService.Dispose();
         }
 
-        private Mock<RealmiusService> CreateSyncService()
+        private Mock<RealmiusSyncService> CreateSyncService()
         {
             Func<Realm> func = GetRealm;
-            var mock = new Mock<RealmiusService>(func, _apiClientMock.Object, false, new[] { typeof(DbSyncClientObject), typeof(DbSyncClientObject2), typeof(DbSyncWithDoNotUpload) })
+            var mock = new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, new[] { typeof(DbSyncClientObject), typeof(DbSyncClientObject2), typeof(DbSyncWithDoNotUpload) })
             {
                 CallBase = true,
             };
@@ -104,7 +104,6 @@ namespace Realmius.Tests.Client
             return Realm.GetInstance(_realmFileName);
         }
 
-
         [Test]
         public void PartialUpdate_NoObjectOnClient()
         {
@@ -116,7 +115,7 @@ namespace Realmius.Tests.Client
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(DbSyncWithDoNotUpload),
                         MobilePrimaryKey = "456",
@@ -126,8 +125,8 @@ namespace Realmius.Tests.Client
             });
             Thread.Sleep(20);
             realm.Refresh();
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
 
             var obj2 = realm.Find<DbSyncWithDoNotUpload>("456");
 
@@ -135,18 +134,15 @@ namespace Realmius.Tests.Client
             obj2.Tags.ShouldBeEquivalentTo("qwe");
             obj2.Text.Should().BeNullOrEmpty();
 
-            _syncService.Realmius.All<UploadRequestItemRealm>().Count().Should().Be(0);
+            _realmiusSyncService.Realmius.All<UploadRequestItemRealm>().Count().Should().Be(0);
         }
-
 
         [Test]
         public void AddObject_UploadDataIsCalled()
         {
-
             var realm = GetRealm();
 
-
-            var obj = new DbSyncClientObject()
+            var obj = new DbSyncClientObject
             {
                 Text = "zxczxczxc",
             };
@@ -154,8 +150,8 @@ namespace Realmius.Tests.Client
             {
                 realm.Add(obj);
             });
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
 
             _uploadTask.Wait();
 
@@ -165,13 +161,12 @@ namespace Realmius.Tests.Client
             _apiClientMock.Verify(x => x.UploadData(It.IsAny<UploadDataRequest>()), Times.Once);
         }
 
-
         [Test]
         public void AddObject_NotSucceeded_Update_UploadDataIsCalled()
         {
             var realm = GetRealm();
 
-            var obj = new DbSyncClientObject()
+            var obj = new DbSyncClientObject
             {
                 Text = "zxczxczxc",
             };
@@ -179,8 +174,8 @@ namespace Realmius.Tests.Client
             {
                 realm.Add(obj);
             });
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
 
             _uploadTask.Wait();
             SetupCorrectUploadResponse();
@@ -188,8 +183,8 @@ namespace Realmius.Tests.Client
             {
                 obj.Text = "123";
             });
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
 
             _uploadTask.Wait();
 
@@ -204,7 +199,7 @@ namespace Realmius.Tests.Client
         {
             var realm = GetRealm();
 
-            var obj = new DbSyncClientObject()
+            var obj = new DbSyncClientObject
             {
                 Text = "444",
             };
@@ -215,8 +210,8 @@ namespace Realmius.Tests.Client
             {
                 realm.Add(obj);
             });
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
 
             _uploadTask.Wait();
 
@@ -228,8 +223,8 @@ namespace Realmius.Tests.Client
             {
                 obj.Text = "555";
             });
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
 
             Wait(() => _lastUploadRequest != null);
 
@@ -238,9 +233,7 @@ namespace Realmius.Tests.Client
                 .Should().MatchEquivalentOf($"Type: DbSyncClientObject, PrimaryKey: {obj.Id}, SerializedObject: {{ \"Text\": \"555\"}}");
             _apiClientMock.Verify(x => x.UploadData(It.IsAny<UploadDataRequest>()), Times.AtLeast(2));
         }
-
-
-
+        
         [Test]
         public void DoNotUploadAttribute_Download()
         {
@@ -290,10 +283,9 @@ namespace Realmius.Tests.Client
                 Tags = "zxc",
             };
 
-            var res = _syncService.SerializeObject(obj);
+            var res = _realmiusSyncService.SerializeObject(obj);
             res.Should().NotContain("Tags");
         }
-
 
         [Test]
         public void HandleDownloadedData_NewObject()
@@ -307,7 +299,6 @@ namespace Realmius.Tests.Client
                 Id = key
             };
 
-
             _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
             {
                 LastChange = DateTimeOffset.Now.ToDictionary(),
@@ -317,7 +308,7 @@ namespace Realmius.Tests.Client
                     {
                         Type = nameof(DbSyncClientObject),
                         MobilePrimaryKey = key,
-                        SerializedObject = _syncService.SerializeObject(obj),
+                        SerializedObject = _realmiusSyncService.SerializeObject(obj),
                     }
                 }
             });
@@ -329,13 +320,12 @@ namespace Realmius.Tests.Client
             obj2.Text.ShouldBeEquivalentTo("zxczxczxc");
             obj2.Id.ShouldBeEquivalentTo(key);
 
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
 
 
             _apiClientMock.Verify(x => x.UploadData(It.IsAny<UploadDataRequest>()), Times.Never);
         }
-
 
         [Test]
         public void Reconnect_LastChangeIsPreserved_IfFlagIsNotSpecified()
@@ -348,11 +338,10 @@ namespace Realmius.Tests.Client
             });
             _apiClientMock.Reset();
 
-            var syncService = new RealmiusService(GetRealm, _apiClientMock.Object, false, new[] { typeof(DbSyncClientObject) });
+            var syncService = new RealmiusSyncService(GetRealm, _apiClientMock.Object, false, new[] { typeof(DbSyncClientObject) });
             _apiClientMock.Verify(x => x.Start(It.Is<ApiClientStartOptions>(z => z.LastDownloaded.ContainsKey("all") == false && string.Join(", ", z.Types) == "DbSyncClientObject")), Times.Once);
             _apiClientMock.Reset();
         }
-
 
         [Test]
         public void Reconnect_LastChangeIsPreserved_FlagIsSpecified()
@@ -366,10 +355,9 @@ namespace Realmius.Tests.Client
             });
             _apiClientMock.Reset();
 
-            var syncService2 = new RealmiusService(GetRealm, _apiClientMock.Object, false, new[] { typeof(DbSyncClientObject) });
+            var syncService2 = new SyncService.RealmiusSyncService(GetRealm, _apiClientMock.Object, false, new[] { typeof(DbSyncClientObject) });
             _apiClientMock.Verify(x => x.Start(It.Is<ApiClientStartOptions>(z => z.LastDownloaded["all"] == offset && string.Join(", ", z.Types) == "DbSyncClientObject")));
         }
-
 
         [Test]
         public void HandleDownloadedData_NewObject_Updated()
@@ -377,23 +365,22 @@ namespace Realmius.Tests.Client
             var realm = GetRealm();
 
             var key = Guid.NewGuid().ToString();
-            var obj = new DbSyncClientObject()
+            var obj = new DbSyncClientObject
             {
                 Text = "zxczxczxc",
                 Id = key
             };
-
 
             _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
             {
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(DbSyncClientObject),
                         MobilePrimaryKey = key,
-                        SerializedObject = _syncService.SerializeObject(obj),
+                        SerializedObject = _realmiusSyncService.SerializeObject(obj),
                     }
                 }
             });
@@ -402,7 +389,7 @@ namespace Realmius.Tests.Client
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(DbSyncClientObject),
                         MobilePrimaryKey = key,
@@ -418,13 +405,11 @@ namespace Realmius.Tests.Client
             obj2.Text.ShouldBeEquivalentTo("qwe");
             obj2.Id.ShouldBeEquivalentTo(key);
 
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
-
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
 
             _apiClientMock.Verify(x => x.UploadData(It.IsAny<UploadDataRequest>()), Times.Never);
         }
-
 
         private class Serializer1 : RealmObject, IRealmiusObjectClient
         {
@@ -445,29 +430,32 @@ namespace Realmius.Tests.Client
             public IList<DbSyncClientObject> DbSyncClientObject { get; }
             public string MobilePrimaryKey => Id;
         }
+
         [Test]
         public void Serializer()
         {
-            _syncService.SerializeObject(new Serializer1()
+            _realmiusSyncService.SerializeObject(new Serializer1
             {
                 Id = "1",
                 Text = "123",
                 Time = new DateTimeOffset(2017, 1, 1, 1, 1, 1, 1, TimeSpan.FromHours(1)),
             }).ShouldBeEquivalentTo("{\"Id\":\"1\",\"Text\":\"123\",\"Time\":\"2017-01-01T01:01:01.001+01:00\",\"MobilePrimaryKey\":\"1\"}");
         }
+
         [Test]
         public void Serializer_Links1()
         {
-            _syncService.SerializeObject(new Serializer_Link()
+            _realmiusSyncService.SerializeObject(new Serializer_Link
             {
                 Id = "1",
                 DbSyncClientObject = new DbSyncClientObject(),
             }).ShouldBeEquivalentTo("{\"Id\":\"1\",\"MobilePrimaryKey\":\"1\"}");
         }
+
         [Test]
         public void Serializer_Collection1()
         {
-            _syncService.SerializeObject(new Serializer_Collection()
+            _realmiusSyncService.SerializeObject(new Serializer_Collection()
             {
                 Id = "1",
                 DbSyncClientObject =
@@ -481,7 +469,7 @@ namespace Realmius.Tests.Client
         [Test]
         public void Dispose_NoNewNotificationsAreReceived()
         {
-            _syncService.Dispose();
+            _realmiusSyncService.Dispose();
             var realm = GetRealm();
             realm.Write(() =>
             {
@@ -491,7 +479,6 @@ namespace Realmius.Tests.Client
             _syncServiceMock.Verify(x => x.ObjectChanged(It.IsAny<IRealmCollection<RealmObject>>(), It.IsAny<ChangeSet>(), It.IsAny<Exception>()), Times.Never);
         }
 
-
         [Test]
         public void Dispose_NotDisposed_ObjectChangedCalled()
         {
@@ -500,16 +487,16 @@ namespace Realmius.Tests.Client
             {
                 realm.Add(new DbSyncClientObject());
             });
-            _syncService.Realm.Refresh();
+            _realmiusSyncService.Realm.Refresh();
             _syncServiceMock.Verify(x => x.ObjectChanged(It.IsAny<IRealmCollection<RealmObject>>(), It.Is<ChangeSet>(z => z != null), It.IsAny<Exception>()), Times.Once);
         }
 
         [Test]
         public void SyncEnabledAfterSomeObjectsWereInsertedInRealm_Modify()
         {
-            _syncService.Dispose();
+            _realmiusSyncService.Dispose();
 
-            var obj = new DbSyncClientObject()
+            var obj = new DbSyncClientObject
             {
                 Text = "123",
             };
@@ -545,15 +532,14 @@ namespace Realmius.Tests.Client
                 .MatchEquivalentOf("{\r\n  \"Id\": \"" + obj.Id + "\",\r\n  \"Text\": \"456\",\r\n  \"Tags\": null,\r\n  \"MobilePrimaryKey\": \"" + obj.Id + "\"\r\n}");
         }
 
-
         [Test]
         public void TwoObjects_DuplicateKeys()
         {
-            var obj = new DbSyncClientObject()
+            var obj = new DbSyncClientObject
             {
                 Text = "123",
             };
-            var obj2 = new DbSyncClientObject2()
+            var obj2 = new DbSyncClientObject2
             {
                 Id = obj.Id,
                 Text = "1234",
@@ -568,9 +554,9 @@ namespace Realmius.Tests.Client
             });
 
 
-            _syncService.Realm.Refresh();
+            _realmiusSyncService.Realm.Refresh();
             _uploadTask.Wait();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
             _uploadTask.Wait();
             //Thread.Sleep(100);
 
@@ -580,11 +566,10 @@ namespace Realmius.Tests.Client
                 .MatchEquivalentOf($"DbSyncClientObject: {obj.Id}, DbSyncClientObject2: {obj.Id}");
         }
 
-
         [Test]
         public void ObjectDownloadedWhenThereAreLocalChanges_ChangesPreserved()
         {
-            var obj = new DbSyncClientObject()
+            var obj = new DbSyncClientObject
             {
                 Text = "123",
             };
@@ -593,14 +578,14 @@ namespace Realmius.Tests.Client
             {
                 realm.Add(obj);
             });
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
 
             _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
             {
-                ChangedObjects = new List<DownloadResponseItem>()
+                ChangedObjects = new List<DownloadResponseItem>
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(DbSyncClientObject),
                         SerializedObject = "{Text: 'zxc' }",
@@ -614,12 +599,11 @@ namespace Realmius.Tests.Client
             obj2.Text.Should().BeEquivalentTo("123");
         }
 
-
         [Test]
         public void AddSkipUpload()
         {
             SetupCorrectUploadResponse();
-            var obj = new DbSyncClientObject()
+            var obj = new DbSyncClientObject
             {
                 Text = "123",
                 Tags = "qwe"
@@ -630,8 +614,8 @@ namespace Realmius.Tests.Client
                 realm.AddSkipUpload(obj);
             });
 
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
 
             Thread.Sleep(70);
             _uploadDataCounter.Should().Be(0);
@@ -642,20 +626,19 @@ namespace Realmius.Tests.Client
                     obj.Text = "zxc";
                 });
 
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
             Thread.Sleep(20);
 
             _uploadDataCounter.Should().Be(1);
             string.Join(", ", _lastUploadRequest.ChangeNotifications).Should().BeEquivalentTo($"Type: DbSyncClientObject, PrimaryKey: {obj.Id}, SerializedObject: {{ \"Text\": \"zxc\"}}");
         }
 
-
         [Test]
         public void SkipUpload()
         {
             SetupCorrectUploadResponse();
-            var obj = new DbSyncClientObject()
+            var obj = new DbSyncClientObject
             {
                 Text = "123",
                 Tags = "qwe"
@@ -666,8 +649,8 @@ namespace Realmius.Tests.Client
                 realm.Add(obj);
             });
 
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
 
             _uploadTask?.Wait();
 
@@ -681,12 +664,11 @@ namespace Realmius.Tests.Client
                     realm.SkipUpload(obj);
                 });
 
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
             Thread.Sleep(20);
 
             _uploadDataCounter.Should().Be(0);
-
 
             realm.Write(
                 () =>
@@ -694,20 +676,19 @@ namespace Realmius.Tests.Client
                     obj.Text = "qwe";
                 });
 
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
             Thread.Sleep(20);
 
             _uploadDataCounter.Should().Be(1);
             string.Join(", ", _lastUploadRequest.ChangeNotifications).Should().BeEquivalentTo($"Type: DbSyncClientObject, PrimaryKey: {obj.Id}, SerializedObject: {{ \"Text\": \"qwe\"}}");
         }
 
-
         [Test]
         public void DeleteObject()
         {
             SetupCorrectUploadResponse();
-            var obj = new DbSyncClientObject()
+            var obj = new DbSyncClientObject
             {
                 Text = "123",
                 Tags = "qwe"
@@ -717,8 +698,8 @@ namespace Realmius.Tests.Client
             {
                 realm.Add(obj);
             });
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
             _uploadTask?.Wait();
             _uploadTask?.Wait();
             _uploadDataCounter = 0;
@@ -731,8 +712,8 @@ namespace Realmius.Tests.Client
                 });
             _uploadTask.Wait();
 
-            _syncService.Realm.Refresh();
-            _syncService.Realmius.Refresh();
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
             _uploadTask.Wait();
 
             _uploadDataCounter.Should().Be(1);
@@ -740,13 +721,12 @@ namespace Realmius.Tests.Client
             string.Join(", ", _lastUploadRequest.ChangeNotifications).Should().BeEquivalentTo($"Type: DbSyncClientObject, PrimaryKey: {id}, Deleted");
         }
 
-
         [Test]
         public void DownloadData_DeleteObject()
         {
             var realm = GetRealm();
             var key = "1";
-            var obj = new DbSyncClientObject()
+            var obj = new DbSyncClientObject
             {
                 Text = "zxczxczxc",
                 Id = key
@@ -755,7 +735,7 @@ namespace Realmius.Tests.Client
                 () =>
                 { realm.Add(obj); });
 
-            _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
+            _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse
             {
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
@@ -777,18 +757,17 @@ namespace Realmius.Tests.Client
             obj2.Should().BeNull();
         }
 
-
         [Test]
         public void DownloadData_NoObjectInDb()
         {
             var realm = GetRealm();
 
-            _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
+            _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse
             {
                 LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
-                    new DownloadResponseItem()
+                    new DownloadResponseItem
                     {
                         Type = nameof(DbSyncClientObject),
                         MobilePrimaryKey = "123",
@@ -816,11 +795,11 @@ namespace Realmius.Tests.Client
                     _uploadRequests.Add(x);
 
                     Console.WriteLine("UploadData_1");
-                    var response = new UploadDataResponse()
+                    var response = new UploadDataResponse
                     {
-                        Results = x.ChangeNotifications.Select(z => new UploadDataResponseItem(z.PrimaryKey, z.Type)
-                        {
-                        }).ToList(),
+                        Results = x.ChangeNotifications
+                            .Select(z => new UploadDataResponseItem(z.PrimaryKey, z.Type))
+                            .ToList(),
                     };
                     return Task.FromResult(response);
                 });

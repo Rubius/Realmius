@@ -23,7 +23,7 @@ using Realmius.SyncService.RealmModels;
 
 namespace Realmius.SyncService
 {
-    public interface IRealmiusService : IDisposable, INotifyPropertyChanged
+    public interface IRealmiusSyncService : IDisposable, INotifyPropertyChanged
     {
         /// <summary>
         /// Raised by the SyncServer when backend tells us we are not authorized to upload
@@ -59,7 +59,9 @@ namespace Realmius.SyncService
         void SkipUpload(IRealmiusObjectClient realmObject);
 
         #region File uploading
+
         string FileUploadUrl { get; set; }
+
         SyncState GetFileSyncState(string mobilePrimaryKey);
 
         /// <summary>
@@ -71,6 +73,7 @@ namespace Realmius.SyncService
         /// <param name="fileParameterName">server-side parameter name for a file (FileParameterName is used as default)</param>
         /// <param name="additionalInfo">any information that will be stored along with the file and passed back in </param>
         void QueueFileUpload(string pathToFile, string queryParams = "", string fileUploadUrl = null, string fileParameterName = null, string additionalInfo = null);
-        #endregion
+
+        #endregion //File uploading
     }
 }

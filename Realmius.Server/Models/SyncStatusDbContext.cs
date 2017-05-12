@@ -19,8 +19,6 @@
 using System.Data.Entity;
 using Realmius.Server.Migrations;
 
-//using Realmius.Server.Migrations;
-
 namespace Realmius.Server.Models
 {
     public class SyncStatusDbContext : DbContext

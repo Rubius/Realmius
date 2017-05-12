@@ -42,7 +42,6 @@ namespace Realmius.Tests.Server
         {
             _config = new ShareEverythingRealmiusServerConfiguration(typeof(DbSyncObject), typeof(RefSyncObject));
             _contextFunc = () => new LocalDbContext(_config);
-
         }
 
         [SetUp]
@@ -56,36 +55,34 @@ namespace Realmius.Tests.Server
         [Test]
         public void NoData()
         {
-            var result = _controller.Download(new DownloadDataRequest()
+            var result = _controller.Download(new DownloadDataRequest
             {
-                LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
+                LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.Now } },
                 Types = new[] { nameof(DbSyncObject) },
             }, new SyncUser());
 
             result.ChangedObjects.Should().BeEmpty();
         }
 
-
         [Test]
         public void ManyToManyRef()
         {
             var ef = _contextFunc();
-            var obj1 = new RefSyncObject()
+            var obj1 = new RefSyncObject
             {
                 Id = "1",
                 Text = "123"
             };
-            var obj2 = new RefSyncObject()
+            var obj2 = new RefSyncObject
             {
                 Id = "2",
                 Text = "zxc"
             };
-            var obj3 = new RefSyncObject()
+            var obj3 = new RefSyncObject
             {
                 Id = "3",
                 Text = "asd",
-                References = new List<RefSyncObject>() { obj1, obj2 },
-
+                References = new List<RefSyncObject> { obj1, obj2 }
             };
             ef.RefSyncObjects.Add(obj1);
             ef.RefSyncObjects.Add(obj2);
@@ -106,16 +103,16 @@ namespace Realmius.Tests.Server
         public void SomeData_WithOldChangeTime_DoNotReturn()
         {
             var ef = _contextFunc();
-            ef.DbSyncObjects.Add(new DbSyncObject()
+            ef.DbSyncObjects.Add(new DbSyncObject
             {
                 Id = Guid.NewGuid().ToString(),
                 Text = "123"
             });
             ef.SaveChanges();
 
-            var result = _controller.Download(new DownloadDataRequest()
+            var result = _controller.Download(new DownloadDataRequest
             {
-                LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
+                LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.Now } },
                 Types = new[] { nameof(DbSyncObject) },
             }, new SyncUser());
 
@@ -126,7 +123,7 @@ namespace Realmius.Tests.Server
         public void Delete()
         {
             var ef = _contextFunc();
-            var obj = new DbSyncObject()
+            var obj = new DbSyncObject
             {
                 Id = "2",
                 Text = "123"
@@ -140,9 +137,9 @@ namespace Realmius.Tests.Server
             ef.DbSyncObjects.Remove(obj);
             ef.SaveChanges();
 
-            var result = _controller.Download(new DownloadDataRequest()
+            var result = _controller.Download(new DownloadDataRequest
             {
-                LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", time } },
+                LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", time } },
                 Types = new[] { nameof(DbSyncObject) },
             }, new SyncUser());
 
@@ -150,12 +147,11 @@ namespace Realmius.Tests.Server
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, Deleted");
         }
 
-
         [Test]
         public void SomeData_WithOldNewerTime_DoReturn()
         {
             var ef = _contextFunc();
-            var obj = new DbSyncObject()
+            var obj = new DbSyncObject
             {
                 Id = Guid.NewGuid().ToString(),
                 Text = "123"
@@ -169,17 +165,16 @@ namespace Realmius.Tests.Server
                 Types = new[] { nameof(DbSyncObject) },
             }, new SyncUser());
 
-            result.ChangedObjects.Select(x => x.MobilePrimaryKey).Should().BeEquivalentTo(new[] { obj.Id });
+            result.ChangedObjects.Select(x => x.MobilePrimaryKey).Should().BeEquivalentTo(obj.Id);
 
             DateTime.UtcNow.Subtract(result.LastChange["all"].DateTime).Should().BeLessThan(TimeSpan.FromSeconds(1));
         }
-
 
         [Test]
         public void UpdateModelViaAttachToContext_NotAllFieldsAreUpdated()
         {
             var ef = _contextFunc();
-            var obj = new DbSyncObject()
+            var obj = new DbSyncObject
             {
                 Id = Guid.NewGuid().ToString(),
                 Text = "123"
@@ -191,7 +186,7 @@ namespace Realmius.Tests.Server
             Thread.Sleep(3);
 
             var ef2 = _contextFunc();
-            var obj2 = new DbSyncObject()
+            var obj2 = new DbSyncObject
             {
                 Id = obj.Id,
                 Text = "123456"
@@ -218,7 +213,7 @@ namespace Realmius.Tests.Server
         public void UpdateModelViaUpdate_NotAllFieldsAreUpdated()
         {
             var ef = _contextFunc();
-            var obj = new DbSyncObject()
+            var obj = new DbSyncObject
             {
                 Id = Guid.NewGuid().ToString(),
                 Text = "123"
@@ -231,13 +226,13 @@ namespace Realmius.Tests.Server
             obj.Text = "456";
             ef.SaveChanges();
 
-            var result = _controller.Download(new DownloadDataRequest()
+            var result = _controller.Download(new DownloadDataRequest
             {
-                LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", date } },
+                LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", date } },
                 Types = new[] { nameof(DbSyncObject) },
             }, new SyncUser());
 
-            result.ChangedObjects.Select(x => x.MobilePrimaryKey).Should().BeEquivalentTo(new[] { obj.Id });
+            result.ChangedObjects.Select(x => x.MobilePrimaryKey).Should().BeEquivalentTo(obj.Id);
             result.ChangedObjects[0].SerializedObject.Should().NotContainEquivalentOf($"\"{nameof(DbSyncObject.Id)}\"");
             result.ChangedObjects[0].SerializedObject.Should().NotContainEquivalentOf($"\"{nameof(DbSyncObject.MobilePrimaryKey)}\"");
             result.ChangedObjects[0].SerializedObject.Should().NotContainEquivalentOf($"\"{nameof(DbSyncObject.Tags)}\"");
@@ -250,7 +245,7 @@ namespace Realmius.Tests.Server
         public void Download_AlreadyDownloadedDataIsNotReturned()
         {
             var ef = _contextFunc();
-            var obj = new DbSyncObject()
+            var obj = new DbSyncObject
             {
                 Id = Guid.NewGuid().ToString(),
                 Text = "123"
@@ -258,15 +253,14 @@ namespace Realmius.Tests.Server
             ef.DbSyncObjects.Add(obj);
             ef.SaveChanges();
 
-            var result = _controller.Download(new DownloadDataRequest()
+            var result = _controller.Download(new DownloadDataRequest
             {
-                LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", new DateTimeOffset(DateTime.Now.AddDays(-2)) } },
+                LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", new DateTimeOffset(DateTime.Now.AddDays(-2)) } },
 
                 Types = new[] { nameof(DbSyncObject) },
             }, new SyncUser());
 
             result.ChangedObjects.Count.Should().Be(1);
-
 
             var result2 = _controller.Download(new DownloadDataRequest()
             {
@@ -285,7 +279,6 @@ namespace Realmius.Tests.Server
                 Types = new[] { nameof(DbSyncObject) },
             }, new SyncUser());
             result3.ChangedObjects.Count.Should().Be(1);
-
         }
 
         [Test]
@@ -293,27 +286,25 @@ namespace Realmius.Tests.Server
         {
             var db = _contextFunc();
             db.DbSyncObjects.Add(
-                new DbSyncObject()
+                new DbSyncObject
                 {
                     Id = "2",
                     Text = "123"
                 });
             db.UnknownSyncObjectServers.Add(
-                new UnknownSyncObjectServer()
+                new UnknownSyncObjectServer
                 {
                     Id = "123"
                 });
             db.SaveChanges();
 
-            var res = _controller.Download(new DownloadDataRequest()
+            var res = _controller.Download(new DownloadDataRequest
             {
-                LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.MinValue } },
+                LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.MinValue } },
 
                 Types = new[] { nameof(UnknownSyncObjectServer), nameof(DbSyncObject) },
             }, new SyncUser());
             string.Join(", ", res.ChangedObjects.Select(x => x.Type)).Should().BeEquivalentTo("DbSyncObject");
-
         }
     }
-
 }

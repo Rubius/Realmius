@@ -39,7 +39,7 @@ using Realms.Schema;
 
 namespace Realmius.SyncService
 {
-    public class RealmiusService : IRealmiusService
+    public class RealmiusSyncService : IRealmiusSyncService
     {
         public static int DelayWhenUploadRequestFailed = 2000;
         public static string RealmiusDbPath = "realm.sync";
@@ -58,7 +58,7 @@ namespace Realmius.SyncService
         private readonly object _handleDownloadDataLock = new object();
         private readonly string _realmDatabasePath;
         private static int _downloadIndex;
-        public RealmiusService(Func<Realm> realmFactoryMethod, IApiClient apiClient, bool deleteSyncDatabase, params Type[] typesToSync)
+        public RealmiusSyncService(Func<Realm> realmFactoryMethod, IApiClient apiClient, bool deleteSyncDatabase, params Type[] typesToSync)
         {
             _realmFactoryMethod = realmFactoryMethod;
             _apiClient = apiClient;
@@ -81,10 +81,10 @@ namespace Realmius.SyncService
             }
             var realm = realmFactoryMethod();
             _realmDatabasePath = realm.Config.DatabasePath;
-            IList<RealmiusService> syncServices;
+            IList<RealmiusSyncService> syncServices;
             if (!SyncServiceFactory.SyncServices.TryGetValue(_realmDatabasePath, out syncServices))
             {
-                syncServices = new List<RealmiusService>();
+                syncServices = new List<RealmiusSyncService>();
                 SyncServiceFactory.SyncServices[realm.Config.DatabasePath] = syncServices;
             }
             syncServices.Add(this);
@@ -979,7 +979,7 @@ namespace Realmius.SyncService
             _disposed = true;
             Unsubscribe();
 
-            IList<RealmiusService> syncServices;
+            IList<RealmiusSyncService> syncServices;
             if (SyncServiceFactory.SyncServices.TryGetValue(_realmDatabasePath, out syncServices))
             {
                 syncServices.Remove(this);
