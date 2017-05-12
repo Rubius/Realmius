@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-
 using System;
 using System.Collections.Generic;
 using Realmius.SyncService;
@@ -39,11 +38,10 @@ namespace Realmius
         {
             ForAllServices(
                 realm,
-                (syncService) =>
+                syncService =>
                 {
                     syncService?.SkipUpload(obj);
                 });
-
         }
 
         internal static void AddSkipUpload(this Realm realm, IRealmiusObjectClient obj, bool update = false)
@@ -63,10 +61,13 @@ namespace Realmius
                 });
         }
 
+        private static void ForAllServices(Realm realm, Action<RealmiusSyncService> action)
         {
             var databasePath = realm.Config.DatabasePath;
+            IList<RealmiusSyncService> syncServices;
             if (SyncServiceFactory.SyncServices.TryGetValue(databasePath, out syncServices))
             {
+                foreach (RealmiusSyncService syncService in syncServices)
                 {
                     action(syncService);
                 }
