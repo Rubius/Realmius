@@ -1,9 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Realmius.Server;
 
-using RealmSync.SyncService;
-
-namespace RealmSync.Tests
+namespace Realmius.Tests
 {
     public class IdGuidObject : IRealmSyncObjectServer
     {

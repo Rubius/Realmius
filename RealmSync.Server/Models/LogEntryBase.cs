@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RealmSync.Server.Models
+namespace Realmius.Server.Models
 {
     public class LogEntryBase
     {

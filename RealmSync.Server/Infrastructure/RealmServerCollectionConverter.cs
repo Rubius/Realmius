@@ -4,10 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
-using RealmSync.Server.Models;
-using RealmSync.SyncService;
+using Realmius.Server.Models;
 
-namespace RealmSync.Server.Infrastructure
+namespace Realmius.Server.Infrastructure
 {
 
     public class RealmServerCollectionConverter : JsonConverter

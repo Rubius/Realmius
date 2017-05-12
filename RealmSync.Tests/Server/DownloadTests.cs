@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading;
-
-using RealmSync.Server;
-using RealmSync.SyncService;
-using RealmSync.Tests.Server.Models;
-
 using FluentAssertions;
 using NUnit.Framework;
+using Realmius.Contracts.Models;
+using Realmius.Server;
+using Realmius.Server.QuickStart;
+using Realmius.Server.ServerConfiguration;
+using Realmius.Tests.Server.Models;
 
-namespace RealmSync.Tests.Server
+namespace Realmius.Tests.Server
 {
     [TestFixture]
     public class DownloadTests : TestBase

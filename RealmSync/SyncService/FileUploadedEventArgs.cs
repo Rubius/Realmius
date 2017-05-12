@@ -1,4 +1,4 @@
-namespace RealmSync.SyncService
+namespace Realmius.SyncService
 {
     public class FileUploadedEventArgs
     {

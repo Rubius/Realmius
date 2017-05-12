@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RealmSync.SyncService
+﻿namespace Realmius.Server
 {
     public interface IRealmSyncObjectServer
     {

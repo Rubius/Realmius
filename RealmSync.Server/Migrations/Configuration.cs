@@ -1,18 +1,16 @@
-namespace RealmSync.Server.Migrations
-{
-    using System;
-    using System.Data.Entity;
-    using System.Data.Entity.Migrations;
-    using System.Linq;
+using System.Data.Entity.Migrations;
+using Realmius.Server.Models;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<RealmSync.Server.Models.SyncStatusDbContext>
+namespace Realmius.Server.Migrations
+{
+    internal sealed class Configuration : DbMigrationsConfiguration<SyncStatusDbContext>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
         }
 
-        protected override void Seed(RealmSync.Server.Models.SyncStatusDbContext context)
+        protected override void Seed(SyncStatusDbContext context)
         {
             //  This method will be called after migrating to the latest version.
 

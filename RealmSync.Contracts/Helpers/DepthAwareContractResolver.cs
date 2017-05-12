@@ -3,7 +3,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace RealmSync.Contracts.Helpers
+namespace Realmius.Contracts.Helpers
 {
     internal class DepthAwareContractResolver : DefaultContractResolver
     {

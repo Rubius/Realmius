@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Realmius.SyncService;
 using Realms;
-using RealmSync.SyncService;
 
-namespace RealmSync
+namespace Realmius
 {
     public static class RealmExtensions
     {

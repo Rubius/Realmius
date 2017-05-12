@@ -5,11 +5,11 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Realmius.SyncService;
 using Realms;
 using Realms.Schema;
-using RealmSync.SyncService;
 
-namespace RealmSync
+namespace Realmius.Infrastructure
 {
 
     public class RealmReferencesSerializer : JsonConverter

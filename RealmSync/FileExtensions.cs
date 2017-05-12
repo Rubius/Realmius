@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using PCLStorage;
 
-namespace PCLStorage
+namespace Realmius
 {
     public class FileExtensions2
     {

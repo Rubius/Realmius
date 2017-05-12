@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using RealmSync.Server.Models;
+using Realmius.Server.Models;
 
-namespace RealmSync.Server
+namespace Realmius.Server
 {
     public class UpdatedDataBatch
     {

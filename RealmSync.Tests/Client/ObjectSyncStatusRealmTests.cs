@@ -1,9 +1,8 @@
-﻿using RealmSync.SyncService;
-
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
+using Realmius.SyncService.RealmModels;
 
-namespace RealmSync.Tests.Client
+namespace Realmius.Tests.Client
 {
     [TestFixture]
     public class ObjectSyncStatusRealmTests

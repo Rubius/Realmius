@@ -1,11 +1,10 @@
 ﻿using System.Data.Entity;
+using Realmius.Server.Models;
+using Realmius.Server.ServerConfiguration;
+using Realmius.Tests.Server;
+using Realmius.Tests.Server.Models;
 
-using RealmSync.Server;
-using RealmSync.Server.Models;
-using RealmSync.Tests.Server;
-using RealmSync.Tests.Server.Models;
-
-namespace RealmSync.Tests
+namespace Realmius.Tests
 {
     public class LocalDbContext : ChangeTrackingDbContext
     {

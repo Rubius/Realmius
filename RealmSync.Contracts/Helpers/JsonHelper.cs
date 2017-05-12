@@ -3,9 +3,8 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RealmSync.Contracts.Helpers;
 
-namespace RealmSync.SyncService
+namespace Realmius.Contracts.Helpers
 {
     public class JsonHelper
     {

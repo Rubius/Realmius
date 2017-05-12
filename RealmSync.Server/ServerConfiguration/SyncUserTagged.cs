@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace RealmSync.Server
+namespace Realmius.Server.ServerConfiguration
 {
     public class SyncUserTagged : ISyncUser
     {

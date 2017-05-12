@@ -1,4 +1,4 @@
-namespace RealmSync.Server.Models
+namespace Realmius.Server.Models
 {
     /// <summary>
     /// should be applied to types to have an ability to track changes made to DB directly (not via EF)

@@ -1,6 +1,6 @@
-﻿using RealmSync.SyncService;
+﻿using Realmius.Contracts.Models;
 
-namespace RealmSync.Server.Models
+namespace Realmius.Server.Models
 {
     public class DownloadResponseItemInfo
     {

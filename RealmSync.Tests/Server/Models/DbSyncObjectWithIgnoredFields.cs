@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
-using Realms;
-using RealmSync.SyncService;
-
 using Newtonsoft.Json;
+using Realmius.Server;
+using Realms;
 
-namespace RealmSync.Tests.Server.Models
+namespace Realmius.Tests.Server.Models
 {
     public class DbSyncObjectWithIgnoredFields : IRealmSyncObjectServer
     {

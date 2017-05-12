@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace RealmSync.Contracts.Helpers
+namespace Realmius.Contracts.Helpers
 {
     public class StringToIntConverter : JsonConverter
     {

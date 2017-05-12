@@ -5,9 +5,10 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Realmius.Infrastructure;
 using Realms;
 
-namespace RealmSync.SyncService
+namespace Realmius.SyncService
 {
     internal class RealmObjectResolver : DefaultContractResolver
     {

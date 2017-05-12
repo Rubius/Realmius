@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using RealmSync.SyncService;
+using Realmius.Contracts.Models;
 
-namespace RealmSync.Server
+namespace Realmius.Server
 {
     internal class UpdatedDataItem
     {

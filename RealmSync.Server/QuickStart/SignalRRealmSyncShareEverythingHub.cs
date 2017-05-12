@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Data.Entity;
 using Microsoft.AspNet.SignalR.Hubs;
-using RealmSync.Server.Models;
+using Realmius.Server.Models;
+using Realmius.Server.ServerConfiguration;
 
-namespace RealmSync.Server
+namespace Realmius.Server.QuickStart
 {
     public class SignalRRealmSyncShareEverythingHub : SignalRRealmSyncHub<SyncUser>
     {

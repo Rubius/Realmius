@@ -1,7 +1,7 @@
 ﻿using System;
 using Realms;
 
-namespace RealmSync.SyncService
+namespace Realmius.SyncService.RealmModels
 {
     public class UploadRequestItemRealm : RealmObject
     {

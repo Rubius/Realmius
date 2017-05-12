@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RealmSync
+namespace Realmius.Server
 {
     internal class Logger
     {

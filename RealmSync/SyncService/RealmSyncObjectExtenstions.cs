@@ -1,4 +1,6 @@
-﻿namespace RealmSync.SyncService
+﻿using Realmius.SyncService.RealmModels;
+
+namespace Realmius.SyncService
 {
     public static class RealmSyncObjectExtenstions
     {

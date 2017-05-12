@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace RealmSync.SyncService
+namespace Realmius.SyncService.ApiClient
 {
     public class ApiClientStartOptions
     {

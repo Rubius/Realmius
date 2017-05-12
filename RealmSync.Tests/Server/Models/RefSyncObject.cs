@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-
-using Realms;
-using RealmSync.Server.Infrastructure;
-using RealmSync.SyncService;
-
 using Newtonsoft.Json;
+using Realmius.Server;
+using Realmius.Server.Infrastructure;
+using Realms;
 
-namespace RealmSync.Tests.Server.Models
+namespace Realmius.Tests.Server.Models
 {
     
     public class RefSyncObject : IRealmSyncObjectServer

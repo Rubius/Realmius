@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Realms;
 
-namespace RealmSync.SyncService
+namespace Realmius.SyncService
 {
     internal class SyncConfiguration : RealmObject
     {

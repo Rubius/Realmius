@@ -1,4 +1,4 @@
-﻿namespace RealmSync
+﻿namespace Realmius.Contracts
 {
     public class Constants
     {

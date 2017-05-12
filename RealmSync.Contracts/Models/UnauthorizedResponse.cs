@@ -1,4 +1,4 @@
-﻿namespace RealmSync.SyncService
+﻿namespace Realmius.Contracts.Models
 {
     public class UnauthorizedResponse
     {

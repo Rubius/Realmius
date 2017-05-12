@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Newtonsoft.Json;
-using RealmSync.Server.Models;
-using RealmSync.SyncService;
+using Realmius.Contracts;
+using Realmius.Contracts.Models;
+using Realmius.Server.Models;
+using Realmius.Server.ServerConfiguration;
 
-namespace RealmSync.Server
+namespace Realmius.Server
 {
     public abstract class SignalRRealmSyncHub<TUser> : Hub
         where TUser : ISyncUser
