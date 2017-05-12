@@ -3,8 +3,7 @@ solution: Realmius.sln
 
 install:
   - nuget restore Realmius.sln
-  - nuget install NUnit.Runners -Version 3.6.1 -OutputDirectory testrunner
 script:
   - xbuild /p:Configuration=Release Realmius.sln
-  - mono ./testrunner/NUnit.Runners.3.6.1/tools/nunit-console.exe ./Realmius.Tests/bin/Release/Realmius.Tests.dll
+  - mono ./packages/NUnit.ConsoleRunner.3.6.1/tools/nunit3-console.exe ./Realmius.Tests/bin/Release/Realmius.Tests.dll
   
