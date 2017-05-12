@@ -7,8 +7,8 @@
     <ProjectGuid>{197EEC4A-5985-4422-B76F-887281D7BC04}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RealmSync.Server</RootNamespace>
-    <AssemblyName>RealmSync.Server</AssemblyName>
+    <RootNamespace>Realmius.Server</RootNamespace>
+    <AssemblyName>Realmius.Server</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -122,9 +122,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RealmSync.Contracts\RealmSync.Contracts.csproj">
+    <ProjectReference Include="..\RealmSync.Contracts\Realmius.Contracts.csproj">
       <Project>{eec4eb66-de49-47b1-b29c-3f20edce2178}</Project>
-      <Name>RealmSync.Contracts</Name>
+      <Name>Realmius.Contracts</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

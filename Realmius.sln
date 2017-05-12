@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealmSync", "RealmSync\RealmSync.csproj", "{B1651A06-7CEC-4529-B8EE-E594D26A62D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius", "RealmSync\Realmius.csproj", "{B1651A06-7CEC-4529-B8EE-E594D26A62D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealmSync.Contracts", "RealmSync.Contracts\RealmSync.Contracts.csproj", "{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius.Contracts", "RealmSync.Contracts\Realmius.Contracts.csproj", "{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealmSync.Server", "RealmSync.Server\RealmSync.Server.csproj", "{197EEC4A-5985-4422-B76F-887281D7BC04}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius.Server", "RealmSync.Server\Realmius.Server.csproj", "{197EEC4A-5985-4422-B76F-887281D7BC04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealmSync.Tests", "RealmSync.Tests\RealmSync.Tests.csproj", "{2C4A00F9-0B66-4CBA-BBD0-601172B00278}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius.Tests", "RealmSync.Tests\Realmius.Tests.csproj", "{2C4A00F9-0B66-4CBA-BBD0-601172B00278}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
