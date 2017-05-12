@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using NUnit.Framework;
+
 using RealmSync.Server;
-using RealmSync.Server.Models;
 using RealmSync.Tests.Server.Models;
+
+using NUnit.Framework;
 using Z.EntityFramework.Plus;
 
 namespace RealmSync.Tests.Server
 {
-
     public static class TestsExtensions
     {
         public static Dictionary<string, DateTimeOffset> ToDictionary(this DateTimeOffset date)

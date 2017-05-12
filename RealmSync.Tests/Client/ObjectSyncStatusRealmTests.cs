@@ -1,6 +1,7 @@
-﻿using FluentAssertions;
+﻿using RealmSync.SyncService;
+
+using FluentAssertions;
 using NUnit.Framework;
-using RealmSync.SyncService;
 
 namespace RealmSync.Tests.Client
 {
@@ -35,7 +36,6 @@ namespace RealmSync.Tests.Client
 
             status2.MobilePrimaryKey.Should().Be("123");
             status2.Type.Should().Be("zxc");
-
         }
     }
 }

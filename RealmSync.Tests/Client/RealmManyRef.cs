@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+
 using Realms;
 using RealmSync.SyncService;
+
+using Newtonsoft.Json;
 
 namespace RealmSync.Tests.Client
 {

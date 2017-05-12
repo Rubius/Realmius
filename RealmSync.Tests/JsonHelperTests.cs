@@ -1,6 +1,7 @@
-﻿using FluentAssertions;
+﻿using RealmSync.SyncService;
+
+using FluentAssertions;
 using NUnit.Framework;
-using RealmSync.SyncService;
 
 namespace RealmSync.Tests
 {
@@ -35,5 +36,4 @@ namespace RealmSync.Tests
             diff.Should().BeEquivalentTo("{\r\n  \"a\": 21,\r\n  \"b\": \"21\"\r\n}");
         }
     }
-
 }

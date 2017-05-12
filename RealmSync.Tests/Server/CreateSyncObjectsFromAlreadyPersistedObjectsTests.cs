@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core;
-using System.Data.Entity.Core.Metadata.Edm;
-using System.Data.Entity.Core.Objects;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading;
-using FluentAssertions;
-using Newtonsoft.Json;
-using NUnit.Framework;
+
 using RealmSync.Server;
-using RealmSync.Server.Models;
 using RealmSync.SyncService;
 using RealmSync.Tests.Server.Models;
-using Z.EntityFramework.Plus;
+
+using FluentAssertions;
+using NUnit.Framework;
 
 namespace RealmSync.Tests.Server
 {

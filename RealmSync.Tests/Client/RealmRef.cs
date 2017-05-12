@@ -1,7 +1,9 @@
 ﻿using System;
-using Newtonsoft.Json;
+
 using Realms;
 using RealmSync.SyncService;
+
+using Newtonsoft.Json;
 
 namespace RealmSync.Tests.Client
 {

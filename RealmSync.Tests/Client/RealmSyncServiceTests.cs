@@ -4,12 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
-using Moq;
-using NUnit.Framework;
+
 using Realms;
 using RealmSync.SyncService;
 using RealmSync.Tests.Server;
+
+using FluentAssertions;
+using Moq;
+using NUnit.Framework;
+
 using TestBase = RealmSync.Tests.Client.Base.TestBase;
 
 namespace RealmSync.Tests.Client

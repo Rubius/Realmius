@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 using RealmSync.SyncService;
 
 namespace RealmSync.Tests
@@ -11,11 +12,13 @@ namespace RealmSync.Tests
         public string Tags { get; set; }
 
         #region IRealmSyncObject
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public string MobilePrimaryKey { get { return Id.ToString(); } }
+        public string MobilePrimaryKey => Id.ToString();
+
         #endregion
     }
 }

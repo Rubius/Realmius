@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using FluentAssertions;
-using Moq;
-using Newtonsoft.Json;
-using NUnit.Framework;
-using RealmSync.Contracts.Helpers;
+
 using RealmSync.Server;
-using RealmSync.Server.Models;
 using RealmSync.SyncService;
 using RealmSync.Tests.Server.Models;
-using Z.EntityFramework.Plus;
+
+using Newtonsoft.Json;
+using NUnit.Framework;
+using FluentAssertions;
+using Moq;
 
 namespace RealmSync.Tests.Server
 {
