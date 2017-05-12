@@ -52,7 +52,6 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -69,12 +68,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\201701291631390_Initial.cs" />
-    <Compile Include="Migrations\201701291631390_Initial.Designer.cs">
-      <DependentUpon>201701291631390_Initial.cs</DependentUpon>
+    <Compile Include="Expressions\ParameterRebinder.cs" />
+    <Compile Include="Expressions\Utility.cs" />
+    <Compile Include="Infrastructure\RealmServerObjectResolver.cs" />
+    <Compile Include="Infrastructure\RealmServerCollectionConverter.cs" />
+    <Compile Include="IRealmSyncObjectServer.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="Migrations\201702191141280_Initial.cs" />
+    <Compile Include="Migrations\201702191141280_Initial.Designer.cs">
+      <DependentUpon>201702191141280_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703051003558_SyncStatusCompositeKey.cs" />
+    <Compile Include="Migrations\201703051003558_SyncStatusCompositeKey.Designer.cs">
+      <DependentUpon>201703051003558_SyncStatusCompositeKey.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\DownloadResponseItemInfo.cs" />
+    <Compile Include="Models\EfEntityInfo.cs" />
+    <Compile Include="Models\LogEntryBase.cs" />
+    <Compile Include="Models\SyncTypeInfo.cs" />
     <Compile Include="QuickStart\ShareEverythingRealmSyncServerConfiguration.cs" />
+    <Compile Include="ServerConfiguration\CheckAndProcessArgs.cs" />
     <Compile Include="ServerConfiguration\RealmSyncServerConfiguration.cs" />
     <Compile Include="ServerConfiguration\IRealmSyncServerConfiguration.cs" />
     <Compile Include="ServerConfiguration\ISyncUser.cs" />
@@ -82,6 +96,7 @@
     <Compile Include="Models\IDbEntityWithVersionSupport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RealmSyncServerProcessor.cs" />
+    <Compile Include="ServerConfiguration\SyncConfigurationBase.cs" />
     <Compile Include="SignalRRealmSyncHub.cs" />
     <Compile Include="Models\SyncStatusDbContext.cs" />
     <Compile Include="Models\SyncStatusServerObject.cs" />
@@ -89,26 +104,28 @@
     <Compile Include="ServerConfiguration\SyncUser.cs" />
     <Compile Include="QuickStart\SignalRRealmSyncShareEverythingHub.cs" />
     <Compile Include="UpdatedDataBatch.cs" />
+    <Compile Include="UpdatedDataHandler.cs" />
     <Compile Include="UpdatedDataItem.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\RealmSync.Model\RealmSync.Model.csproj">
-      <Project>{1217ecdb-ccd8-48d4-b84b-8a87ec9db2a8}</Project>
-      <Name>RealmSync.Model</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\RealmSync\RealmSync.csproj">
-      <Project>{B1651A06-7CEC-4529-B8EE-E594D26A62D3}</Project>
-      <Name>RealmSync</Name>
-    </ProjectReference>
+    <EmbeddedResource Include="Migrations\201702191141280_Initial.resx">
+      <DependentUpon>201702191141280_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703051003558_SyncStatusCompositeKey.resx">
+      <DependentUpon>201703051003558_SyncStatusCompositeKey.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201701291631390_Initial.resx">
-      <DependentUpon>201701291631390_Initial.cs</DependentUpon>
-    </EmbeddedResource>
+    <ProjectReference Include="..\RealmSync.Contracts\RealmSync.Contracts.csproj">
+      <Project>{eec4eb66-de49-47b1-b29c-3f20edce2178}</Project>
+      <Name>RealmSync.Contracts</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

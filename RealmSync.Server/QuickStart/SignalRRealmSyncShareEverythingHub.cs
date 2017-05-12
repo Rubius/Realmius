@@ -8,7 +8,7 @@ namespace RealmSync.Server
     public class SignalRRealmSyncShareEverythingHub : SignalRRealmSyncHub<SyncUser>
     {
         public SignalRRealmSyncShareEverythingHub(Func<ChangeTrackingDbContext> dbContextFactoryFunc, params Type[] syncedTypes) :
-            base(new RealmSyncServerProcessor<SyncUser>(dbContextFactoryFunc, new ShareEverythingRealmSyncServerConfiguration(syncedTypes)))
+            base(new RealmSyncServerProcessor<SyncUser>(dbContextFactoryFunc, new ShareEverythingRealmSyncServerConfiguration<SyncUser>(syncedTypes)))
         {
         }
 

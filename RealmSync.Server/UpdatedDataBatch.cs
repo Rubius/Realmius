@@ -5,11 +5,11 @@ namespace RealmSync.Server
 {
     public class UpdatedDataBatch
     {
-        public IList<SyncStatusServerObject> Items { get; set; }
+        public IList<DownloadResponseItemInfo> Items { get; set; }
 
         public UpdatedDataBatch()
         {
-            Items = new List<SyncStatusServerObject>();
+            Items = new List<DownloadResponseItemInfo>();
         }
     }
 }

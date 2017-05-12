@@ -1,16 +1,38 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 using Realms;
 
 namespace RealmSync.SyncService
 {
     internal class SyncConfiguration : RealmObject
     {
+
         [PrimaryKey]
         public int Id { get; set; }
-        public DateTimeOffset LastDownloaded
+
+        public string LastDownloadedTagsSerialized { get; set; }
+
+        private Dictionary<string, DateTimeOffset> _lastDownloadedTags;
+        public Dictionary<string, DateTimeOffset> LastDownloadedTags
         {
-            get;
-            set;
-        } = new DateTimeOffset(new DateTime(1970, 1, 1));
+            get
+            {
+                if (string.IsNullOrEmpty(LastDownloadedTagsSerialized))
+                    _lastDownloadedTags = new Dictionary<string, DateTimeOffset>();
+
+                return _lastDownloadedTags ?? (_lastDownloadedTags = JsonConvert.DeserializeObject<Dictionary<string, DateTimeOffset>>(LastDownloadedTagsSerialized));
+            }
+            set
+            {
+                _lastDownloadedTags = value;
+                SaveLastDownloadedTags();
+            }
+        }
+
+        public void SaveLastDownloadedTags()
+        {
+            LastDownloadedTagsSerialized = JsonConvert.SerializeObject(_lastDownloadedTags);
+        }
     }
 }

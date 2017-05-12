@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using RealmSync.Server.Models;
 using RealmSync.SyncService;
 
 namespace RealmSync.Server
 {
-    public class RealmSyncServerConfiguration : IRealmSyncServerConfiguration<SyncUser>
+    public class RealmSyncServerConfiguration : SyncConfigurationBase<SyncUser>
     {
         private readonly Func<IRealmSyncObjectServer, IList<string>> _getTagsFunc;
-        public IList<Type> TypesToSync { get; }
+        public override IList<Type> TypesToSync { get; }
 
         public RealmSyncServerConfiguration(IList<Type> typesToSync, Func<IRealmSyncObjectServer, IList<string>> getTagsFunc)
         {
@@ -15,12 +16,12 @@ namespace RealmSync.Server
             TypesToSync = typesToSync;
         }
 
-        public bool CheckAndProcess(IRealmSyncObjectServer deserialized, SyncUser user)
+        public override bool CheckAndProcess(CheckAndProcessArgs<SyncUser> args)
         {
             return true;
         }
 
-        public IList<string> GetTagsForObject(IRealmSyncObjectServer obj)
+        public override IList<string> GetTagsForObject(ChangeTrackingDbContext db, IRealmSyncObjectServer obj)
         {
             return _getTagsFunc(obj);
         }

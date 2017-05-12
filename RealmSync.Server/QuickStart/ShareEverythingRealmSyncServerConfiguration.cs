@@ -1,18 +1,31 @@
 using System;
 using System.Collections.Generic;
+using RealmSync.Server.Models;
 using RealmSync.SyncService;
 
 namespace RealmSync.Server
 {
-    public class ShareEverythingRealmSyncServerConfiguration : IRealmSyncServerConfiguration<ISyncUser>
+    public class ShareEverythingRealmSyncServerConfiguration : ShareEverythingRealmSyncServerConfiguration<ISyncUser>
     {
-        public bool CheckAndProcess(IRealmSyncObjectServer deserialized, ISyncUser user)
+        public ShareEverythingRealmSyncServerConfiguration(IList<Type> typesToSync) : base(typesToSync)
+        {
+        }
+
+        public ShareEverythingRealmSyncServerConfiguration(Type typeToSync, params Type[] typesToSync) : base(typeToSync, typesToSync)
+        {
+        }
+    }
+
+    public class ShareEverythingRealmSyncServerConfiguration<T> : SyncConfigurationBase<T>
+        where T : ISyncUser
+    {
+        public override bool CheckAndProcess(CheckAndProcessArgs<T> args)
         {
             return true;
         }
 
-        public IList<Type> TypesToSync { get; }
-        public IList<string> GetTagsForObject(IRealmSyncObjectServer obj)
+        public override IList<Type> TypesToSync { get; }
+        public override IList<string> GetTagsForObject(ChangeTrackingDbContext db, IRealmSyncObjectServer obj)
         {
             return new[] { "all" };
         }

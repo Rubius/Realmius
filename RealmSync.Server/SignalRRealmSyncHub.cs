@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
+using Newtonsoft.Json;
 using RealmSync.Server.Models;
 using RealmSync.SyncService;
 
@@ -12,39 +14,31 @@ namespace RealmSync.Server
     public abstract class SignalRRealmSyncHub<TUser> : Hub
         where TUser : ISyncUser
     {
-        private readonly RealmSyncServerProcessor<TUser> _processor;
+        protected readonly RealmSyncServerProcessor<TUser> _processor;
+        protected static RealmSyncServerProcessor<TUser> _processorStatic;
+
+        static SignalRRealmSyncHub()
+        {
+            ChangeTrackingDbContext.DataUpdated += UpdatedDataHandler.HandleDataChanges;
+        }
 
         protected SignalRRealmSyncHub(RealmSyncServerProcessor<TUser> processor)
         {
             _processor = processor;
-            ChangeTrackingDbContext.DataUpdated += HandleDataChanges;
+            if (_processorStatic == null)
+                _processorStatic = processor;
         }
+
         public UploadDataResponse UploadData(UploadDataRequest request)
         {
-            return _processor.Upload(request, _connections[Context.ConnectionId]);
-        }
-
-        private void HandleDataChanges(object sender, UpdatedDataBatch updatedDataBatch)
-        {
-            foreach (var item in updatedDataBatch.Items)
+            if (!_connections.ContainsKey(Context.ConnectionId))
             {
-                var download = new DownloadDataResponse()
-                {
-                };
-                download.ChangedObjects.Add(new DownloadResponseItem()
-                {
-                    MobilePrimaryKey = item.MobilePrimaryKey,
-                    Type = item.Type,
-                    SerializedObject = item.ChangesAsJson,
-                });
-                download.LastChange = DateTimeOffset.UtcNow;
-
-                var tags = new List<string>()
-                {
-                    item.Tag0,item.Tag1,item.Tag2,item.Tag3
-                };
-                this.Clients.Groups(tags).DataDownloaded(download);
+                Logger.Log.Info($"User with ConnectionId {Context.ConnectionId} not found in the connections pool (not authorized?)");
+                return new UploadDataResponse();
             }
+
+            var result = _processor.Upload(request, _connections[Context.ConnectionId]);
+            return result;
         }
 
         private static readonly Dictionary<string, TUser> _connections = new Dictionary<string, TUser>();
@@ -55,18 +49,104 @@ namespace RealmSync.Server
             return base.OnConnected();
         }
 
+        public static void AddUserGroup<THub>(Func<TUser, bool> userPredicate, string group)
+            where THub : SignalRRealmSyncHub<TUser>
+        {
+            var connectionIds = _connections.Where(x => userPredicate(x.Value));
+            var hub = GlobalHost.ConnectionManager.GetHubContext<THub>();
+
+            foreach (KeyValuePair<string, TUser> connectionId in connectionIds)
+            {
+                hub.Groups.Add(connectionId.Key, group);
+
+                if (connectionId.Value.Tags.Contains(group))
+                    continue;
+
+                connectionId.Value.Tags.Add(group);
+                //include data for the tag
+                var changes = _processorStatic.Download(new DownloadDataRequest()
+                {
+                    LastChangeTime = new Dictionary<string, DateTimeOffset>() { { group, DateTimeOffset.MinValue } },
+                    Types = _processorStatic.Configuration.TypesToSync.Select(x => x.Name),
+                    OnlyDownloadSpecifiedTags = true,
+                }, connectionId.Value);
+
+                hub.Clients.Client(connectionId.Key).DataDownloaded(new DownloadDataResponse()
+                {
+                    ChangedObjects = changes.ChangedObjects,
+                    LastChange = new Dictionary<string, DateTimeOffset>() { { group, DateTimeOffset.UtcNow } },
+                    LastChangeContainsNewTags = true,
+                });
+            }
+
+        }
+
+        //public static void UpdateUserGroups<THub>(Func<TUser, bool> userPredicate, IList<string> groups)
+        //    where THub : SignalRRealmSyncHub<TUser>
+        //{
+        //    var connectionIds = _connections.Where(x => userPredicate(x.Value));
+        //    var hub = GlobalHost.ConnectionManager.GetHubContext<THub>();
+
+        //    foreach (KeyValuePair<string, TUser> connectionId in connectionIds)
+        //    {
+        //        var oldGroups = connectionId.Value.Tags.ToList();
+
+        //        foreach (string oldGroup in oldGroups)
+        //        {
+        //            hub.Groups.Remove(connectionId.Key, oldGroup);
+        //        }
+
+        //        connectionId.Value.Tags.Clear();
+        //        foreach (var item in groups)
+        //        {
+        //            connectionId.Value.Tags.Add(item);
+        //            hub.Groups.Add(connectionId.Key, item);
+        //        }
+        //    }
+        //}
+
         protected virtual void UserConnected()
         {
             var user = CreateUserInfo(Context);
+            if (user == null)
+            {
+                Clients.Caller.Unauthorized(new UnauthorizedResponse()
+                {
+                    Error = "User not authorized"
+                });
+                return;
+            }
             _connections[Context.ConnectionId] = user;
 
-            var lastDownload = Context.QueryString[Constants.LastDownloadParameterName];
+
+            var lastDownloadString = Context.QueryString[Constants.LastDownloadParameterName];
+            Dictionary<string, DateTimeOffset> lastDownload;
+            if (string.IsNullOrEmpty(lastDownloadString))
+            {
+                var lastDownloadOld = Context.QueryString[Constants.LastDownloadParameterNameOld];
+                if (string.IsNullOrEmpty(lastDownloadOld))
+                {
+                    lastDownload = new Dictionary<string, DateTimeOffset>();
+                }
+                else
+                {
+                    var date = DateTimeOffset.Parse(lastDownloadOld);
+                    lastDownload = user.Tags.ToDictionary(x => x, x => date);
+                }
+
+            }
+            else
+            {
+                lastDownload = JsonConvert.DeserializeObject<Dictionary<string, DateTimeOffset>>(lastDownloadString);
+            }
             var types = Context.QueryString[Constants.SyncTypesParameterName];
             var data = _processor.Download(new DownloadDataRequest()
             {
-                LastChangeTime = DateTimeOffset.Parse(lastDownload),
+                LastChangeTime = lastDownload,
                 Types = types.Split(','),
             }, user);
+
+            data.LastChangeContainsNewTags = true;
             Clients.Caller.DataDownloaded(data);
 
             foreach (var userTag in user.Tags)
@@ -89,13 +169,6 @@ namespace RealmSync.Server
             UserConnected();
 
             await base.OnReconnected();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            ChangeTrackingDbContext.DataUpdated -= HandleDataChanges;
-
-            base.Dispose(disposing);
         }
 
         protected abstract TUser CreateUserInfo(HubCallerContext context);
