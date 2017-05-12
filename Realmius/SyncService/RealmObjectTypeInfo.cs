@@ -1,0 +1,19 @@
+using System;
+using System.Reflection;
+
+namespace Realmius.SyncService
+{
+    internal class RealmObjectTypeInfo
+    {
+        public Type Type { get; private set; }
+        public bool ImplementsSyncState { get; private set; }
+
+        private static readonly Type syncObjectWithSyncStatusInterface = typeof(IRealmiusObjectWithSyncStatusClient);
+        public RealmObjectTypeInfo(Type type)
+        {
+            Type = type;
+            ImplementsSyncState =
+                syncObjectWithSyncStatusInterface.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo());
+        }
+    }
+}
