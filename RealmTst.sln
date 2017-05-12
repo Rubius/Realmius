@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealmWeb", "RealmTst\RealmWeb.csproj", "{9769C0B5-C2C1-4B12-92E3-98288BE1F77A}"
 EndProject
@@ -12,8 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{2C4A00F9-0B66-4CBA-BBD0-601172B00278}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealmSync.Server", "RealmSync.Server\RealmSync.Server.csproj", "{197EEC4A-5985-4422-B76F-887281D7BC04}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealmIos", "RealmIos\RealmIos.csproj", "{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "RealmSync.Model.Shared", "RealmSync.Model.Shared\RealmSync.Model.Shared.shproj", "{8864D395-0079-48D9-A152-587CD1C2BEE2}"
 EndProject
@@ -94,18 +92,6 @@ Global
 		{197EEC4A-5985-4422-B76F-887281D7BC04}.Release|iPhone.Build.0 = Release|Any CPU
 		{197EEC4A-5985-4422-B76F-887281D7BC04}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{197EEC4A-5985-4422-B76F-887281D7BC04}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
-		{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}.Debug|Any CPU.ActiveCfg = Debug|iPhoneSimulator
-		{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}.Debug|Any CPU.Build.0 = Debug|iPhoneSimulator
-		{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}.Debug|iPhone.ActiveCfg = Debug|iPhone
-		{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}.Debug|iPhone.Build.0 = Debug|iPhone
-		{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
-		{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
-		{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}.Release|Any CPU.ActiveCfg = Release|iPhone
-		{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}.Release|Any CPU.Build.0 = Release|iPhone
-		{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}.Release|iPhone.ActiveCfg = Release|iPhone
-		{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}.Release|iPhone.Build.0 = Release|iPhone
-		{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
-		{631CBA40-B72C-4B11-A44D-9C2A8AED7BD1}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{E724FC5C-C849-4B94-A196-E2F32048BA19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E724FC5C-C849-4B94-A196-E2F32048BA19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E724FC5C-C849-4B94-A196-E2F32048BA19}.Debug|iPhone.ActiveCfg = Debug|Any CPU
