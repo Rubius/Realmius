@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -81,10 +82,12 @@ namespace Realmius.Tests.Client
         private Mock<RealmiusSyncService> CreateSyncService()
         {
             Func<Realm> func = GetRealm;
-            var mock = new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, new[] { typeof(DbSyncClientObject), typeof(DbSyncClientObject2), typeof(DbSyncWithDoNotUpload) })
+            
+            var mock = new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, Assembly.GetExecutingAssembly())
             {
                 CallBase = true,
             };
+
             mock.Object.InTests = true;
             mock.Setup(x => x.StartUploadTask()).Callback(
                 () =>
@@ -112,7 +115,7 @@ namespace Realmius.Tests.Client
 
             _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
             {
-                LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
+                LastChange = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
                     new DownloadResponseItem
@@ -519,7 +522,6 @@ namespace Realmius.Tests.Client
                 realm2.Add(obj2, true);
             });
 
-
             syncService.Realm.Refresh();
             syncService.Realmius.Refresh();
             syncServiceMock.Verify(x => x.ObjectChanged(It.Is<IRealmCollection<RealmObject>>(z => z != null), It.Is<ChangeSet>(z => z != null), It.IsAny<Exception>()), Times.Once);
@@ -552,7 +554,6 @@ namespace Realmius.Tests.Client
                 realm.Add(obj);
                 realm.Add(obj2);
             });
-
 
             _realmiusSyncService.Realm.Refresh();
             _uploadTask.Wait();
@@ -764,7 +765,7 @@ namespace Realmius.Tests.Client
 
             _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse
             {
-                LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
+                LastChange = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
                     new DownloadResponseItem

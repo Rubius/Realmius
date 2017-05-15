@@ -50,23 +50,40 @@ namespace Realmius.SyncService
         public event EventHandler DataDownloaded;
         public event EventHandler<FileUploadedEventArgs> FileUploaded;
 
-        private readonly bool _isBuggedRealm;
-        private readonly Func<Realm> _realmFactoryMethod;
+        private bool _isBuggedRealm;
+        private Func<Realm> _realmFactoryMethod;
         private readonly Dictionary<string, RealmObjectTypeInfo> _typesToSync;
-        private readonly IApiClient _apiClient;
-        private readonly JsonSerializerSettings _jsonSerializerSettings;
+        private IApiClient _apiClient;
+        private JsonSerializerSettings _jsonSerializerSettings;
         private readonly object _handleDownloadDataLock = new object();
-        private readonly string _realmDatabasePath;
+        private string _realmDatabasePath;
         private static int _downloadIndex;
-
+        
         public RealmiusSyncService(Func<Realm> realmFactoryMethod, IApiClient apiClient, bool deleteSyncDatabase, params Type[] typesToSync)
+        {
+            _typesToSync = typesToSync.ToDictionary(x => x.Name, x => new RealmObjectTypeInfo(x));
+
+            Initialize(realmFactoryMethod, apiClient, deleteSyncDatabase);
+        }
+
+        public RealmiusSyncService(Func<Realm> realmFactoryMethod, IApiClient apiClient, bool deleteSyncDatabase, Assembly assemblyWithModels)
+        {
+            var a = assemblyWithModels.ExportedTypes.Where(
+                type => type.GetTypeInfo().IsClass &&
+                        typeof(IRealmiusObjectClient).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()) &&
+                        typeof(RealmObject).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()));
+
+            _typesToSync = a.ToDictionary(x => x.Name, x => new RealmObjectTypeInfo(x));
+            Initialize(realmFactoryMethod, apiClient, deleteSyncDatabase);
+        }
+
+        private void Initialize(Func<Realm> realmFactoryMethod, IApiClient apiClient, bool deleteSyncDatabase)
         {
             _realmFactoryMethod = realmFactoryMethod;
             _apiClient = apiClient;
 
             _isBuggedRealm = "1.1.2.0".Equals(GetRealmVersion());
 
-            _typesToSync = typesToSync.ToDictionary(x => x.Name, x => new RealmObjectTypeInfo(x));
             _jsonSerializerSettings = new JsonSerializerSettings
             {
                 ContractResolver = new RealmObjectResolver()
@@ -120,24 +137,18 @@ namespace Realmius.SyncService
             return SyncState.Unsynced;
         }
 
-        private static RealmConfiguration RealmiusConfiguration
+        private static RealmConfiguration RealmiusConfiguration => new RealmConfiguration(RealmiusDbPath)
         {
-            get
+            ShouldDeleteIfMigrationNeeded = false,
+            ObjectClasses = new[]
             {
-                return new RealmConfiguration(RealmiusDbPath)
-                {
-                    ShouldDeleteIfMigrationNeeded = false,
-                    ObjectClasses = new Type[]
-                    {
-                        typeof(ObjectSyncStatusRealm),
-                        typeof(UploadFileInfo),
-                        typeof(UploadRequestItemRealm),
-                        typeof(SyncConfiguration),
-                    },
-                    SchemaVersion = 10,
-                };
-            }
-        }
+                typeof(ObjectSyncStatusRealm),
+                typeof(UploadFileInfo),
+                typeof(UploadRequestItemRealm),
+                typeof(SyncConfiguration),
+            },
+            SchemaVersion = 10,
+        };
 
         private Realm CreateRealmius()
         {
@@ -620,18 +631,11 @@ namespace Realmius.SyncService
                                     {
                                         foreach (var key in changesIds[GetSyncStatusKey(realmiusObject.Type, realmiusObject.MobilePrimaryKey)])
                                         {
-                                            var uploadRequestItemRealm =
-                                                realmius.Find<UploadRequestItemRealm>(key);
-                                            // TODO: TartunovVA - Delete this!
-                                            //if (uploadRequestItemRealm == null)
-                                            //{
-                                            //    var q = 1;
-                                            //}
+                                            var uploadRequestItemRealm = realmius.Find<UploadRequestItemRealm>(key);
                                             Logger.Log.Debug(
                                                 $"Removed UploadRequest {uploadRequestItemRealm?.Id} for {realmiusObject.Type}:{realmiusObject.MobilePrimaryKey}");
 
                                             realmius.Remove(uploadRequestItemRealm);
-
                                         }
 
                                         syncStateObject.SetSyncState(SyncState.Synced);
@@ -649,17 +653,6 @@ namespace Realmius.SyncService
                                             obj.SyncStatus = (int)SyncState.Synced;
                                         });
                                 }
-
-                                // TODO: TartunovVA - Delete this!
-                                //if (obj.DateTime > sendObjectsTime)
-                                //{
-                                //    //object has changed since we sent the result, will not change the SyncState
-                                //}
-                                //else
-                                //{
-
-                                //    obj.SetSyncState(SyncState.Synced);
-                                //}
                             }
                         }
                     }
@@ -678,8 +671,6 @@ namespace Realmius.SyncService
             {
                 _uploadInProgress = false;
             }
-
-
 #pragma warning disable 4014
             Task.Factory.StartNew(async () =>
 #pragma warning restore 4014
@@ -730,19 +721,7 @@ namespace Realmius.SyncService
 
         private IEnumerable<UploadRequestItemRealm> GetObjectsToUpload(Realm realmius)
         {
-            var items = realmius.All<UploadRequestItemRealm>().OrderBy(x => x.DateTime);
-            //var result = new List<UploadRequestItemRealm>();
-            //var i = 0;
-            //foreach (var item in items)
-            //{
-            //    result.Add(item);
-            //    i++;
-            //    if (i == 10)
-            //        break;
-            //}
-
-            //return result;
-            return items;
+            return realmius.All<UploadRequestItemRealm>().OrderBy(x => x.DateTime);
         }
 
         private async Task HandleDownloadedData(DownloadDataResponse result)
@@ -795,7 +774,7 @@ namespace Realmius.SyncService
                     var syncStateObject = FindSyncStatus(realmiusData, changeObject.Type, changeObject.MobilePrimaryKey);
                     if (syncStateObject == null)
                     {
-                        syncStateObject = new ObjectSyncStatusRealm()
+                        syncStateObject = new ObjectSyncStatusRealm
                         {
                             Type = changeObject.Type,
                             MobilePrimaryKey = changeObject.MobilePrimaryKey,
@@ -818,27 +797,14 @@ namespace Realmius.SyncService
                                 realmLocal.Write(
                                     () =>
                                     {
-
                                         AssignKey(obj, changeObject.MobilePrimaryKey, realmLocal);
                                         var success = Populate(changeObject.SerializedObject, obj, realmLocal);
                                         realmLocal.AddSkipUpload(obj, false);
-
-                                        //    realmiusData.Write(() =>
-                                        //{
-                                        //    syncStateObject.SerializedObject = SerializeObject(obj);
-                                        //    if (!syncStateObject.IsManaged)
-                                        //    {
-                                        //        realmiusData.Add(syncStateObject);
-                                        //    }
-                                        //});
-
-
+                                        
                                         if (!success)
                                         {
                                             problematicChangedObjects.Add(changeObject);
                                         }
-
-
                                     });
                             }
                             finally
@@ -894,7 +860,6 @@ namespace Realmius.SyncService
                                             Populate(uploadRequestItemRealm.SerializedObject, objInDb, realmLocal);
                                         }
 
-
                                         realmiusData.Write(
                                         () =>
                                         {
@@ -909,8 +874,6 @@ namespace Realmius.SyncService
                                 _skipObjectChanges = false;
                             }
                         }
-
-
                         //Logger.Log.Info("     syncState.Change.Finished");
                     }
                 }

@@ -24,7 +24,7 @@ namespace Realmius.SyncService.RealmModels
     public class ObjectSyncStatusRealm : RealmObject
     {
         public const string SplitSymbols = "_$_";
-        [Realms.PrimaryKey]
+        [PrimaryKey]
         public string Key { get; set; }
 
         private string _mobilePrimaryKey;
