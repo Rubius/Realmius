@@ -1,9 +1,9 @@
 language: csharp
 solution: Realmius.sln
 
-install:
-  - nuget restore Realmius.sln
-script:
-  - xbuild /p:Configuration=Release Realmius.sln
-  - mono ./packages/NUnit.ConsoleRunner.3.6.1/tools/nunit3-console.exe ./Realmius.Tests/bin/Release/Realmius.Tests.dll
-  
+# Disable run test on CI
+#install:
+#  - nuget restore Realmius.sln
+#script:
+#  - xbuild /p:Configuration=Release Realmius.sln
+#  - mono ./packages/NUnit.ConsoleRunner.3.6.1/tools/nunit3-console.exe ./Realmius.Tests/bin/Release/Realmius.Tests.dll 
