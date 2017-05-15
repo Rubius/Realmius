@@ -58,6 +58,7 @@ namespace Realmius.SyncService
         private readonly object _handleDownloadDataLock = new object();
         private readonly string _realmDatabasePath;
         private static int _downloadIndex;
+
         public RealmiusSyncService(Func<Realm> realmFactoryMethod, IApiClient apiClient, bool deleteSyncDatabase, params Type[] typesToSync)
         {
             _realmFactoryMethod = realmFactoryMethod;
@@ -137,6 +138,7 @@ namespace Realmius.SyncService
                 };
             }
         }
+
         private Realm CreateRealmius()
         {
             return Realm.GetInstance(RealmiusConfiguration);
@@ -211,28 +213,20 @@ namespace Realmius.SyncService
                 syncOptions = realmius.Find<SyncConfiguration>(1);
                 if (syncOptions == null)
                 {
-                    syncOptions = new SyncConfiguration()
-                    {
-                        Id = 1,
-                    };
-                    realmius.Write(() =>
-                    {
-                        realmius.Add(syncOptions);
-                    });
+                    syncOptions = new SyncConfiguration {Id = 1};
+                    realmius.Write(() => { realmius.Add(syncOptions); });
                 }
 
-
                 _strongReferencedRealm = _realmFactoryMethod();
-                var syncObjectInterface = typeof(IRealmiusObjectClient);
+                var syncObjectType = typeof(IRealmiusObjectClient).GetTypeInfo();
                 foreach (var type in _typesToSync.Values)
                 {
-                    if (!syncObjectInterface.GetTypeInfo().IsAssignableFrom(type.Type.GetTypeInfo()))
+                    if (!syncObjectType.IsAssignableFrom(type.Type.GetTypeInfo()))
                         throw new InvalidOperationException($"Type {type} does not implement IRealmiusObjectClient, unable to continue");
 
                     var filter = (IQueryable<RealmObject>)_strongReferencedRealm.All(type.Type.Name);
                     var subscribeHandler = filter.AsRealmCollection().SubscribeForNotifications(ObjectChanged);
                     _unsubscribeFromRealm += () => { subscribeHandler.Dispose(); };
-
                 }
 
                 _strongReferencedRealmius = CreateRealmius();
@@ -413,8 +407,6 @@ namespace Realmius.SyncService
             }
         }
 
-
-
         private int _fileUploadsInProgress;
         public int ParallelFileUploads { get; set; } = 2;
         public virtual async Task UploadFiles()
@@ -527,7 +519,6 @@ namespace Realmius.SyncService
             return new HttpClient();
         }
 
-
         private bool _uploadInProgress;
         private object _uploadLock = new object();
         private bool _disposed;
@@ -548,8 +539,7 @@ namespace Realmius.SyncService
                 }
             }
             var uploadSucceeded = false;
-
-
+            
             Dictionary<string, List<string>> changesIds;
             var changes = new UploadDataRequest();
             try
@@ -755,7 +745,6 @@ namespace Realmius.SyncService
             return items;
         }
 
-
         private async Task HandleDownloadedData(DownloadDataResponse result)
         {
             Logger.Log.Info($"HandleDownloadedData: {result?.LastChange}");
@@ -934,7 +923,6 @@ namespace Realmius.SyncService
             if (problematicChangedObjects.Count < changedObjects.Count)
                 StoreChangedObjects(problematicChangedObjects, realmiusData, realmLocal);
         }
-
 
         private void AssignKey(IRealmiusObjectClient realmiusObjectClient, string key, Realm realmLocal)
         {

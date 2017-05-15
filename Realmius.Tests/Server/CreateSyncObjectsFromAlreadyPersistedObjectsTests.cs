@@ -36,7 +36,6 @@ namespace Realmius.Tests.Server
         private Func<LocalDbContext> _contextFunc;
         private RealmiusServerProcessor _processor;
 
-
         public CreateSyncObjectsFromAlreadyPersistedObjectsTests()
         {
             _contextFunc = () => new LocalDbContext(new ShareEverythingRealmiusServerConfiguration(typeof(DbSyncObject)));
@@ -59,42 +58,44 @@ namespace Realmius.Tests.Server
             db.GetKeyType(nameof(IdIntObject)).Should().Be(typeof(int));
         }
 
-
         [Test]
         public void GetObjectByKey()
         {
+            // Assert
             var db = _contextFunc();
-            db.DbSyncObjects.Add(new DbSyncObject()
+            db.DbSyncObjects.Add(new DbSyncObject
             {
                 Id = "2",
                 Text = "x",
             });
-            var g = Guid.NewGuid();
-            db.IdGuidObjects.Add(new IdGuidObject()
+            var guid = Guid.NewGuid();
+            db.IdGuidObjects.Add(new IdGuidObject
             {
-                Id = g,
+                Id = guid,
                 Text = "b"
             });
-            db.IdIntObjects.Add(new IdIntObject()
+            db.IdIntObjects.Add(new IdIntObject
             {
                 Id = 4,
                 Text = "5",
             });
+            
+            // Act
             db.SaveChanges();
-
             var db2 = _contextFunc();
+
+            // Arrange
             ((DbSyncObject)db2.GetObjectByKey(nameof(DbSyncObject), "2")).Text.Should().BeEquivalentTo("x");
-            ((IdGuidObject)db2.GetObjectByKey(nameof(IdGuidObject), g.ToString())).Text.Should().BeEquivalentTo("b");
+            ((IdGuidObject)db2.GetObjectByKey(nameof(IdGuidObject), guid.ToString())).Text.Should().BeEquivalentTo("b");
             ((IdIntObject)db2.GetObjectByKey(nameof(IdIntObject), "4")).Text.Should().BeEquivalentTo("5");
         }
-
 
         [Test]
         public void Attach_NewObject()
         {
             var db = _contextFunc();
             db.EnableSyncTracking = false;
-            db.DbSyncObjects.Add(new DbSyncObject()
+            db.DbSyncObjects.Add(new DbSyncObject
             {
                 Id = "2",
                 Text = "x",
@@ -104,13 +105,13 @@ namespace Realmius.Tests.Server
             db.CreateSyncStatusContext().SyncStatusServerObjects.Count().Should().Be(0);
 
             var res = _processor.Download(
-                new DownloadDataRequest()
+                new DownloadDataRequest
                 {
                     Types = new[]
                     {
                         nameof(DbSyncObject)
                     },
-                    LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.MinValue } },
+                    LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.MinValue } },
                 },
                 new SyncUser());
             res.ChangedObjects.Count.Should().Be(0);
@@ -119,9 +120,8 @@ namespace Realmius.Tests.Server
             db.AttachObject(nameof(DbSyncObject), "2");
             db.CreateSyncStatusContext().SyncStatusServerObjects.Count().Should().Be(1);
 
-            var sync = db.CreateSyncStatusContext();
             var res2 = _processor.Download(
-                new DownloadDataRequest()
+                new DownloadDataRequest
                 {
                     Types = new[]
                     {
@@ -134,12 +134,11 @@ namespace Realmius.Tests.Server
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, SerializedObject: { \"Text\": \"x\", \"Tags\": null, \"Id\": \"2\"}");
         }
 
-
         [Test]
         public void Attach_UpdatedObject()
         {
             var db = _contextFunc();
-            var obj = new DbSyncObject()
+            var obj = new DbSyncObject
             {
                 Id = "2",
                 Text = "x",
@@ -188,7 +187,6 @@ namespace Realmius.Tests.Server
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, SerializedObject: { \"Text\": \"qwe\", \"Tags\": \"c\", \"Id\": \"2\"}");
         }
 
-
         [Test]
         public void Attach_DeletedObject()
         {
@@ -196,7 +194,7 @@ namespace Realmius.Tests.Server
             Thread.Sleep(10);
 
             var db = _contextFunc();
-            var obj = new DbSyncObject()
+            var obj = new DbSyncObject
             {
                 Id = "2",
                 Text = "x",
@@ -213,13 +211,13 @@ namespace Realmius.Tests.Server
 
             
             var res = _processor.Download(
-                new DownloadDataRequest()
+                new DownloadDataRequest
                 {
                     Types = new[]
                     {
                         nameof(DbSyncObject)
                     },
-                    LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", time } },
+                    LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", time } },
                 },
                 new SyncUser());
             string.Join(", ", res.ChangedObjects)
@@ -227,7 +225,7 @@ namespace Realmius.Tests.Server
 
             db.AttachDeletedObject(nameof(DbSyncObject), "2");
             var res2 = _processor.Download(
-                new DownloadDataRequest()
+                new DownloadDataRequest
                 {
                     Types = new[]
                     {
@@ -241,5 +239,4 @@ namespace Realmius.Tests.Server
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, Deleted");
         }
     }
-
 }

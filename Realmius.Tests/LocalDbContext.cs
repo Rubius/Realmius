@@ -28,7 +28,7 @@ namespace Realmius.Tests
     {
         static LocalDbContext()
         {
-            Database.SetInitializer<LocalDbContext>(new DropCreateDatabaseAlways<LocalDbContext>());
+            Database.SetInitializer(new DropCreateDatabaseAlways<LocalDbContext>());
         }
 
         public LocalDbContext(IRealmiusServerDbConfiguration config) 

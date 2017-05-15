@@ -28,9 +28,11 @@ namespace Realmius.Tests.Client
         [Test]
         public void KeyGenerationTest1()
         {
-            var status = new ObjectSyncStatusRealm();
-            status.MobilePrimaryKey = "123";
-            status.Type = "qwe";
+            var status = new ObjectSyncStatusRealm
+            {
+                MobilePrimaryKey = "123",
+                Type = "qwe"
+            };
 
             status.MobilePrimaryKey.Should().BeEquivalentTo("123");
             status.Type.Should().BeEquivalentTo("qwe");
@@ -39,13 +41,15 @@ namespace Realmius.Tests.Client
         [Test]
         public void KeyGenerationTest2()
         {
-            var status = new ObjectSyncStatusRealm();
-            status.MobilePrimaryKey = "123";
-            status.Type = "qwe";
+            var status = new ObjectSyncStatusRealm
+            {
+                MobilePrimaryKey = "123",
+                Type = "qwe"
+            };
 
             var key = status.Key;
+            var status2 = new ObjectSyncStatusRealm { Key = key };
 
-            var status2 = new ObjectSyncStatusRealm() { Key = key };
             status2.MobilePrimaryKey.Should().Be("123");
             status2.Type.Should().Be("qwe");
 

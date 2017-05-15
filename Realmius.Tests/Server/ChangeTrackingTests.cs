@@ -40,9 +40,7 @@ namespace Realmius.Tests.Server
         {
             _config = new ShareEverythingRealmiusServerConfiguration(typeof(DbSyncObject), typeof(DbSyncObjectWithIgnoredFields));
             _contextFunc = () => new LocalDbContext(_config);
-            var connectionString = _contextFunc().Database.Connection.ConnectionString;
             _syncContextFunc = () => new SyncStatusDbContext(_contextFunc().Database.Connection.ConnectionString);
-
         }
 
         [SetUp]
@@ -54,42 +52,49 @@ namespace Realmius.Tests.Server
         [Test]
         public void AddData()
         {
+            // Arrange
             _syncContextFunc().SyncStatusServerObjects.Count().Should().Be(0);
 
             var db = _contextFunc();
-            var obj = new DbSyncObject()
+            var objectToAdd = new DbSyncObject
             {
                 Id = Guid.NewGuid().ToString(),
-                Text = "asd"
+                Text = "TestText"
             };
-            db.DbSyncObjects.Add(obj);
+
+            // Act
+            db.DbSyncObjects.Add(objectToAdd);
             db.SaveChanges();
 
+            // Assert
             _syncContextFunc().SyncStatusServerObjects.Count().Should().Be(1);
             var syncObject = _syncContextFunc().SyncStatusServerObjects.First();
             var res = JsonConvert.DeserializeObject<DbSyncObject>(syncObject.FullObjectAsJson);
-            res.MobilePrimaryKey.Should().Be(obj.Id);
-            res.Text.Should().Be("asd");
+            res.MobilePrimaryKey.Should().Be(objectToAdd.Id);
+            res.Text.Should().Be("TestText");
         }
 
         [Test]
         public void UpdateData()
         {
+            // Arrange
             _syncContextFunc().SyncStatusServerObjects.Count().Should().Be(0);
 
             var db = _contextFunc();
-            var obj = new DbSyncObject()
+            var objectToUpdate = new DbSyncObject
             {
                 Id = Guid.NewGuid().ToString(),
                 Text = "asd"
             };
-            db.DbSyncObjects.Add(obj);
+            db.DbSyncObjects.Add(objectToUpdate);
             db.SaveChanges();
 
+            // Act
             Thread.Sleep(1);
-            obj.Text = "qwe";
+            objectToUpdate.Text = "qwe";
             db.SaveChanges();
 
+            // Assert
             _syncContextFunc().SyncStatusServerObjects.Count().Should().Be(1);
             var syncObject = _syncContextFunc().SyncStatusServerObjects.ToList()[0];
             var textChange = syncObject.ColumnChangeDates["Text"];
@@ -102,23 +107,27 @@ namespace Realmius.Tests.Server
         [Test]
         public void AddData_IgnoredFieldsNotSerialized()
         {
+            // Arrange
             _syncContextFunc().SyncStatusServerObjects.Count().Should().Be(0);
 
             var db = _contextFunc();
-            var obj = new DbSyncObjectWithIgnoredFields()
+            var objectToAdd = new DbSyncObjectWithIgnoredFields
             {
                 Id = Guid.NewGuid().ToString(),
                 Text = "asd",
                 Tags = "zxc",
             };
-            db.DbSyncObjectWithIgnoredFields.Add(obj);
+
+            // Act
+            db.DbSyncObjectWithIgnoredFields.Add(objectToAdd);
             db.SaveChanges();
 
+            // Assert
             _syncContextFunc().SyncStatusServerObjects.Count().Should().Be(1);
             var syncObject = _syncContextFunc().SyncStatusServerObjects.First();
             var res = JsonConvert.DeserializeObject<DbSyncObjectWithIgnoredFields>(syncObject.FullObjectAsJson);
 
-            res.MobilePrimaryKey.Should().Be(obj.Id);
+            res.MobilePrimaryKey.Should().Be(objectToAdd.Id);
             res.Tags.Should().BeNullOrEmpty();
 
             var jObject = JObject.Parse(syncObject.FullObjectAsJson);
@@ -128,22 +137,25 @@ namespace Realmius.Tests.Server
         [Test]
         public void UpdateData_IgnoredFieldsNotSerialized()
         {
+            // Arrange
             _syncContextFunc().SyncStatusServerObjects.Count().Should().Be(0);
 
             var db = _contextFunc();
-            var obj = new DbSyncObjectWithIgnoredFields()
+            var objectToUpdate = new DbSyncObjectWithIgnoredFields
             {
                 Id = Guid.NewGuid().ToString(),
                 Text = "asd",
                 Tags = "123",
             };
-            db.DbSyncObjectWithIgnoredFields.Add(obj);
+            db.DbSyncObjectWithIgnoredFields.Add(objectToUpdate);
             db.SaveChanges();
 
+            // Act
             Thread.Sleep(1);
-            obj.Text = "qwe";
+            objectToUpdate.Text = "qwe";
             db.SaveChanges();
 
+            // Assert
             _syncContextFunc().SyncStatusServerObjects.Count().Should().Be(1);
             var syncObject = _syncContextFunc().SyncStatusServerObjects.ToList()[0];
             //var textChange = syncObject.ColumnChangeDates["Text"];
@@ -152,5 +164,4 @@ namespace Realmius.Tests.Server
             syncObject.ColumnChangeDates.ContainsKey("Text").Should().BeTrue();
         }
     }
-
 }
