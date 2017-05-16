@@ -29,7 +29,7 @@ namespace Realmius.Tests.Server
     {
         public static Dictionary<string, DateTimeOffset> ToDictionary(this DateTimeOffset date)
         {
-            return new Dictionary<string, DateTimeOffset>() { { "all", date } };
+            return new Dictionary<string, DateTimeOffset> { { "all", date } };
         }
     }
 

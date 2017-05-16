@@ -25,7 +25,6 @@ using Realms;
 
 namespace Realmius.Tests.Server.Models
 {
-    
     public class RefSyncObject : IRealmiusObjectServer
     {
         public string Text { get; set; }

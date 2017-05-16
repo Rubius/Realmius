@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
@@ -78,7 +79,7 @@ namespace Realmius.Tests.Client
         private Mock<RealmiusSyncService> CreateSyncService()
         {
             Func<Realm> func = GetRealm;
-            return new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, new[] { typeof(DbSyncClientObject), typeof(DbSyncClientObject2), typeof(RealmRef), typeof(RealmManyRef) })
+            return new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, Assembly.GetExecutingAssembly())
             {
                 CallBase = true,
             };
@@ -152,7 +153,7 @@ namespace Realmius.Tests.Client
 
             _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
             {
-                LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
+                LastChange = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
                     new DownloadResponseItem
@@ -208,9 +209,9 @@ namespace Realmius.Tests.Client
 
             RealmManyRef parent;
 
-            _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
+            _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse
             {
-                LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
+                LastChange = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
                     new DownloadResponseItem
@@ -238,9 +239,9 @@ namespace Realmius.Tests.Client
             parent = realm.All<RealmManyRef>().First();
             string.Join(", ", parent.Children.Select(x => x.Id)).Should().BeEquivalentTo("");
 
-            _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
+            _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse
             {
-                LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
+                LastChange = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
                     new DownloadResponseItem
@@ -362,9 +363,9 @@ namespace Realmius.Tests.Client
         {
             var realm = GetRealm();
 
-            _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse()
+            _apiClientMock.Raise(x => x.NewDataDownloaded += null, _apiClientMock.Object, new DownloadDataResponse
             {
-                LastChange = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.Now } },
+                LastChange = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.Now } },
                 ChangedObjects =
                 {
                     new DownloadResponseItem

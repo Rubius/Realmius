@@ -23,10 +23,11 @@ namespace Realmius.SyncService
 {
     internal class RealmObjectTypeInfo
     {
-        public Type Type { get; private set; }
-        public bool ImplementsSyncState { get; private set; }
+        private readonly Type syncObjectWithSyncStatusInterface = typeof(IRealmiusObjectWithSyncStatusClient);
 
-        private static readonly Type syncObjectWithSyncStatusInterface = typeof(IRealmiusObjectWithSyncStatusClient);
+        public Type Type { get; }
+        public bool ImplementsSyncState { get; }
+        
         public RealmObjectTypeInfo(Type type)
         {
             Type = type;
