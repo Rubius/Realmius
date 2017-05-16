@@ -24,10 +24,6 @@ namespace FormsClient
         public Form1()
         {
             InitializeComponent();
-
-            _realmFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            RealmiusSyncService.RealmiusDbPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + "sync");
-            InitializeRealmSync();
         }
 
         public Realm GetRealm()
@@ -73,6 +69,14 @@ namespace FormsClient
             var realm = GetRealm();
 
             realm.Write(() => realm.Add(tmpUser));
+            realm.Refresh();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            _realmFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            RealmiusSyncService.RealmiusDbPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + "sync");
+            InitializeRealmSync();
         }
     }
 }
