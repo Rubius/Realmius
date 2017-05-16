@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using MessageClient.Models;
-using Newtonsoft.Json;
 using Realmius;
 using Realmius.Contracts.Models;
 using Realmius.SyncService;
@@ -15,7 +12,7 @@ namespace FormsClient
 {
     public partial class Form1 : Form
     {
-        private string _url = "http://localhost:53960";
+        private string _url = "http://localhost:45000";
 
         private string _realmFileName;
 

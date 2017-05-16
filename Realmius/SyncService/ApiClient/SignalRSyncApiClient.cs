@@ -66,7 +66,6 @@ namespace Realmius.SyncService.ApiClient
             _startOptions = startOptions;
 
             await Reconnect();
-
         }
 
         private Action _hubUnsubscribe = () => { };
