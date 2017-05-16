@@ -11,7 +11,7 @@ namespace Server.Sync
     public class SyncHub : SignalRRealmiusHub<User>
     {
         public SyncHub()
-            : base(new RealmiusServerProcessor<User>(() => new MessagingContext(), SyncConfiguration.Instance))
+            : base(new RealmiusServerProcessor<User>(() => new MessagingContext(new ShareEverythingRealmSyncServerConfiguration(typeof(User), typeof(Message))), SyncConfiguration.Instance))
         {
 
         }

@@ -12,23 +12,13 @@ namespace Server.Entities
         public IDbSet<Message> Messages { get; set; }
         public IDbSet<User> Users { get; set; }
 
-        public MessagingContext(string nameOrConnectionString, IRealmiusServerDbConfiguration syncConfiguration)
-            : base(nameOrConnectionString, syncConfiguration)
+        static MessagingContext()
         {
+            Database.SetInitializer<MessagingContext>(new DropCreateDatabaseAlways<MessagingContext>());
         }
 
-        public MessagingContext() 
+        public MessagingContext(IRealmiusServerDbConfiguration syncConfiguration) 
             : base(SyncConfiguration)
-        {
-        }
-
-        public MessagingContext(string nameOrConnectionString, Type typeToSync, params Type[] typesToSync)
-            : base(nameOrConnectionString, typeToSync, typesToSync)
-        {
-        }
-
-        public MessagingContext(Type typeToSync, params Type[] typesToSync) 
-            : base(typeToSync, typesToSync)
         {
         }
     }
