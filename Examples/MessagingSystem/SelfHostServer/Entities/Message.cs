@@ -13,7 +13,7 @@ namespace Server.Entities
         
         public DateTime DateTime { get; set; }
 
-        public long UserId { get; set; }
+        public string UserId { get; set; }
 
         public string Text { get; set; }
     }

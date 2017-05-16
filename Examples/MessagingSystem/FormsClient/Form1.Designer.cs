@@ -97,8 +97,9 @@ namespace FormsClient
             this.sendButton.Name = "sendButton";
             this.sendButton.Size = new System.Drawing.Size(75, 23);
             this.sendButton.TabIndex = 7;
-            this.sendButton.Text = "Send";
+            this.sendButton.Text = "Save";
             this.sendButton.UseVisualStyleBackColor = true;
+            this.sendButton.Click += new System.EventHandler(this.sendButton_Click);
             // 
             // Form1
             // 

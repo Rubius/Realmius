@@ -18,7 +18,7 @@ namespace Server.Entities
         }
 
         public MessagingContext(IRealmiusServerDbConfiguration syncConfiguration) 
-            : base(SyncConfiguration)
+            : base(syncConfiguration)
         {
         }
     }

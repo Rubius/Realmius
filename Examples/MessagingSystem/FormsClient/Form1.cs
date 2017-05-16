@@ -14,6 +14,8 @@ namespace FormsClient
     {
         private string _url = "http://localhost:45000";
 
+        private User _user;
+
         private string _realmFileName;
 
         private static IRealmiusSyncService _syncService;
@@ -38,12 +40,12 @@ namespace FormsClient
 
         private void SyncServiceOnDataDownloaded(object sender, EventArgs e)
         {
-            messagesBox.Invoke((MethodInvoker) delegate { messagesBox.AppendText("SYSTEM: DataDownloaded"); });
+            messagesBox.Invoke((MethodInvoker) delegate { messagesBox.AppendText("SYSTEM: DataDownloaded + Environment.NewLine"); });
         }
 
         private void SyncServiceOnUnauthorized(object sender, UnauthorizedResponse e)
         {
-            messagesBox.Invoke((MethodInvoker)delegate { messagesBox.AppendText("SYSTEM: DataDownloaded"); });
+            messagesBox.Invoke((MethodInvoker)delegate { messagesBox.AppendText("SYSTEM: DataDownloaded + Environment.NewLine"); });
         }
 
         protected internal virtual IRealmiusSyncService CreateSyncService()
@@ -62,17 +64,17 @@ namespace FormsClient
                     typeof(Message)
                 });
 
-            syncService.Unauthorized += (sender, response) => { messagesBox.AppendText("SYSTEM: User not authorized!"); };
+            syncService.Unauthorized += (sender, response) => { messagesBox.AppendText("SYSTEM: User not authorized!" + Environment.NewLine); };
             
             return syncService;
         }
 
         private void CreateNewUser_Click(object sender, EventArgs e)
         {
-            var tmpUser = new User {Nickname = usernameBox.Text};
+            _user = new User {Nickname = usernameBox.Text};
             var realm = GetRealm();
 
-            realm.Write(() => realm.Add(tmpUser));
+            realm.Write(() => realm.Add(_user));
             realm.Refresh();
         }
 
@@ -81,6 +83,15 @@ namespace FormsClient
             _realmFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             RealmiusSyncService.RealmiusDbPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + "sync");
             InitializeRealmSync();
+        }
+
+        private void sendButton_Click(object sender, EventArgs e)
+        {
+            var msg = new Message {Text = messageBox.Text, UserId = _user == null ? "NONAME" : _user.Id};
+            var realm = GetRealm();
+
+            realm.Write(() => realm.Add(msg));
+            realm.Refresh();
         }
     }
 }
