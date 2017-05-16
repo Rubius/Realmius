@@ -21,6 +21,6 @@ namespace MessageClient.Models
 
         public string MobilePrimaryKey => Id;
 
-        public string Name { get; set; }
+        public string Nickname { get; set; }
     }
 }

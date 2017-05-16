@@ -21,6 +21,10 @@ namespace MessageClient.Models
 
         public string MobilePrimaryKey => Id;
 
+        public DateTime DateTime { get; set; }
+
+        public long UserId { get; set; }
+
         public string Text { get; set; }
     }
 }
