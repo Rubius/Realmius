@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.SignalR.Hubs;
+﻿using System;
+using Microsoft.AspNet.SignalR.Hubs;
 using Realmius.Contracts;
 using Realmius.Server;
 using Server.Entities;
@@ -11,32 +12,24 @@ namespace Server.Sync
         public SyncHub()
             : base(new RealmiusServerProcessor<User>(() => new MessagingContext(new ShareEverythingRealmSyncServerConfiguration(typeof(User), typeof(Message))), SyncConfiguration.Instance))
         {
-
+            Console.WriteLine("SyncHub created.");
         }
 
         protected override User CreateUserInfo(HubCallerContext context)
         {
-            return null;
-            //try
-            //{
-            //    var email = context.QueryString["email"];
-            //    var key = context.QueryString["authKey"];
-            //    var deviceId = context.QueryString["deviceId"];
+            try
+            {
+                var email = context.QueryString["email"];
+                var key = context.QueryString["authKey"];
+                var deviceId = context.QueryString["deviceId"];
 
-            //    var db = new HouseManagementDbContext();
-            //    var authenticationService = new AuthenticationService(db);
-            //    var user = authenticationService.CheckAccess(email, deviceId, key);
-
-            //    if (user == null)
-            //        return null;
-
-            //    return user.GetUserInfo(deviceId);
-            //}
-            //catch (Exception e)
-            //{
-            //    WebLogger.Log.Error(e, "User not found");
-            //    return null;
-            //}
+                return new User();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"User not found");
+                return null;
+            }
         }
     }
 }
