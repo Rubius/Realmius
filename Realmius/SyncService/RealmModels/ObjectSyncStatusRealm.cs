@@ -24,6 +24,7 @@ namespace Realmius.SyncService.RealmModels
     public class ObjectSyncStatusRealm : RealmObject
     {
         public const string SplitSymbols = "_$_";
+
         [PrimaryKey]
         public string Key { get; set; }
 
@@ -64,6 +65,7 @@ namespace Realmius.SyncService.RealmModels
         public DateTimeOffset DateTime { get; set; }
         public string SerializedObject { get; set; }
         public bool IsDeleted { get; set; }
+        
         /// <summary>
         /// values are from SyncState enum. enums are not supported by Realm yet
         /// </summary>

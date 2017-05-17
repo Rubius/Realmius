@@ -31,62 +31,25 @@ namespace Server.Sync
 
         public static SyncConfiguration Instance => _instance ?? (_instance = new SyncConfiguration());
 
-        public static string PropertySyncGroup(string propertyId)
-        {
-            return "PROP" + propertyId;
-        }
-
         private SyncConfiguration()
         {
         }
 
-        public override IList<Type> TypesToSync { get; } = new List<Type>()
+        public override IList<Type> TypesToSync { get; } = new List<Type>
         {
-            typeof(Client),
             typeof(Message)
         };
 
         public override IList<string> GetTagsForObject(ChangeTrackingDbContext changeTrackingContext, IRealmiusObjectServer obj)
         {
-            //if (obj is ItemCategory)
-            //    return new[] { "all" };
-            
-            var client = obj as Client;
             var message = obj as Message;
             
-            var db = (MessagingContext)changeTrackingContext;
-
-            if (client != null)
-            {
-                return new[] { "all" };
-                //if (itemModel.IsUserMade)
-                //{
-                //    return new[] { itemModel.MadeByUserId.ToString() };
-                //}
-                //else
-                //{
-                //    return new[] { "MDL" + user.Id };
-                //}
-            }
             if (message != null)
             {
                 return new[] { "all" };
-                //if (planCategory.IsUserMade)
-                //{
-                //    return new[] { planCategory.MadeByUserId.ToString() };
-                //}
-                //else
-                //{
-                //    return new[] { "all" };
-                //}
             }
             
-            //var entityWithUserId = obj as IEntityWithUserId;
-            //if (entityWithUserId != null)
-            //{
-            //    return new[] { entityWithUserId.ClientId };
-            //}
-            return new List<string> { };
+            return new List<string>();
         }
 
         public override bool CheckAndProcess(CheckAndProcessArgs<Client> args)

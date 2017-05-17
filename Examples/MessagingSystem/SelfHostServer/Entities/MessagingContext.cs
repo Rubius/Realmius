@@ -25,13 +25,7 @@ namespace Server.Entities
     public class MessagingContext : ChangeTrackingDbContext
     {
         public IDbSet<Message> Messages { get; set; }
-        public IDbSet<Client> Clients { get; set; }
-
-        static MessagingContext()
-        {
-            //Database.SetInitializer<MessagingContext>(new DropCreateDatabaseAlways<MessagingContext>());
-        }
-
+        
         public MessagingContext(IRealmiusServerDbConfiguration syncConfiguration) 
             : base(syncConfiguration)
         {

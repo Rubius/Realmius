@@ -21,8 +21,11 @@ namespace Realmius.Contracts.Models
     public class UploadRequestItem
     {
         public string Type { get; set; }
+
         public string PrimaryKey { get; set; }
+
         public string SerializedObject { get; set; }
+
         public bool IsDeleted { get; set; }
 
         public override string ToString()

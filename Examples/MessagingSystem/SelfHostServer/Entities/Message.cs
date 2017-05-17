@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using Realmius.Server;
 
@@ -27,6 +28,8 @@ namespace Server.Entities
         public string Id { get; set; }
 
         public string MobilePrimaryKey => Id;
+
+        public DateTimeOffset DateTime { get; set; }
         
         public string ClientId { get; set; }
 

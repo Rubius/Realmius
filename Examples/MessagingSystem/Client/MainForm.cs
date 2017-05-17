@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using Realmius;
 using Realmius.Contracts.Models;
@@ -29,7 +30,7 @@ namespace Client
 {
     public partial class MainForm : Form
     {
-        private string _url = "http://localhost:45000";
+        private string _serverUrl = "http://localhost:45000";
         
         private string _realmFileName;
 
@@ -45,35 +46,31 @@ namespace Client
             return Realm.GetInstance(_realmFileName);
         }
 
-        protected internal virtual void InitializeRealmSync()
+        protected internal virtual void InitializeRealmius()
         {
             _syncService = CreateSyncService();
-            _syncService.Unauthorized += SyncServiceOnUnauthorized;
-            _syncService.DataDownloaded += SyncServiceOnDataDownloaded;
-        }
-
-        private void SyncServiceOnDataDownloaded(object sender, EventArgs e)
-        {
-            messagesBox.Invoke((MethodInvoker) delegate
+            _syncService.Unauthorized += delegate
             {
-                messagesBox.Text = "SYSTEM: DataDownloaded" + Environment.NewLine;
-                var realm = GetRealm();
-
-                foreach (var message in realm.All<Message>())
+                messagesBox.Invoke((MethodInvoker) delegate
                 {
-                    messagesBox.AppendText($"{message.ClientId} : {message.Text}"+ Environment.NewLine);
-                }
-                
-                realm.Refresh();
-            });
-        }
-
-        private void SyncServiceOnUnauthorized(object sender, UnauthorizedResponse e)
-        {
-            messagesBox.Invoke((MethodInvoker) delegate
+                    messagesBox.AppendText("SYSTEM: DataDownloaded" + Environment.NewLine);
+                });
+            };
+            _syncService.DataDownloaded += delegate
             {
-                messagesBox.AppendText("SYSTEM: DataDownloaded" + Environment.NewLine);
-            });
+                messagesBox.Invoke((MethodInvoker) delegate
+                {
+                    messagesBox.Text = "SYSTEM: DataDownloaded" + Environment.NewLine;
+                    var realm = GetRealm();
+
+                    foreach (var message in realm.All<Message>().OrderBy(x => x.DateTime))
+                    {
+                        messagesBox.AppendText(FormatMessage(message));
+                    }
+
+                    realm.Refresh();
+                });
+            };
         }
 
         protected internal virtual IRealmiusSyncService CreateSyncService()
@@ -82,13 +79,12 @@ namespace Client
 
             var syncService = SyncServiceFactory.CreateUsingSignalR(
                 GetRealm,
-                new Uri(_url + $"/signalr?clientId={clientId}"),
+                new Uri(_serverUrl + $"/signalr?clientId={clientId}"),
                 "SignalRSyncHub",
                 new[]
                 {
                     typeof(Message)
-                },
-                deleteDatabase:true);
+                });
 
             syncService.Unauthorized += (sender, response) => { messagesBox.AppendText("SYSTEM: User not authorized!" + Environment.NewLine); };
             
@@ -97,25 +93,29 @@ namespace Client
 
         private void Connect_Click(object sender, EventArgs e)
         {
-            var path = @"D:\realms\"; // Path.GetTempPath();
-            var name = $"client-{clientID.Text}.db"; // Guid.NewGuid().ToString();
+            var path = Path.GetTempPath();
+            var name = Guid.NewGuid().ToString();
             _realmFileName = Path.Combine(path, name);
             RealmiusSyncService.RealmiusDbPath = Path.Combine(path, name + "sync");
-            //RealmiusSyncService.RealmiusDbPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + "sync");
-            InitializeRealmSync();
+            InitializeRealmius();
         }
 
         private void sendButton_Click(object sender, EventArgs e)
         {
-            var msg = new Message {Text = messageBox.Text, ClientId = clientID.Text };
+            var msg = new Message {Text = messageBox.Text, ClientId = clientID.Text, DateTime = DateTimeOffset.Now};
             var realm = GetRealm();
 
             realm.Write(() => realm.Add(msg));
             realm.Refresh();
 
-            messagesBox.AppendText($"{msg.ClientId} : {msg.Text}" + Environment.NewLine);
+            messagesBox.AppendText(FormatMessage(msg));
 
             messageBox.Text = string.Empty;
+        }
+
+        private string FormatMessage(Message msg)
+        {
+            return $"{msg.ClientId} at {msg.DateTime} : {msg.Text}" + Environment.NewLine;
         }
 
         private void messageBox_KeyDown(object sender, KeyEventArgs e)

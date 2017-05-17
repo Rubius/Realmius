@@ -31,7 +31,7 @@ namespace Server.Sync
         public SyncHub()
             : base(new RealmiusServerProcessor<Client>(() => new MessagingContext(new ShareEverythingRealmiusServerConfiguration(typeof(Client), typeof(Message))), SyncConfiguration.Instance))
         {
-            Console.WriteLine("SyncHub created.");
+            Console.WriteLine("Sync hub created.");
         }
 
         protected override Client CreateUserInfo(HubCallerContext context)
@@ -46,7 +46,7 @@ namespace Server.Sync
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error in connection with client");
+                Console.WriteLine($"Error when client connect: {e.Message}");
                 return null;
             }
         }

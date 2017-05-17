@@ -30,7 +30,7 @@ namespace Realmius.SyncService
 {
     internal class RealmObjectResolver : DefaultContractResolver
     {
-        private static Dictionary<Type, IList<JsonProperty>> _propertyCache = new Dictionary<Type, IList<JsonProperty>>();
+        private static readonly Dictionary<Type, IList<JsonProperty>> _propertyCache = new Dictionary<Type, IList<JsonProperty>>();
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
         {
             if (!_propertyCache.ContainsKey(type))
@@ -50,9 +50,8 @@ namespace Realmius.SyncService
 
                 ).ToList();
             }
+
             return _propertyCache[type];
-
-
         }
     }
 }

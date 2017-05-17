@@ -28,7 +28,9 @@ namespace Client.Models
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public string MobilePrimaryKey => Id;
-        
+
+        public DateTimeOffset DateTime { get; set; }
+
         public string ClientId { get; set; }
 
         public string Text { get; set; }

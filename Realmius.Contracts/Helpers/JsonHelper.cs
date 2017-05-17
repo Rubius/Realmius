@@ -26,7 +26,6 @@ namespace Realmius.Contracts.Helpers
 {
     public class JsonHelper
     {
-
         public static string GetJsonDiff(object existing, object modified)
         {
             return GetJsonDiff(JObject.FromObject(existing), JObject.FromObject(modified)).ToString();
@@ -68,7 +67,6 @@ namespace Realmius.Contracts.Helpers
             }
             return result;
         }
-
 
         public static string SerializeObject(object obj, int maxDepth)
         {

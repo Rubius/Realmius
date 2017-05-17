@@ -517,7 +517,6 @@ namespace Realmius.SyncService
 
             await Task.Factory.StartNew(async () =>
             {
-                // TODO: TartunovVA - check this
                 if (!uploadSucceeded)
                     await Task.Delay(2000); //ToDo: delays might be increased in case of consequent errors
 
@@ -576,9 +575,7 @@ namespace Realmius.SyncService
                     }
 
                     UploadInProgress = true;
-
-                    //var sendObjectsTime = DateTime.Now;
-
+                    
                     foreach (var uploadRequestItemRealm in objectsToUpload.Values)
                     {
                         //remove upload items that should not be synced anymore
@@ -901,16 +898,13 @@ namespace Realmius.SyncService
 
         protected internal bool Populate(string changeObjectSerializedObject, IRealmiusObjectClient objInDb, Realm realm)
         {
-            var serializer = new RealmReferencesSerializer()
+            var serializer = new RealmReferencesSerializer
             {
                 Realm = realm,
             };
-            var settings = new JsonSerializerSettings()
+            var settings = new JsonSerializerSettings
             {
-                Converters = new List<JsonConverter>()
-                {
-                    serializer
-                },
+                Converters = new List<JsonConverter> { serializer },
                 ObjectCreationHandling = ObjectCreationHandling.Reuse,
             };
             JsonConvert.PopulateObject(changeObjectSerializedObject, objInDb, settings);
@@ -925,6 +919,7 @@ namespace Realmius.SyncService
             _unsubscribeFromRealm();
             _unsubscribeFromRealm = () => { };
         }
+
         public void Dispose()
         {
             _disposed = true;

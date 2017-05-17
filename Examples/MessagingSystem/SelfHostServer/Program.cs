@@ -44,13 +44,14 @@ namespace Server
                         {
                             Id = Guid.NewGuid().ToString(),
                             ClientId = "SystemID",
+                            DateTime = DateTimeOffset.Now,
                             Text = "Random generated value: " + new Random().Next(1000)
                         };
 
                         db.Messages.Add(message);
                         db.SaveChanges();
                         Console.WriteLine(
-                            $"Client '{message.ClientId}' created message '{message.Text}'");
+                            $"Client '{message.ClientId}' created message '{message.Text}' at {message.DateTime}");
                     }
                 }
             }
