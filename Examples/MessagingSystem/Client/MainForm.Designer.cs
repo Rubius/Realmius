@@ -1,8 +1,6 @@
-﻿using Realmius.SyncService;
-
-namespace FormsClient
+﻿namespace Client
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -40,9 +38,9 @@ namespace FormsClient
             // 
             // connectButton
             // 
-            this.connectButton.Location = new System.Drawing.Point(270, 9);
+            this.connectButton.Location = new System.Drawing.Point(270, 11);
             this.connectButton.Name = "connectButton";
-            this.connectButton.Size = new System.Drawing.Size(75, 23);
+            this.connectButton.Size = new System.Drawing.Size(75, 20);
             this.connectButton.TabIndex = 1;
             this.connectButton.Text = "Connect";
             this.connectButton.UseVisualStyleBackColor = true;
@@ -68,7 +66,7 @@ namespace FormsClient
             // 
             this.sendButton.Location = new System.Drawing.Point(270, 218);
             this.sendButton.Name = "sendButton";
-            this.sendButton.Size = new System.Drawing.Size(75, 23);
+            this.sendButton.Size = new System.Drawing.Size(75, 20);
             this.sendButton.TabIndex = 7;
             this.sendButton.Text = "Save";
             this.sendButton.UseVisualStyleBackColor = true;
@@ -91,19 +89,19 @@ namespace FormsClient
             this.clientID.TabIndex = 9;
             this.clientID.Text = "ID1";
             // 
-            // Form1
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(355, 248);
+            this.ClientSize = new System.Drawing.Size(354, 248);
             this.Controls.Add(this.clientID);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.sendButton);
             this.Controls.Add(this.messageBox);
             this.Controls.Add(this.messagesBox);
             this.Controls.Add(this.connectButton);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Name = "MainForm";
+            this.Text = "Client application";
             this.ResumeLayout(false);
             this.PerformLayout();
 

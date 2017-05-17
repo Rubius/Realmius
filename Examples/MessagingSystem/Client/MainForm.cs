@@ -1,15 +1,33 @@
-﻿using System;
+﻿////////////////////////////////////////////////////////////////////////////
+//
+// Copyright 2017 Rubius
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
+
+using System;
 using System.IO;
 using System.Windows.Forms;
 using Realmius;
 using Realmius.Contracts.Models;
 using Realmius.SyncService;
 using Realms;
-using Message = MessageClient.Models.Message;
+using Message = Client.Models.Message;
 
-namespace FormsClient
+namespace Client
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         private string _url = "http://localhost:45000";
         
@@ -17,7 +35,7 @@ namespace FormsClient
 
         private static IRealmiusSyncService _syncService;
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
         }
@@ -43,7 +61,7 @@ namespace FormsClient
 
                 foreach (var message in realm.All<Message>())
                 {
-                    messagesBox.AppendText($"{message.UserId} : {message.Text}"+ Environment.NewLine);
+                    messagesBox.AppendText($"{message.ClientId} : {message.Text}"+ Environment.NewLine);
                 }
                 
                 realm.Refresh();
@@ -60,11 +78,11 @@ namespace FormsClient
 
         protected internal virtual IRealmiusSyncService CreateSyncService()
         {
-            var deviceId = clientID.Text;
+            var clientId = clientID.Text;
 
             var syncService = SyncServiceFactory.CreateUsingSignalR(
                 GetRealm,
-                new Uri(_url + $"/signalr?deviceId={deviceId}"),
+                new Uri(_url + $"/signalr?clientId={clientId}"),
                 "SignalRSyncHub",
                 new[]
                 {
@@ -89,13 +107,13 @@ namespace FormsClient
 
         private void sendButton_Click(object sender, EventArgs e)
         {
-            var msg = new Message {Text = messageBox.Text, UserId = clientID.Text };
+            var msg = new Message {Text = messageBox.Text, ClientId = clientID.Text };
             var realm = GetRealm();
 
             realm.Write(() => realm.Add(msg));
             realm.Refresh();
 
-            messagesBox.AppendText($"{msg.UserId} : {msg.Text}" + Environment.NewLine);
+            messagesBox.AppendText($"{msg.ClientId} : {msg.Text}" + Environment.NewLine);
 
             messageBox.Text = string.Empty;
         }

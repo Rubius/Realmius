@@ -16,25 +16,23 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-using System.Data.Entity;
-using Realmius.Server.Models;
-using Realmius.Server.ServerConfiguration;
+using System;
+using System.Windows.Forms;
+using Client;
 
-namespace Server.Entities
+namespace FormsClient
 {
-    public class MessagingContext : ChangeTrackingDbContext
+    static class Program
     {
-        public IDbSet<Message> Messages { get; set; }
-        public IDbSet<Client> Clients { get; set; }
-
-        static MessagingContext()
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        static void Main()
         {
-            //Database.SetInitializer<MessagingContext>(new DropCreateDatabaseAlways<MessagingContext>());
-        }
-
-        public MessagingContext(IRealmiusServerDbConfiguration syncConfiguration) 
-            : base(syncConfiguration)
-        {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new MainForm());
         }
     }
 }

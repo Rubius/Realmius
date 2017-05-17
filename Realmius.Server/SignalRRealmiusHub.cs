@@ -100,30 +100,6 @@ namespace Realmius.Server
 
         }
 
-        //public static void UpdateUserGroups<THub>(Func<TUser, bool> userPredicate, IList<string> groups)
-        //    where THub : SignalRRealmiusHub<TUser>
-        //{
-        //    var connectionIds = _connections.Where(x => userPredicate(x.Value));
-        //    var hub = GlobalHost.ConnectionManager.GetHubContext<THub>();
-
-        //    foreach (KeyValuePair<string, TUser> connectionId in connectionIds)
-        //    {
-        //        var oldGroups = connectionId.Value.Tags.ToList();
-
-        //        foreach (string oldGroup in oldGroups)
-        //        {
-        //            hub.Groups.Remove(connectionId.Key, oldGroup);
-        //        }
-
-        //        connectionId.Value.Tags.Clear();
-        //        foreach (var item in groups)
-        //        {
-        //            connectionId.Value.Tags.Add(item);
-        //            hub.Groups.Add(connectionId.Key, item);
-        //        }
-        //    }
-        //}
-
         protected virtual void UserConnected()
         {
             var user = CreateUserInfo(Context);
@@ -136,7 +112,6 @@ namespace Realmius.Server
                 return;
             }
             _connections[Context.ConnectionId] = user;
-
 
             var lastDownloadString = Context.QueryString[Constants.LastDownloadParameterName];
             Dictionary<string, DateTimeOffset> lastDownload;

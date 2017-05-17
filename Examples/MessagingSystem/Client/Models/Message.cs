@@ -16,25 +16,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-using System.Data.Entity;
-using Realmius.Server.Models;
-using Realmius.Server.ServerConfiguration;
+using System;
+using Realmius.SyncService;
+using Realms;
 
-namespace Server.Entities
+namespace Client.Models
 {
-    public class MessagingContext : ChangeTrackingDbContext
+    public class Message : RealmObject, IRealmiusObjectClient
     {
-        public IDbSet<Message> Messages { get; set; }
-        public IDbSet<Client> Clients { get; set; }
+        [PrimaryKey]
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
-        static MessagingContext()
-        {
-            //Database.SetInitializer<MessagingContext>(new DropCreateDatabaseAlways<MessagingContext>());
-        }
+        public string MobilePrimaryKey => Id;
+        
+        public string ClientId { get; set; }
 
-        public MessagingContext(IRealmiusServerDbConfiguration syncConfiguration) 
-            : base(syncConfiguration)
-        {
-        }
+        public string Text { get; set; }
     }
 }
