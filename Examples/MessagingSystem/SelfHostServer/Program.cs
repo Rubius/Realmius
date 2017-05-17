@@ -3,6 +3,7 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Cors;
 using Microsoft.Owin.Hosting;
 using Owin;
+using Realmius.Server.QuickStart;
 using Server.Entities;
 using Server.Sync;
 
@@ -20,7 +21,7 @@ namespace SelfHostServer
                 {
                     Console.WriteLine("Create new random message");
                     using (var db = new MessagingContext(
-                        new ShareEverythingRealmSyncServerConfiguration(typeof(User), typeof(Message))))
+                        new ShareEverythingRealmiusServerConfiguration(typeof(User), typeof(Message))))
                     {
                         var user = new User { Nickname = "SystemUser", Id = Guid.NewGuid().ToString() };
                         db.Users.Add(user);

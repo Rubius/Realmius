@@ -2,6 +2,7 @@
 using Microsoft.AspNet.SignalR.Hubs;
 using Realmius.Contracts;
 using Realmius.Server;
+using Realmius.Server.QuickStart;
 using Server.Entities;
 
 namespace Server.Sync
@@ -10,7 +11,7 @@ namespace Server.Sync
     public class SyncHub : SignalRRealmiusHub<User>
     {
         public SyncHub()
-            : base(new RealmiusServerProcessor<User>(() => new MessagingContext(new ShareEverythingRealmSyncServerConfiguration(typeof(User), typeof(Message))), SyncConfiguration.Instance))
+            : base(new RealmiusServerProcessor<User>(() => new MessagingContext(new ShareEverythingRealmiusServerConfiguration(typeof(User), typeof(Message))), SyncConfiguration.Instance))
         {
             Console.WriteLine("SyncHub created.");
         }
@@ -25,7 +26,7 @@ namespace Server.Sync
 
                 Console.WriteLine($"Connect user with id '{deviceId}'");
 
-                return new User();
+                return new User {Id = deviceId};
             }
             catch (Exception e)
             {

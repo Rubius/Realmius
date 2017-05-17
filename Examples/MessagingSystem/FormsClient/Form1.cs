@@ -86,7 +86,7 @@ namespace FormsClient
 
         private void CreateNewUser_Click(object sender, EventArgs e)
         {
-            _user = new User {Nickname = usernameBox.Text};
+            _user = new User {Id = clientID.Text, Nickname = usernameBox.Text};
             var realm = GetRealm();
 
             realm.Write(() => realm.Add(_user));

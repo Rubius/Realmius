@@ -14,6 +14,6 @@ namespace Server.Entities
 
         public string MobilePrimaryKey => Id;
 
-        public IList<string> Tags { get; } = new List<string>();
+        public IList<string> Tags { get; } = new List<string> {"all"};
     }
 }

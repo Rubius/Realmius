@@ -152,7 +152,6 @@ namespace Realmius.Server
                     var date = DateTimeOffset.Parse(lastDownloadOld);
                     lastDownload = user.Tags.ToDictionary(x => x, x => date);
                 }
-
             }
             else
             {
