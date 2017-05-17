@@ -25,11 +25,13 @@ namespace Realmius.Server.QuickStart
 {
     public class ShareEverythingRealmiusServerConfiguration : ShareEverythingRealmiusServerConfiguration<ISyncUser>
     {
-        public ShareEverythingRealmiusServerConfiguration(IList<Type> typesToSync) : base(typesToSync)
+        public ShareEverythingRealmiusServerConfiguration(IList<Type> typesToSync)
+            : base(typesToSync)
         {
         }
 
-        public ShareEverythingRealmiusServerConfiguration(Type typeToSync, params Type[] typesToSync) : base(typeToSync, typesToSync)
+        public ShareEverythingRealmiusServerConfiguration(Type typeToSync, params Type[] typesToSync)
+            : base(typeToSync, typesToSync)
         {
         }
     }

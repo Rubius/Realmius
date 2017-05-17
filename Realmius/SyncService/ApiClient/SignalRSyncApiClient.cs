@@ -66,7 +66,6 @@ namespace Realmius.SyncService.ApiClient
             _startOptions = startOptions;
 
             await Reconnect();
-
         }
 
         private Action _hubUnsubscribe = () => { };
@@ -82,7 +81,7 @@ namespace Realmius.SyncService.ApiClient
 
                 var parameters = GetParameters(Uri);
                 parameters[Constants.LastDownloadParameterName] =
-                    WebUtility.UrlEncode(JsonConvert.SerializeObject(_startOptions.LastDownloaded));
+                    WebUtility.UrlEncode(JsonConvert.SerializeObject(_startOptions.LastDownloaded ?? new Dictionary<string, DateTimeOffset>()));
                 parameters[Constants.SyncTypesParameterName] = string.Join(",", _startOptions.Types);
                 var connectionUri = Uri.ToString();
                 if (!string.IsNullOrEmpty(Uri.Query))

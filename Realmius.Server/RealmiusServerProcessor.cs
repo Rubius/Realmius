@@ -72,7 +72,6 @@ namespace Realmius.Server
             }
 
             _connectionString = dbContextFactoryFunc().Database.Connection.ConnectionString;
-
         }
 
         public UploadDataResponse Upload(UploadDataRequest request, TUser user)

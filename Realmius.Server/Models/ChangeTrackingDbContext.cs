@@ -230,9 +230,9 @@ namespace Realmius.Server.Models
                     OnDataUpdated(updatedResult);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //Console.WriteLine(e);
+                Console.WriteLine(e);
                 throw;
             }
 
