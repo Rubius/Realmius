@@ -51,6 +51,7 @@
             this.messagesBox.Location = new System.Drawing.Point(12, 38);
             this.messagesBox.Multiline = true;
             this.messagesBox.Name = "messagesBox";
+            this.messagesBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.messagesBox.Size = new System.Drawing.Size(333, 174);
             this.messagesBox.TabIndex = 5;
             // 
@@ -100,6 +101,7 @@
             this.Controls.Add(this.messageBox);
             this.Controls.Add(this.messagesBox);
             this.Controls.Add(this.connectButton);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "MainForm";
             this.Text = "Client application";
             this.ResumeLayout(false);

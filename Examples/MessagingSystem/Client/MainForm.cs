@@ -53,13 +53,14 @@ namespace Client
             {
                 messagesBox.Invoke((MethodInvoker) delegate
                 {
-                    messagesBox.AppendText("SYSTEM: DataDownloaded" + Environment.NewLine);
+                    messagesBox.AppendText("SYSTEM: User not authorized!" + Environment.NewLine);
                 });
             };
             _syncService.DataDownloaded += delegate
             {
                 messagesBox.Invoke((MethodInvoker) delegate
                 {
+                    messagesBox.Text = string.Empty;
                     messagesBox.Text = "SYSTEM: DataDownloaded" + Environment.NewLine;
                     var realm = GetRealm();
 
@@ -86,8 +87,6 @@ namespace Client
                     typeof(Message)
                 });
 
-            syncService.Unauthorized += (sender, response) => { messagesBox.AppendText("SYSTEM: User not authorized!" + Environment.NewLine); };
-            
             return syncService;
         }
 
