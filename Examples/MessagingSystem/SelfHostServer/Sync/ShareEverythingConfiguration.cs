@@ -18,11 +18,13 @@ namespace Server.Sync
 {
     public class ShareEverythingRealmSyncServerConfiguration : ShareEverythingRealmSyncServerConfiguration<ISyncUser>
     {
-        public ShareEverythingRealmSyncServerConfiguration(IList<Type> typesToSync) : base(typesToSync)
+        public ShareEverythingRealmSyncServerConfiguration(IList<Type> typesToSync) 
+            : base(typesToSync)
         {
         }
 
-        public ShareEverythingRealmSyncServerConfiguration(Type typeToSync, params Type[] typesToSync) : base(typeToSync, typesToSync)
+        public ShareEverythingRealmSyncServerConfiguration(Type typeToSync, params Type[] typesToSync)
+            : base(typeToSync, typesToSync)
         {
         }
     }

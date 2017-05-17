@@ -37,11 +37,13 @@ namespace FormsClient
             this.messagesBox = new System.Windows.Forms.TextBox();
             this.messageBox = new System.Windows.Forms.TextBox();
             this.sendButton = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.clientID = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // createUserBtn
             // 
-            this.createUserBtn.Location = new System.Drawing.Point(178, 10);
+            this.createUserBtn.Location = new System.Drawing.Point(179, 34);
             this.createUserBtn.Name = "createUserBtn";
             this.createUserBtn.Size = new System.Drawing.Size(75, 23);
             this.createUserBtn.TabIndex = 0;
@@ -62,7 +64,7 @@ namespace FormsClient
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(11, 15);
+            this.label1.Location = new System.Drawing.Point(12, 39);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(55, 13);
             this.label1.TabIndex = 2;
@@ -70,7 +72,7 @@ namespace FormsClient
             // 
             // usernameBox
             // 
-            this.usernameBox.Location = new System.Drawing.Point(72, 12);
+            this.usernameBox.Location = new System.Drawing.Point(73, 36);
             this.usernameBox.Name = "usernameBox";
             this.usernameBox.Size = new System.Drawing.Size(100, 20);
             this.usernameBox.TabIndex = 4;
@@ -101,11 +103,30 @@ namespace FormsClient
             this.sendButton.UseVisualStyleBackColor = true;
             this.sendButton.Click += new System.EventHandler(this.sendButton_Click);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 14);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(44, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "ClientID";
+            // 
+            // clientID
+            // 
+            this.clientID.Location = new System.Drawing.Point(73, 11);
+            this.clientID.Name = "clientID";
+            this.clientID.Size = new System.Drawing.Size(100, 20);
+            this.clientID.TabIndex = 9;
+            this.clientID.Text = "ID1";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(573, 248);
+            this.Controls.Add(this.clientID);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.sendButton);
             this.Controls.Add(this.messageBox);
             this.Controls.Add(this.messagesBox);
@@ -129,6 +150,8 @@ namespace FormsClient
         private System.Windows.Forms.TextBox messagesBox;
         private System.Windows.Forms.TextBox messageBox;
         private System.Windows.Forms.Button sendButton;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox clientID;
     }
 }
 

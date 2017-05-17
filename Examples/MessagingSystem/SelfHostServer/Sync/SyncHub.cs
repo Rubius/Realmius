@@ -23,6 +23,8 @@ namespace Server.Sync
                 var key = context.QueryString["authKey"];
                 var deviceId = context.QueryString["deviceId"];
 
+                Console.WriteLine($"Connect user with id '{deviceId}'");
+
                 return new User();
             }
             catch (Exception e)

@@ -16,6 +16,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormsClient", "FormsClient\FormsClient.csproj", "{4C98245E-B143-4F96-99E5-79F0D87E9854}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelfHostServer", "SelfHostServer\SelfHostServer.csproj", "{71AFA93C-6B98-4B4F-AAED-D4811F0F7566}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4C98245E-B143-4F96-99E5-79F0D87E9854} = {4C98245E-B143-4F96-99E5-79F0D87E9854}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{47C3E3FA-2A97-49C0-906F-E9A4B197B00D}"
 EndProject

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using MessageClient.Models;
 using Realmius;
@@ -40,19 +41,33 @@ namespace FormsClient
 
         private void SyncServiceOnDataDownloaded(object sender, EventArgs e)
         {
-            messagesBox.Invoke((MethodInvoker) delegate { messagesBox.AppendText("SYSTEM: DataDownloaded + Environment.NewLine"); });
+            messagesBox.Invoke((MethodInvoker) delegate
+            {
+                messagesBox.Text = "SYSTEM: DataDownloaded" + Environment.NewLine;
+                var realm = GetRealm();
+
+                foreach (var message in realm.All<Message>())
+                {
+                    messagesBox.AppendText($"{message.UserId} : {message.Text}"+ Environment.NewLine);
+                }
+                
+                realm.Refresh();
+            });
         }
 
         private void SyncServiceOnUnauthorized(object sender, UnauthorizedResponse e)
         {
-            messagesBox.Invoke((MethodInvoker)delegate { messagesBox.AppendText("SYSTEM: DataDownloaded + Environment.NewLine"); });
+            messagesBox.Invoke((MethodInvoker) delegate
+            {
+                messagesBox.AppendText("SYSTEM: DataDownloaded" + Environment.NewLine);
+            });
         }
 
         protected internal virtual IRealmiusSyncService CreateSyncService()
         {
             var email = "test@test.com";
             var key = "123";
-            var deviceId = "Device1";
+            var deviceId = clientID.Text;
 
             var syncService = SyncServiceFactory.CreateUsingSignalR(
                 GetRealm,
@@ -80,18 +95,23 @@ namespace FormsClient
 
         private void Connect_Click(object sender, EventArgs e)
         {
-            _realmFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            RealmiusSyncService.RealmiusDbPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + "sync");
+            var path = @"D:\realms\"; // Path.GetTempPath();
+            var name = $"client-{clientID.Text}.db"; // Guid.NewGuid().ToString();
+            _realmFileName = Path.Combine(path, name);
+            RealmiusSyncService.RealmiusDbPath = Path.Combine(path, name + "sync");
+            //RealmiusSyncService.RealmiusDbPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + "sync");
             InitializeRealmSync();
         }
 
         private void sendButton_Click(object sender, EventArgs e)
         {
-            var msg = new Message {Text = messageBox.Text, UserId = _user == null ? "NONAME" : _user.Id};
+            var msg = new Message {Text = messageBox.Text, UserId = clientID.Text };
             var realm = GetRealm();
 
             realm.Write(() => realm.Add(msg));
             realm.Refresh();
+
+            messagesBox.AppendText($"{msg.UserId} : {msg.Text}" + Environment.NewLine);
         }
     }
 }
