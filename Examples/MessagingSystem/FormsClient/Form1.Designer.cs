@@ -30,10 +30,7 @@ namespace FormsClient
         /// </summary>
         private void InitializeComponent()
         {
-            this.createUserBtn = new System.Windows.Forms.Button();
             this.connectButton = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.usernameBox = new System.Windows.Forms.TextBox();
             this.messagesBox = new System.Windows.Forms.TextBox();
             this.messageBox = new System.Windows.Forms.TextBox();
             this.sendButton = new System.Windows.Forms.Button();
@@ -41,19 +38,9 @@ namespace FormsClient
             this.clientID = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
-            // createUserBtn
-            // 
-            this.createUserBtn.Location = new System.Drawing.Point(179, 34);
-            this.createUserBtn.Name = "createUserBtn";
-            this.createUserBtn.Size = new System.Drawing.Size(75, 23);
-            this.createUserBtn.TabIndex = 0;
-            this.createUserBtn.Text = "Create user";
-            this.createUserBtn.UseVisualStyleBackColor = true;
-            this.createUserBtn.Click += new System.EventHandler(this.CreateNewUser_Click);
-            // 
             // connectButton
             // 
-            this.connectButton.Location = new System.Drawing.Point(496, 9);
+            this.connectButton.Location = new System.Drawing.Point(270, 9);
             this.connectButton.Name = "connectButton";
             this.connectButton.Size = new System.Drawing.Size(75, 23);
             this.connectButton.TabIndex = 1;
@@ -61,41 +48,25 @@ namespace FormsClient
             this.connectButton.UseVisualStyleBackColor = true;
             this.connectButton.Click += new System.EventHandler(this.Connect_Click);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 39);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(55, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Username";
-            // 
-            // usernameBox
-            // 
-            this.usernameBox.Location = new System.Drawing.Point(73, 36);
-            this.usernameBox.Name = "usernameBox";
-            this.usernameBox.Size = new System.Drawing.Size(100, 20);
-            this.usernameBox.TabIndex = 4;
-            this.usernameBox.Text = "TestUser1";
-            // 
             // messagesBox
             // 
-            this.messagesBox.Location = new System.Drawing.Point(12, 76);
+            this.messagesBox.Location = new System.Drawing.Point(12, 38);
             this.messagesBox.Multiline = true;
             this.messagesBox.Name = "messagesBox";
-            this.messagesBox.Size = new System.Drawing.Size(549, 136);
+            this.messagesBox.Size = new System.Drawing.Size(333, 174);
             this.messagesBox.TabIndex = 5;
             // 
             // messageBox
             // 
             this.messageBox.Location = new System.Drawing.Point(12, 218);
             this.messageBox.Name = "messageBox";
-            this.messageBox.Size = new System.Drawing.Size(459, 20);
+            this.messageBox.Size = new System.Drawing.Size(252, 20);
             this.messageBox.TabIndex = 6;
+            this.messageBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.messageBox_KeyDown);
             // 
             // sendButton
             // 
-            this.sendButton.Location = new System.Drawing.Point(486, 215);
+            this.sendButton.Location = new System.Drawing.Point(270, 218);
             this.sendButton.Name = "sendButton";
             this.sendButton.Size = new System.Drawing.Size(75, 23);
             this.sendButton.TabIndex = 7;
@@ -114,9 +85,9 @@ namespace FormsClient
             // 
             // clientID
             // 
-            this.clientID.Location = new System.Drawing.Point(73, 11);
+            this.clientID.Location = new System.Drawing.Point(62, 11);
             this.clientID.Name = "clientID";
-            this.clientID.Size = new System.Drawing.Size(100, 20);
+            this.clientID.Size = new System.Drawing.Size(202, 20);
             this.clientID.TabIndex = 9;
             this.clientID.Text = "ID1";
             // 
@@ -124,16 +95,13 @@ namespace FormsClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(573, 248);
+            this.ClientSize = new System.Drawing.Size(355, 248);
             this.Controls.Add(this.clientID);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.sendButton);
             this.Controls.Add(this.messageBox);
             this.Controls.Add(this.messagesBox);
-            this.Controls.Add(this.usernameBox);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.connectButton);
-            this.Controls.Add(this.createUserBtn);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -142,11 +110,7 @@ namespace FormsClient
         }
 
         #endregion
-
-        private System.Windows.Forms.Button createUserBtn;
         private System.Windows.Forms.Button connectButton;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox usernameBox;
         private System.Windows.Forms.TextBox messagesBox;
         private System.Windows.Forms.TextBox messageBox;
         private System.Windows.Forms.Button sendButton;

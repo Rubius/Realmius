@@ -7,10 +7,9 @@ namespace Server.Entities
 {
     public class MessagingContext : ChangeTrackingDbContext
     {
-        public static IRealmiusServerConfiguration<User> SyncConfiguration { get; set; }
+        public static IRealmiusServerConfiguration SyncConfiguration { get; set; }
 
         public IDbSet<Message> Messages { get; set; }
-        public IDbSet<User> Users { get; set; }
 
         static MessagingContext()
         {

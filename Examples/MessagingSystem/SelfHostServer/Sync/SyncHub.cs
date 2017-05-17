@@ -20,11 +20,9 @@ namespace Server.Sync
         {
             try
             {
-                var email = context.QueryString["email"];
-                var key = context.QueryString["authKey"];
                 var deviceId = context.QueryString["deviceId"];
 
-                Console.WriteLine($"Connect user with id '{deviceId}'");
+                Console.WriteLine($"Connect client with id '{deviceId}'");
 
                 return new User {Id = deviceId};
             }

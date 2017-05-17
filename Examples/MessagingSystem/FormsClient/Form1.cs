@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
-using MessageClient.Models;
 using Realmius;
 using Realmius.Contracts.Models;
 using Realmius.SyncService;
@@ -14,9 +12,7 @@ namespace FormsClient
     public partial class Form1 : Form
     {
         private string _url = "http://localhost:45000";
-
-        private User _user;
-
+        
         private string _realmFileName;
 
         private static IRealmiusSyncService _syncService;
@@ -36,7 +32,6 @@ namespace FormsClient
             _syncService = CreateSyncService();
             _syncService.Unauthorized += SyncServiceOnUnauthorized;
             _syncService.DataDownloaded += SyncServiceOnDataDownloaded;
-            //_syncService.FileUploaded += SyncServiceOnFileUploaded;
         }
 
         private void SyncServiceOnDataDownloaded(object sender, EventArgs e)
@@ -65,32 +60,21 @@ namespace FormsClient
 
         protected internal virtual IRealmiusSyncService CreateSyncService()
         {
-            var email = "test@test.com";
-            var key = "123";
             var deviceId = clientID.Text;
 
             var syncService = SyncServiceFactory.CreateUsingSignalR(
                 GetRealm,
-                new Uri(_url + $"/signalr?email={email}&authKey={key}&deviceId={deviceId}"),
+                new Uri(_url + $"/signalr?deviceId={deviceId}"),
                 "SignalRSyncHub",
                 new[]
                 {
-                    typeof(User),
                     typeof(Message)
-                });
+                },
+                deleteDatabase:true);
 
             syncService.Unauthorized += (sender, response) => { messagesBox.AppendText("SYSTEM: User not authorized!" + Environment.NewLine); };
             
             return syncService;
-        }
-
-        private void CreateNewUser_Click(object sender, EventArgs e)
-        {
-            _user = new User {Id = clientID.Text, Nickname = usernameBox.Text};
-            var realm = GetRealm();
-
-            realm.Write(() => realm.Add(_user));
-            realm.Refresh();
         }
 
         private void Connect_Click(object sender, EventArgs e)
@@ -112,6 +96,16 @@ namespace FormsClient
             realm.Refresh();
 
             messagesBox.AppendText($"{msg.UserId} : {msg.Text}" + Environment.NewLine);
+
+            messageBox.Text = string.Empty;
+        }
+
+        private void messageBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                sendButton_Click(this, e);
+            }
         }
     }
 }

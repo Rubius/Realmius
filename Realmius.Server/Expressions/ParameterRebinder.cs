@@ -23,7 +23,6 @@ namespace Realmius.Server.Expressions
 {
     public class ParameterRebinder : ExpressionVisitor
     {
-
         private readonly Dictionary<ParameterExpression, ParameterExpression> _map;
 
         public ParameterRebinder(Dictionary<ParameterExpression, ParameterExpression> map)
@@ -47,6 +46,5 @@ namespace Realmius.Server.Expressions
 
             return base.VisitParameter(p);
         }
-
     }
 }

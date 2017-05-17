@@ -66,7 +66,7 @@ namespace Server.Sync
             //var entityWithUserId = obj as IEntityWithUserId;
             //if (entityWithUserId != null)
             //{
-            //    return new[] { entityWithUserId.UserId };
+            //    return new[] { entityWithUserId.ClientId };
             //}
             return new List<string> { };
         }
