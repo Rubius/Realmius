@@ -53,6 +53,14 @@
     <Reference Include="Realm.DataBinding, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Realm.DataBinding.1.1.0\lib\netstandard1.0\Realm.DataBinding.dll</HintPath>
     </Reference>
+    <Reference Include="Realmius, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\binaries\Realmius.dll</HintPath>
+    </Reference>
+    <Reference Include="Realmius.Contracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\binaries\Realmius.Contracts.dll</HintPath>
+    </Reference>
     <Reference Include="Remotion.Linq, Version=2.1.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
       <HintPath>..\packages\Remotion.Linq.2.1.1\lib\net45\Remotion.Linq.dll</HintPath>
     </Reference>
@@ -166,16 +174,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Realmius.Contracts\Realmius.Contracts.csproj">
-      <Project>{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}</Project>
-      <Name>Realmius.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Realmius\Realmius.csproj">
-      <Project>{b1651a06-7cec-4529-b8ee-e594d26a62d3}</Project>
-      <Name>Realmius</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="FodyWeavers.xml" />

@@ -65,6 +65,14 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="Realmius.Contracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\binaries\Realmius.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="Realmius.Server, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\binaries\Realmius.Server.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -90,16 +98,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Realmius.Contracts\Realmius.Contracts.csproj">
-      <Project>{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}</Project>
-      <Name>Realmius.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Realmius.Server\Realmius.Server.csproj">
-      <Project>{197EEC4A-5985-4422-B76F-887281D7BC04}</Project>
-      <Name>Realmius.Server</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
