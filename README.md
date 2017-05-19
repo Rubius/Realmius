@@ -16,7 +16,8 @@
 1. Use the NuGet package manager to add a reference to Realmius.Server
 2. Setup Entity Framework, create entities with implementation of IRealmiusObjectServer interface
 3. Create EF context with implementation of ChangeTrackingDbContext
-4. Start SignalR hub (also you may use long-pooling variant)
+4. Create sync configuration as implementation of SyncConfigurationBase
+5. Start SignalR hub (also you may use long-pooling variant)
 
 ##### Client
 1. Use the NuGet package manager to add a reference to Realmius
