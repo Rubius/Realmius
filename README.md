@@ -14,4 +14,14 @@
 
 #### Examples
 
+You can find examples in the `/Examples` folder in the code repository.
+
 #### NuGet packages
+
+The stable release packages published to [nuget.org](https://www.nuget.org/packages?q=Realmius).
+
+Package | Targets
+--------|---------------
+Realmius | Portable class library, Xamarin.Ios, Xamarin.Android
+Realmius.Contracts | NET46
+Realmius.Server | NET46
