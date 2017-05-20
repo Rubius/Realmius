@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 using System;
+using Newtonsoft.Json;
 using Realmius.SyncService;
 using Realms;
 
@@ -32,6 +33,9 @@ namespace Client.Models
         public DateTimeOffset DateTime { get; set; }
 
         public string ClientId { get; set; }
+
+        [JsonProperty("ReplyId")]
+        public Message Reply { get; set; }
 
         public string Text { get; set; }
     }

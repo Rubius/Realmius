@@ -26,29 +26,12 @@ using Server.Entities;
 namespace Server.Sync
 {
     [HubName(Constants.SignalRHubName)]
-    public class SyncHub : SignalRRealmiusHub<Client>
+    public class SyncHub : SignalRRealmiusShareEverythingHub
     {
         public SyncHub()
-            : base(new RealmiusServerProcessor<Client>(() => new MessagingContext(new ShareEverythingRealmiusServerConfiguration(typeof(Client), typeof(Message))), SyncConfiguration.Instance))
+            : base(() => new MessagingContext(), typeof(Message))
         {
             Console.WriteLine("Sync hub created.");
-        }
-
-        protected override Client CreateUserInfo(HubCallerContext context)
-        {
-            try
-            {
-                var clientId = context.QueryString["clientId"];
-
-                Console.WriteLine($"Connect client with id '{clientId}'");
-
-                return new Client { Id = clientId};
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error when client connect: {e.Message}");
-                return null;
-            }
         }
     }
 }

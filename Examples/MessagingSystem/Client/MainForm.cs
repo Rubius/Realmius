@@ -31,7 +31,7 @@ namespace Client
     public partial class MainForm : Form
     {
         private string _serverUrl = "http://localhost:45000";
-        
+
         private string _realmFileName;
 
         private static IRealmiusSyncService _syncService;
@@ -49,29 +49,21 @@ namespace Client
         protected internal virtual void InitializeRealmius()
         {
             _syncService = CreateSyncService();
-            _syncService.Unauthorized += delegate
-            {
-                messagesBox.Invoke((MethodInvoker) delegate
-                {
-                    messagesBox.AppendText("SYSTEM: User not authorized!" + Environment.NewLine);
-                });
-            };
-            _syncService.DataDownloaded += delegate
-            {
-                messagesBox.Invoke((MethodInvoker) delegate
-                {
-                    messagesBox.Text = string.Empty;
-                    messagesBox.Text = "SYSTEM: DataDownloaded" + Environment.NewLine;
-                    var realm = GetRealm();
+            var realm = GetRealm();
+            realm.All<Message>().SubscribeForNotifications((collection, y, z) =>
+              {
+                  if (y?.InsertedIndices != null)
+                  {
+                      foreach (var change in y.InsertedIndices)
+                      {
+                          messagesBox.AppendText(FormatMessage(collection[change]));
+                      }
+                  }
 
-                    foreach (var message in realm.All<Message>().OrderBy(x => x.DateTime))
-                    {
-                        messagesBox.AppendText(FormatMessage(message));
-                    }
 
-                    realm.Refresh();
-                });
-            };
+                  
+              });
+            
         }
 
         protected internal virtual IRealmiusSyncService CreateSyncService()
@@ -101,14 +93,14 @@ namespace Client
 
         private void sendButton_Click(object sender, EventArgs e)
         {
-            var msg = new Message {Text = messageBox.Text, ClientId = clientID.Text, DateTime = DateTimeOffset.Now};
+            if (string.IsNullOrEmpty(_realmFileName))
+                return;
+
+            var msg = new Message { Text = messageBox.Text, ClientId = clientID.Text, DateTime = DateTimeOffset.Now };
             var realm = GetRealm();
 
             realm.Write(() => realm.Add(msg));
-            realm.Refresh();
-
-            messagesBox.AppendText(FormatMessage(msg));
-
+            
             messageBox.Text = string.Empty;
         }
 
@@ -123,6 +115,11 @@ namespace Client
             {
                 sendButton_Click(this, e);
             }
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

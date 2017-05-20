@@ -50,7 +50,6 @@ namespace Realmius.SyncService
         public event EventHandler DataDownloaded;
         public event EventHandler<FileUploadedEventArgs> FileUploaded;
 
-        private bool _isBuggedRealm;
         private Func<Realm> _realmFactoryMethod;
         private readonly Dictionary<string, RealmObjectTypeInfo> _typesToSync;
         private IApiClient _apiClient;
@@ -58,7 +57,8 @@ namespace Realmius.SyncService
         private readonly object _handleDownloadDataLock = new object();
         private string _realmDatabasePath;
         private static int _downloadIndex;
-        
+        private string _syncServiceId;
+
         public RealmiusSyncService(Func<Realm> realmFactoryMethod, IApiClient apiClient, bool deleteSyncDatabase, params Type[] typesToSync)
         {
             _typesToSync = typesToSync.ToDictionary(x => x.Name, x => new RealmObjectTypeInfo(x));
@@ -79,10 +79,9 @@ namespace Realmius.SyncService
 
         private void Initialize(Func<Realm> realmFactoryMethod, IApiClient apiClient, bool deleteSyncDatabase)
         {
+            _syncServiceId = Guid.NewGuid().ToString();
             _realmFactoryMethod = realmFactoryMethod;
             _apiClient = apiClient;
-
-            _isBuggedRealm = "1.1.2.0".Equals(GetRealmVersion());
 
             _jsonSerializerSettings = new JsonSerializerSettings
             {
@@ -224,7 +223,7 @@ namespace Realmius.SyncService
                 syncOptions = realmius.Find<SyncConfiguration>(1);
                 if (syncOptions == null)
                 {
-                    syncOptions = new SyncConfiguration {Id = 1};
+                    syncOptions = new SyncConfiguration { Id = 1 };
                     realmius.Write(() => { realmius.Add(syncOptions); });
                 }
 
@@ -434,7 +433,7 @@ namespace Realmius.SyncService
                 try
                 {
                     var files = realmius.All<UploadFileInfo>().Where(x => !x.UploadFinished).OrderBy(x => x.Added);
-                    var file = _isBuggedRealm ? files.ToList().FirstOrDefault() : files.FirstOrDefault();
+                    var file = files.FirstOrDefault();
 
                     if (file == null)
                     {
@@ -532,7 +531,6 @@ namespace Realmius.SyncService
         private bool _uploadInProgress;
         private object _uploadLock = new object();
         private bool _disposed;
-
         public virtual async Task Upload()
         {
             if (_uploadInProgress || _disposed)
@@ -549,7 +547,7 @@ namespace Realmius.SyncService
                 }
             }
             var uploadSucceeded = false;
-            
+
             Dictionary<string, List<string>> changesIds;
             var changes = new UploadDataRequest();
             try
@@ -575,7 +573,7 @@ namespace Realmius.SyncService
                     }
 
                     UploadInProgress = true;
-                    
+
                     foreach (var uploadRequestItemRealm in objectsToUpload.Values)
                     {
                         //remove upload items that should not be synced anymore
@@ -626,16 +624,35 @@ namespace Realmius.SyncService
                                 realmius.Write(
                                     () =>
                                     {
-                                        foreach (var key in changesIds[GetSyncStatusKey(realmiusObject.Type, realmiusObject.MobilePrimaryKey)])
+                                        try
                                         {
-                                            var uploadRequestItemRealm = realmius.Find<UploadRequestItemRealm>(key);
-                                            Logger.Log.Debug(
-                                                $"Removed UploadRequest {uploadRequestItemRealm?.Id} for {realmiusObject.Type}:{realmiusObject.MobilePrimaryKey}");
 
-                                            realmius.Remove(uploadRequestItemRealm);
+
+                                            foreach (var key in changesIds[GetSyncStatusKey(realmiusObject.Type, realmiusObject.MobilePrimaryKey)])
+                                            {
+                                                try
+                                                {
+                                                    var uploadRequestItemRealm = realmius.Find<UploadRequestItemRealm>(key);
+                                                    Logger.Log.Debug(
+                                                        $"Removed UploadRequest {uploadRequestItemRealm?.Id} for {realmiusObject.Type}:{realmiusObject.MobilePrimaryKey}");
+
+                                                    if (uploadRequestItemRealm != null)
+                                                        realmius.Remove(uploadRequestItemRealm);
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    //System.Console.WriteLine(e);
+                                                    throw;
+                                                }
+                                            }
+
+                                            syncStateObject.SetSyncState(SyncState.Synced);
                                         }
-
-                                        syncStateObject.SetSyncState(SyncState.Synced);
+                                        catch (Exception e)
+                                        {
+                                            //System.Console.WriteLine(e);
+                                            throw;
+                                        }
                                     });
 
                                 if (_typesToSync[realmiusObject.Type].ImplementsSyncState)
@@ -777,6 +794,10 @@ namespace Realmius.SyncService
                             MobilePrimaryKey = changeObject.MobilePrimaryKey,
                             SyncState = (int)SyncState.Synced,
                         };
+                        realmiusData.Write(() =>
+                        {
+                            realmiusData.Add(syncStateObject);
+                        });
                     }
 
                     var objInDb = (IRealmiusObjectClient)realmLocal.Find(changeObject.Type, changeObject.MobilePrimaryKey);
@@ -797,7 +818,7 @@ namespace Realmius.SyncService
                                         AssignKey(obj, changeObject.MobilePrimaryKey, realmLocal);
                                         var success = Populate(changeObject.SerializedObject, obj, realmLocal);
                                         realmLocal.AddSkipUpload(obj, false);
-                                        
+
                                         if (!success)
                                         {
                                             problematicChangedObjects.Add(changeObject);

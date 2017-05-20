@@ -37,8 +37,7 @@ namespace Server
                 while (Console.ReadKey().Key != ConsoleKey.Q)
                 {
                     Console.WriteLine("Create new random message");
-                    using (var db = new MessagingContext(
-                        new ShareEverythingRealmiusServerConfiguration(typeof(Client), typeof(Message))))
+                    using (var db = new MessagingContext())
                     {
                         var message = new Message
                         {

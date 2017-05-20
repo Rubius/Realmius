@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,7 +39,14 @@ namespace Realmius.Server
 
         static SignalRRealmiusHub()
         {
-            ChangeTrackingDbContext.DataUpdated += UpdatedDataHandler.HandleDataChanges;
+            ChangeTrackingDbContext.DataUpdated += (sender, data) =>
+            {
+                Task.Factory.StartNew(async () =>
+                {
+                    await Task.Delay(20);
+                    UpdatedDataHandler.HandleDataChanges(sender, data);
+                });
+            };
         }
 
         protected SignalRRealmiusHub(RealmiusServerProcessor<TUser> processor)
@@ -60,7 +68,7 @@ namespace Realmius.Server
             return result;
         }
 
-        private static readonly Dictionary<string, TUser> _connections = new Dictionary<string, TUser>();
+        private static readonly ConcurrentDictionary<string, TUser> _connections = new ConcurrentDictionary<string, TUser>();
         public override Task OnConnected()
         {
             UserConnected();
@@ -151,8 +159,9 @@ namespace Realmius.Server
         public override Task OnDisconnected(bool stopCalled)
         {
             var connectionId = Context.ConnectionId;
+            TUser user;
             if (_connections.ContainsKey(connectionId))
-                _connections.Remove(connectionId);
+                _connections.TryRemove(connectionId, out user);
 
             return base.OnDisconnected(stopCalled);
         }

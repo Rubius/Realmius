@@ -18,6 +18,7 @@
 
 using System.Data.Entity;
 using Realmius.Server.Models;
+using Realmius.Server.QuickStart;
 using Realmius.Server.ServerConfiguration;
 
 namespace Server.Entities
@@ -25,9 +26,9 @@ namespace Server.Entities
     public class MessagingContext : ChangeTrackingDbContext
     {
         public IDbSet<Message> Messages { get; set; }
-        
-        public MessagingContext(IRealmiusServerDbConfiguration syncConfiguration) 
-            : base(syncConfiguration)
+
+        public MessagingContext()
+            : base(new ShareEverythingRealmiusServerConfiguration(typeof(Message)))
         {
         }
     }

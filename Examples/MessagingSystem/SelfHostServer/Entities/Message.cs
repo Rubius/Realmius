@@ -18,6 +18,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 using Realmius.Server;
 
 namespace Server.Entities
@@ -30,9 +31,16 @@ namespace Server.Entities
         public string MobilePrimaryKey => Id;
 
         public DateTimeOffset DateTime { get; set; }
-        
+
         public string ClientId { get; set; }
 
         public string Text { get; set; }
+
+        [ForeignKey(nameof(ReplyId))]
+        [NotMapped]
+        [JsonIgnore]
+        public virtual Message Reply { get; set; }
+        [NotMapped]
+        public string ReplyId { get; set; }
     }
 }

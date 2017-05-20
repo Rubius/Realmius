@@ -50,6 +50,11 @@ namespace Realmius.Server.QuickStart
             return new[] { "all" };
         }
 
+        public virtual IList<string> GetTagsForUser(ChangeTrackingDbContext db, IRealmiusObjectServer obj)
+        {
+            return new[] { "all" };
+        }
+
         public ShareEverythingRealmiusServerConfiguration(IList<Type> typesToSync)
         {
             TypesToSync = typesToSync;

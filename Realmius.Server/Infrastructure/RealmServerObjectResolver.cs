@@ -19,6 +19,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -37,7 +38,7 @@ namespace Realmius.Server.Infrastructure
                 var realmObjectTypeInfo = typeof(IRealmiusObjectServer).GetTypeInfo();
                 var enumerableTypeInfo = typeof(IEnumerable).GetTypeInfo();
                 _propertyCache[type] = props.Where(p => p.PropertyName != nameof(IRealmiusObjectServer.MobilePrimaryKey)
-                                           //&& (!p.AttributeProvider.GetAttributes(typeof(DoNotUploadAttribute), true).Any())
+                                           && (!p.AttributeProvider.GetAttributes(typeof(NotMappedAttribute), true).Any())
                                            && (!realmObjectTypeInfo.IsAssignableFrom(p.PropertyType.GetTypeInfo()) || p.AttributeProvider.GetAttributes(typeof(JsonConverterAttribute), true).Any())
                                            && (!enumerableTypeInfo.IsAssignableFrom(p.PropertyType.GetTypeInfo()) || p.PropertyType == typeof(string) || p.AttributeProvider.GetAttributes(typeof(JsonConverterAttribute), true).Any())
 
