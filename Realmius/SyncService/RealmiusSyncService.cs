@@ -209,6 +209,9 @@ namespace Realmius.SyncService
 
         private async void HandleDownloadedData(object sender, DownloadDataResponse e)
         {
+            if (_disposed)
+                return;
+
             await HandleDownloadedData(e);
             OnDataDownloaded();
         }
@@ -388,10 +391,6 @@ namespace Realmius.SyncService
                     realmiusData.Write(
                         () =>
                         {
-                            syncStatusObject.SerializedObject = serializedCurrent;
-                            syncStatusObject.IsDeleted = isDeleted;
-                            syncStatusObject.SyncState = (int)SyncState.Unsynced;
-
                             //Logger.Log.Debug("UploadRequestItemRealm added");
                             realmiusData.Add(
                                 new UploadRequestItemRealm()
@@ -402,6 +401,9 @@ namespace Realmius.SyncService
                                     SerializedObject = serializedDiff,
                                     DateTime = DateTimeOffset.Now,
                                 });
+                            syncStatusObject.SerializedObject = serializedCurrent;
+                            syncStatusObject.IsDeleted = isDeleted;
+                            syncStatusObject.SyncState = (int)SyncState.Unsynced;
                         });
 
 
@@ -788,6 +790,9 @@ namespace Realmius.SyncService
         private void StoreChangedObjects(List<DownloadResponseItem> changedObjects, Realm realmiusData, Realm realmLocal)
         {
             var problematicChangedObjects = new List<DownloadResponseItem>();
+
+            realmLocal.Write(() =>
+            {
             foreach (var changeObject in changedObjects)
             {
                 _downloadIndex++;
@@ -823,9 +828,9 @@ namespace Realmius.SyncService
                             try
                             {
                                 _skipObjectChanges = true;
-                                realmLocal.Write(
-                                    () =>
-                                    {
+                                //realmLocal.Write(
+                                //    () =>
+                                //    {
                                         AssignKey(obj, changeObject.MobilePrimaryKey, realmLocal);
                                         var success = Populate(changeObject.SerializedObject, obj, realmLocal);
                                         realmLocal.AddSkipUpload(obj, false);
@@ -834,7 +839,7 @@ namespace Realmius.SyncService
                                         {
                                             problematicChangedObjects.Add(changeObject);
                                         }
-                                    });
+                                    //});
                             }
                             finally
                             {
@@ -854,9 +859,9 @@ namespace Realmius.SyncService
 
                         if (changeObject.IsDeleted)
                         {
-                            realmLocal.Write(
-                                () =>
-                                {
+                            //realmLocal.Write(
+                            //    () =>
+                            //    {
                                     realmiusData.Write(
                                         () =>
                                         {
@@ -865,16 +870,16 @@ namespace Realmius.SyncService
                                         });
 
                                     realmLocal.Remove((RealmObject)objInDb);
-                                });
+                                //});
                         }
                         else
                         {
                             try
                             {
                                 _skipObjectChanges = true;
-                                realmLocal.Write(
-                                    () =>
-                                    {
+                                //realmLocal.Write(
+                                //    () =>
+                                //    {
 
 
                                         var success = Populate(changeObject.SerializedObject, objInDb, realmLocal);
@@ -896,7 +901,7 @@ namespace Realmius.SyncService
                                             syncStateObject.IsDeleted = changeObject.IsDeleted;
                                         });
 
-                                    });
+                                    //});
                             }
                             finally
                             {
@@ -911,6 +916,7 @@ namespace Realmius.SyncService
                     Logger.Log.Debug($"error applying changed objects {ex}");
                 }
             }
+            });
 
             if (problematicChangedObjects.Count < changedObjects.Count)
                 StoreChangedObjects(problematicChangedObjects, realmiusData, realmLocal);
