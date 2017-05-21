@@ -32,7 +32,7 @@ namespace Realmius.SyncService
         event EventHandler DataDownloaded;
         event EventHandler<FileUploadedEventArgs> FileUploaded;
 
-        bool UploadInProgress { get; }
+        bool UIUploadInProgress { get; }
 
         Uri ServerUri { get; set; }
 
