@@ -392,7 +392,7 @@ namespace Realmius.SyncService
                             syncStatusObject.IsDeleted = isDeleted;
                             syncStatusObject.SyncState = (int)SyncState.Unsynced;
 
-                            Logger.Log.Debug("UploadRequestItemRealm added");
+                            //Logger.Log.Debug("UploadRequestItemRealm added");
                             realmiusData.Add(
                                 new UploadRequestItemRealm()
                                 {
@@ -539,7 +539,7 @@ namespace Realmius.SyncService
         private bool _disposed;
         public virtual async Task Upload()
         {
-            Logger.Log.Debug($"Attempt to Upload");
+            //Logger.Log.Debug($"Attempt to Upload");
             if (_uploadInProgress || _disposed)
             {
                 return;
@@ -611,7 +611,7 @@ namespace Realmius.SyncService
                 try
                 {
                     var result = await _apiClient.UploadData(changes);
-                    Logger.Log.Debug($"Upload finished " + JsonConvert.SerializeObject(result));
+                    //Logger.Log.Debug($"Upload finished " + JsonConvert.SerializeObject(result));
                     using (var realmius = CreateRealmius())
                     {
                         realmius.Refresh();
@@ -636,8 +636,6 @@ namespace Realmius.SyncService
                                     {
                                         try
                                         {
-
-
                                             foreach (var key in changesIds[GetSyncStatusKey(realmiusObject.Type, realmiusObject.MobilePrimaryKey)])
                                             {
                                                 try
@@ -661,8 +659,6 @@ namespace Realmius.SyncService
                                         catch (Exception e)
                                         {
                                             //System.Console.WriteLine(e);
-
-
                                             throw;
                                         }
                                     });
@@ -812,7 +808,7 @@ namespace Realmius.SyncService
                         {
                             realmiusData.Add(syncStateObject);
                         });
-                        Logger.Log.Debug($"  Created SyncStatus {changeObject.MobilePrimaryKey}");
+                        //Logger.Log.Debug($"  Created SyncStatus {changeObject.MobilePrimaryKey}");
                     }
 
                     var objInDb = (IRealmiusObjectClient)realmLocal.Find(changeObject.Type, changeObject.MobilePrimaryKey);
