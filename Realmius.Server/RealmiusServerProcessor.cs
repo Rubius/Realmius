@@ -23,6 +23,7 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Realmius.Contracts.Models;
@@ -36,6 +37,13 @@ namespace Realmius.Server
 {
     public class RealmiusServerProcessor : RealmiusServerProcessor<ISyncUser>
     {
+        public static void FixSignalREncoding()
+        {
+            var serializer = new JsonSerializer();
+            serializer.StringEscapeHandling = StringEscapeHandling.EscapeNonAscii;
+            GlobalHost.DependencyResolver.Register(typeof(JsonSerializer), () => serializer);
+        }
+
         public RealmiusServerProcessor(Func<ChangeTrackingDbContext> dbContextFactoryFunc,
             IRealmiusServerConfiguration<ISyncUser> configuration)
             : base(dbContextFactoryFunc, configuration)
@@ -51,7 +59,7 @@ namespace Realmius.Server
         }
     }
 
-    public class RealmiusServerProcessor<TUser> 
+    public class RealmiusServerProcessor<TUser>
         where TUser : ISyncUser
     {
         private readonly Func<ChangeTrackingDbContext> _dbContextFactoryFunc;
@@ -340,7 +348,7 @@ namespace Realmius.Server
             //    request.Types.Contains(x.Type)
             //    && (user.Tags.Contains(x.Tag0) || user.Tags.Contains(x.Tag1) || user.Tags.Contains(x.Tag2) || user.Tags.Contains(x.Tag3)))
             //    .OrderBy(x => x.LastChange);
-            
+
             return changes;
         }
 
