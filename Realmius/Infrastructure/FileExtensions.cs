@@ -19,9 +19,8 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using PCLStorage;
 
-namespace Realmius
+namespace Realmius.Infrastructure
 {
     public class FileExtensions2
     {
