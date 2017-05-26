@@ -17,14 +17,17 @@
 ////////////////////////////////////////////////////////////////////////////
 
 using System.Collections.Generic;
+using Realmius.Server.Configurations;
 
-namespace Realmius.Server.ServerConfiguration
+namespace Realmius.Server.QuickStart
 {
-    public interface ISyncUser
+    public class LimitedUser : IRealmiusUser
     {
-        /// <summary>
-        /// tags the user has access to
-        /// </summary>
-        IList<string> Tags { get; }
+        public IList<string> Tags { get; set; }
+
+        public LimitedUser(IList<string> tags)
+        {
+            Tags = tags;
+        }
     }
 }

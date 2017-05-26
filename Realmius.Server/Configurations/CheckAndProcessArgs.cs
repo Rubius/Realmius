@@ -16,23 +16,31 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-using System;
-using Microsoft.AspNet.SignalR.Hubs;
 using Realmius.Server.Models;
-using Realmius.Server.ServerConfiguration;
 
-namespace Realmius.Server.QuickStart
+namespace Realmius.Server.Configurations
 {
-    public class SignalRRealmiusShareEverythingHub : SignalRRealmiusHub<SyncUser>
+    public class CheckAndProcessArgs<TUser>
     {
-        public SignalRRealmiusShareEverythingHub(Func<ChangeTrackingDbContext> dbContextFactoryFunc, params Type[] syncedTypes) :
-            base(new RealmiusServerProcessor<SyncUser>(dbContextFactoryFunc, new ShareEverythingRealmiusServerConfiguration<SyncUser>(syncedTypes)))
-        {
-        }
+        /// <summary>
+        /// reference to EF to retrieve entities if needed
+        /// </summary>
+        public ChangeTrackingDbContext Database { get; set; }
 
-        protected override SyncUser CreateUserInfo(HubCallerContext context)
-        {
-            return new SyncUser();
-        }
+        /// <summary>
+        /// user that is uploading the changes
+        /// </summary>
+        public TUser User { get; set; }
+
+        /// <summary>
+        /// entity with user's changes applied
+        /// </summary>
+        public IRealmiusObjectServer Entity { get; set; }
+
+        /// <summary>
+        /// entity as it is in database before user's changes are applied
+        /// </summary>
+        public IRealmiusObjectServer OriginalDbEntity { get; set; }
+
     }
 }

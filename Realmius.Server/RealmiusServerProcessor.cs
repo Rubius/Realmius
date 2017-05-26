@@ -27,15 +27,15 @@ using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Realmius.Contracts.Models;
+using Realmius.Server.Configurations;
 using Realmius.Server.Expressions;
 using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
 using Realmius.Server.QuickStart;
-using Realmius.Server.ServerConfiguration;
 
 namespace Realmius.Server
 {
-    public class RealmiusServerProcessor : RealmiusServerProcessor<ISyncUser>
+    public class RealmiusServerProcessor : RealmiusServerProcessor<IRealmiusUser>
     {
         public static void FixSignalREncoding()
         {
@@ -45,7 +45,7 @@ namespace Realmius.Server
         }
 
         public RealmiusServerProcessor(Func<ChangeTrackingDbContext> dbContextFactoryFunc,
-            IRealmiusServerConfiguration<ISyncUser> configuration)
+            IRealmiusServerConfiguration<IRealmiusUser> configuration)
             : base(dbContextFactoryFunc, configuration)
         {
         }
@@ -54,13 +54,13 @@ namespace Realmius.Server
         /// this will all the types between all users!
         /// </summary>
         public RealmiusServerProcessor(Func<ChangeTrackingDbContext> dbContextFactoryFunc, Type typeToSync, params Type[] typesToSync)
-            : base(dbContextFactoryFunc, new ShareEverythingRealmiusServerConfiguration(typeToSync, typesToSync))
+            : base(dbContextFactoryFunc, new ShareEverythingConfiguration(typeToSync, typesToSync))
         {
         }
     }
 
     public class RealmiusServerProcessor<TUser>
-        where TUser : ISyncUser
+        where TUser : IRealmiusUser
     {
         private readonly Func<ChangeTrackingDbContext> _dbContextFactoryFunc;
         public IRealmiusServerConfiguration<TUser> Configuration { get; }

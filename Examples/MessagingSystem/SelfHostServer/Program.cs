@@ -21,7 +21,6 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Cors;
 using Microsoft.Owin.Hosting;
 using Owin;
-using Realmius.Server.QuickStart;
 using Server.Entities;
 
 namespace Server

@@ -16,31 +16,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-using System;
+using System.Collections.Generic;
+using Realmius.Server.Models;
 
-namespace Realmius.Server
+namespace Realmius.Server.Exchange
 {
-    internal class Logger
+    public class UpdatedDataBatch
     {
-        public static Logger Log { get; } = new Logger();
+        public IList<DownloadResponseItemInfo> Items { get; set; }
 
-        private Logger()
+        public UpdatedDataBatch()
         {
-        }
-
-        public void Exception(Exception ex, string text = null)
-        {
-            System.Diagnostics.Debug.WriteLine($"Exception: {ex}, {text}");
-        }
-
-        public void Info(string text)
-        {
-            System.Diagnostics.Debug.WriteLine(text);
-        }
-
-        public void Debug(string text)
-        {
-            System.Diagnostics.Debug.WriteLine(text);
+            Items = new List<DownloadResponseItemInfo>();
         }
     }
 }

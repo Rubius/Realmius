@@ -29,9 +29,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Realmius.Contracts.Helpers;
 using Realmius.Contracts.Models;
+using Realmius.Server.Configurations;
+using Realmius.Server.Exchange;
 using Realmius.Server.Infrastructure;
 using Realmius.Server.QuickStart;
-using Realmius.Server.ServerConfiguration;
 
 namespace Realmius.Server.Models
 {
@@ -83,7 +84,7 @@ namespace Realmius.Server.Models
 
         private void Initialize(Type typeToSync, Type[] typesToSync)
         {
-            var syncConfiguration = new ShareEverythingRealmiusServerConfiguration(typeToSync, typesToSync);
+            var syncConfiguration = new ShareEverythingConfiguration(typeToSync, typesToSync);
             Initialize(syncConfiguration);
         }
 

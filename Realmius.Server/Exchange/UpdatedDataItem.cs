@@ -17,17 +17,14 @@
 ////////////////////////////////////////////////////////////////////////////
 
 using System.Collections.Generic;
-using Realmius.Server.Models;
+using Realmius.Contracts.Models;
 
-namespace Realmius.Server
+namespace Realmius.Server.Exchange
 {
-    public class UpdatedDataBatch
+    internal class UpdatedDataItem
     {
-        public IList<DownloadResponseItemInfo> Items { get; set; }
-
-        public UpdatedDataBatch()
-        {
-            Items = new List<DownloadResponseItemInfo>();
-        }
+        public IRealmiusObjectServer DeserializedObject { get; set; }
+        public DownloadResponseItem Change { get; set; }
+        public IList<string> Tags { get; set; }
     }
 }

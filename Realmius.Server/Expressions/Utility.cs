@@ -24,7 +24,6 @@ namespace Realmius.Server.Expressions
 {
     public static class Utility
     {
-
         public class ReplaceParameterVisitor<TResult> : ExpressionVisitor
         {
             private readonly ParameterExpression parameter;
@@ -61,7 +60,6 @@ namespace Realmius.Server.Expressions
         {
             return Expression.Lambda<Func<T, bool>>(Expression.OrElse(left.Body, right.WithParametersOf(left).Body), left.Parameters);
         }
-
 
         //public static Expression<T> Compose<T>(this Expression<T> first, Expression<T> second, Func<Expression, Expression, Expression> merge)
         //{

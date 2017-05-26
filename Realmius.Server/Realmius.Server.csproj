@@ -70,7 +70,7 @@
     <Compile Include="Infrastructure\RealmServerObjectResolver.cs" />
     <Compile Include="Infrastructure\RealmServerCollectionConverter.cs" />
     <Compile Include="IRealmiusObjectServer.cs" />
-    <Compile Include="Logger.cs" />
+    <Compile Include="Infrastructure\Logger.cs" />
     <Compile Include="Migrations\201702191141280_Initial.cs" />
     <Compile Include="Migrations\201702191141280_Initial.Designer.cs">
       <DependentUpon>201702191141280_Initial.cs</DependentUpon>
@@ -84,25 +84,25 @@
     <Compile Include="Models\EfEntityInfo.cs" />
     <Compile Include="Models\LogEntryBase.cs" />
     <Compile Include="Models\SyncTypeInfo.cs" />
-    <Compile Include="QuickStart\ShareEverythingRealmiusServerConfiguration.cs" />
-    <Compile Include="ServerConfiguration\CheckAndProcessArgs.cs" />
-    <Compile Include="ServerConfiguration\RealmiusServerConfiguration.cs" />
-    <Compile Include="ServerConfiguration\IRealmSyncServerConfiguration.cs" />
-    <Compile Include="ServerConfiguration\ISyncUser.cs" />
+    <Compile Include="QuickStart\Configuration\ShareEverythingConfiguration.cs" />
+    <Compile Include="Configurations\CheckAndProcessArgs.cs" />
+    <Compile Include="Configurations\RealmiusServerConfiguration.cs" />
+    <Compile Include="Configurations\IRealmiusServerConfiguration.cs" />
+    <Compile Include="Configurations\IRealmiusUser.cs" />
     <Compile Include="Models\ChangeTrackingDbContext.cs" />
     <Compile Include="Models\IDbEntityWithVersionSupport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RealmiusServerProcessor.cs" />
-    <Compile Include="ServerConfiguration\SyncConfigurationBase.cs" />
-    <Compile Include="SignalRRealmiusHub.cs" />
+    <Compile Include="Configurations\RealmiusConfigurationBase.cs" />
+    <Compile Include="QuickStart\SignalR\RealmiusHub.cs" />
     <Compile Include="Models\SyncStatusDbContext.cs" />
     <Compile Include="Models\SyncStatusServerObject.cs" />
-    <Compile Include="ServerConfiguration\SyncUserTagged.cs" />
-    <Compile Include="ServerConfiguration\SyncUser.cs" />
-    <Compile Include="QuickStart\SignalRRealmiusShareEverythingHub.cs" />
-    <Compile Include="UpdatedDataBatch.cs" />
-    <Compile Include="UpdatedDataHandler.cs" />
-    <Compile Include="UpdatedDataItem.cs" />
+    <Compile Include="QuickStart\Access\LimitedUser.cs" />
+    <Compile Include="QuickStart\Access\RootUser.cs" />
+    <Compile Include="QuickStart\SignalR\ShareEverythingHub.cs" />
+    <Compile Include="Exchange\UpdatedDataBatch.cs" />
+    <Compile Include="Exchange\UpdatedDataHandler.cs" />
+    <Compile Include="Exchange\UpdatedDataItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
@@ -124,6 +124,7 @@
       <Name>Realmius.Contracts</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
