@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 using System.Data.Entity;
+using Realmius.Server.Configurations;
 using Realmius.Server.Models;
-using Realmius.Server.ServerConfiguration;
 using Realmius.Tests.Server;
 using Realmius.Tests.Server.Models;
 

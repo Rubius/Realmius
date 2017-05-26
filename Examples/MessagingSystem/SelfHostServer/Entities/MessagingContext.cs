@@ -19,7 +19,6 @@
 using System.Data.Entity;
 using Realmius.Server.Models;
 using Realmius.Server.QuickStart;
-using Realmius.Server.ServerConfiguration;
 
 namespace Server.Entities
 {
@@ -28,7 +27,7 @@ namespace Server.Entities
         public IDbSet<Message> Messages { get; set; }
 
         public MessagingContext()
-            : base(new ShareEverythingRealmiusServerConfiguration(typeof(Message)))
+            : base(new ShareEverythingConfiguration(typeof(Message)))
         {
         }
     }

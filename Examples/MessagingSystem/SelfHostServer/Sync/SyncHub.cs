@@ -19,19 +19,18 @@
 using System;
 using Microsoft.AspNet.SignalR.Hubs;
 using Realmius.Contracts;
-using Realmius.Server;
-using Realmius.Server.QuickStart;
 using Server.Entities;
+using Realmius.Server.QuickStart;
 
 namespace Server.Sync
 {
     [HubName(Constants.SignalRHubName)]
-    public class SyncHub : SignalRRealmiusShareEverythingHub
+    public class SyncHub : ShareEverythingHub
     {
         public SyncHub()
             : base(() => new MessagingContext(), typeof(Message))
         {
-            Console.WriteLine("Sync hub created.");
+            Console.WriteLine("Hub for sync data created.");
         }
     }
 }

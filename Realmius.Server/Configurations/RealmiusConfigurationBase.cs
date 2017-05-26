@@ -20,10 +20,10 @@ using System;
 using System.Collections.Generic;
 using Realmius.Server.Models;
 
-namespace Realmius.Server.ServerConfiguration
+namespace Realmius.Server.Configurations
 {
-    public abstract class SyncConfigurationBase<TUser> : IRealmiusServerConfiguration<TUser>
-        where TUser : ISyncUser
+    public abstract class RealmiusConfigurationBase<TUser> : IRealmiusServerConfiguration<TUser>
+        where TUser : IRealmiusUser
     {
         public abstract IList<Type> TypesToSync { get; }
         public abstract IList<string> GetTagsForObject(ChangeTrackingDbContext db, IRealmiusObjectServer obj);
@@ -31,7 +31,7 @@ namespace Realmius.Server.ServerConfiguration
 
         public bool CheckAndProcess(ChangeTrackingDbContext ef, IRealmiusObjectServer deserialized, TUser user)
         {
-            return CheckAndProcess(new CheckAndProcessArgs<TUser>()
+            return CheckAndProcess(new CheckAndProcessArgs<TUser>
             {
                 Entity = deserialized,
                 Database = ef,

@@ -26,18 +26,20 @@ using Microsoft.AspNet.SignalR.Hubs;
 using Newtonsoft.Json;
 using Realmius.Contracts;
 using Realmius.Contracts.Models;
+using Realmius.Server.Configurations;
+using Realmius.Server.Exchange;
+using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
-using Realmius.Server.ServerConfiguration;
 
-namespace Realmius.Server
+namespace Realmius.Server.QuickStart
 {
-    public abstract class SignalRRealmiusHub<TUser> : Hub
-        where TUser : ISyncUser
+    public abstract class RealmiusHub<TUser> : Hub
+        where TUser : IRealmiusUser
     {
         protected readonly RealmiusServerProcessor<TUser> _processor;
         protected static RealmiusServerProcessor<TUser> _processorStatic;
 
-        static SignalRRealmiusHub()
+        static RealmiusHub()
         {
             ChangeTrackingDbContext.DataUpdated += (sender, data) =>
             {
@@ -49,7 +51,7 @@ namespace Realmius.Server
             };
         }
 
-        protected SignalRRealmiusHub(RealmiusServerProcessor<TUser> processor)
+        protected RealmiusHub(RealmiusServerProcessor<TUser> processor)
         {
             _processor = processor;
             if (_processorStatic == null)
@@ -77,7 +79,7 @@ namespace Realmius.Server
         }
 
         public static void AddUserGroup<THub>(Func<TUser, bool> userPredicate, string group)
-            where THub : SignalRRealmiusHub<TUser>
+            where THub : RealmiusHub<TUser>
         {
             var connectionIds = _connections.Where(x => userPredicate(x.Value));
             var hub = GlobalHost.ConnectionManager.GetHubContext<THub>();

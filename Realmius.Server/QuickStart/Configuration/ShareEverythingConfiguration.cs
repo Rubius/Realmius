@@ -18,26 +18,26 @@
 
 using System;
 using System.Collections.Generic;
+using Realmius.Server.Configurations;
 using Realmius.Server.Models;
-using Realmius.Server.ServerConfiguration;
 
 namespace Realmius.Server.QuickStart
 {
-    public class ShareEverythingRealmiusServerConfiguration : ShareEverythingRealmiusServerConfiguration<ISyncUser>
+    public class ShareEverythingConfiguration : ShareEverythingConfiguration<IRealmiusUser>
     {
-        public ShareEverythingRealmiusServerConfiguration(IList<Type> typesToSync)
+        public ShareEverythingConfiguration(IList<Type> typesToSync)
             : base(typesToSync)
         {
         }
 
-        public ShareEverythingRealmiusServerConfiguration(Type typeToSync, params Type[] typesToSync)
+        public ShareEverythingConfiguration(Type typeToSync, params Type[] typesToSync)
             : base(typeToSync, typesToSync)
         {
         }
     }
 
-    public class ShareEverythingRealmiusServerConfiguration<T> : SyncConfigurationBase<T>
-        where T : ISyncUser
+    public class ShareEverythingConfiguration<T> : RealmiusConfigurationBase<T>
+        where T : IRealmiusUser
     {
         public override bool CheckAndProcess(CheckAndProcessArgs<T> args)
         {
@@ -55,11 +55,12 @@ namespace Realmius.Server.QuickStart
             return new[] { "all" };
         }
 
-        public ShareEverythingRealmiusServerConfiguration(IList<Type> typesToSync)
+        public ShareEverythingConfiguration(IList<Type> typesToSync)
         {
             TypesToSync = typesToSync;
         }
-        public ShareEverythingRealmiusServerConfiguration(Type typeToSync, params Type[] typesToSync)
+
+        public ShareEverythingConfiguration(Type typeToSync, params Type[] typesToSync)
         {
             var types = new List<Type> { typeToSync };
             types.AddRange(typesToSync);

@@ -16,31 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-using Realmius.Server.Models;
+using System.Collections.Generic;
+using Realmius.Server.Configurations;
 
-namespace Realmius.Server.ServerConfiguration
+namespace Realmius.Server.QuickStart
 {
-    public class CheckAndProcessArgs<TUser>
+    /// <summary>
+    /// User with access to all data
+    /// </summary>
+    public class RootUser : IRealmiusUser
     {
-        /// <summary>
-        /// reference to EF to retrieve entities if needed
-        /// </summary>
-        public ChangeTrackingDbContext Database { get; set; }
-
-        /// <summary>
-        /// user that is uploading the changes
-        /// </summary>
-        public TUser User { get; set; }
-
-        /// <summary>
-        /// entity with user's changes applied
-        /// </summary>
-        public IRealmiusObjectServer Entity { get; set; }
-
-        /// <summary>
-        /// entity as it is in database before user's changes are applied
-        /// </summary>
-        public IRealmiusObjectServer OriginalDbEntity { get; set; }
-
+        private static readonly IList<string> _tags = new[] { "all" };
+        public IList<string> Tags => _tags;
     }
 }

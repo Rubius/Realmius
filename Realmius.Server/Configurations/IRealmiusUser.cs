@@ -18,15 +18,13 @@
 
 using System.Collections.Generic;
 
-namespace Realmius.Server.ServerConfiguration
+namespace Realmius.Server.Configurations
 {
-    public class SyncUserTagged : ISyncUser
+    public interface IRealmiusUser
     {
-        public IList<string> Tags { get; set; }
-
-        public SyncUserTagged(IList<string> tags)
-        {
-            Tags = tags;
-        }
+        /// <summary>
+        /// tags the user has access to
+        /// </summary>
+        IList<string> Tags { get; }
     }
 }

@@ -23,7 +23,7 @@ using Microsoft.AspNet.SignalR;
 using Realmius.Contracts;
 using Realmius.Contracts.Models;
 
-namespace Realmius.Server
+namespace Realmius.Server.Exchange
 {
     internal class UpdatedDataHandler
     {
