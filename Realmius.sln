@@ -3,13 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius", "Realmius\Realmius.csproj", "{B1651A06-7CEC-4529-B8EE-E594D26A62D3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius.Contracts", "Realmius.Contracts\Realmius.Contracts.csproj", "{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius.Server", "Realmius.Server\Realmius.Server.csproj", "{197EEC4A-5985-4422-B76F-887281D7BC04}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius.Tests", "Realmius.Tests\Realmius.Tests.csproj", "{2C4A00F9-0B66-4CBA-BBD0-601172B00278}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F5533398-9DD8-4A21-B84E-6FE17E7DD66B} = {F5533398-9DD8-4A21-B84E-6FE17E7DD66B}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius.Contracts", "Realmius.Contracts.Another\Realmius.Contracts.csproj", "{F19882E2-06D4-4AF9-BD04-91EF1A3E983A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius", "Realmius.Another\Realmius.csproj", "{F5533398-9DD8-4A21-B84E-6FE17E7DD66B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,14 +20,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B1651A06-7CEC-4529-B8EE-E594D26A62D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1651A06-7CEC-4529-B8EE-E594D26A62D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B1651A06-7CEC-4529-B8EE-E594D26A62D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B1651A06-7CEC-4529-B8EE-E594D26A62D3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}.Release|Any CPU.Build.0 = Release|Any CPU
 		{197EEC4A-5985-4422-B76F-887281D7BC04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{197EEC4A-5985-4422-B76F-887281D7BC04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{197EEC4A-5985-4422-B76F-887281D7BC04}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +28,14 @@ Global
 		{2C4A00F9-0B66-4CBA-BBD0-601172B00278}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C4A00F9-0B66-4CBA-BBD0-601172B00278}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C4A00F9-0B66-4CBA-BBD0-601172B00278}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F19882E2-06D4-4AF9-BD04-91EF1A3E983A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F19882E2-06D4-4AF9-BD04-91EF1A3E983A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F19882E2-06D4-4AF9-BD04-91EF1A3E983A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F19882E2-06D4-4AF9-BD04-91EF1A3E983A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5533398-9DD8-4A21-B84E-6FE17E7DD66B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5533398-9DD8-4A21-B84E-6FE17E7DD66B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5533398-9DD8-4A21-B84E-6FE17E7DD66B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5533398-9DD8-4A21-B84E-6FE17E7DD66B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.4</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Migrations\201702191141280_Initial.Designer.cs">
+      <DependentUpon>201702191141280_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Migrations\201703051003558_SyncStatusCompositeKey.Designer.cs">
+      <DependentUpon>201703051003558_SyncStatusCompositeKey.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Migrations\201702191141280_Initial.resx">
+      <DependentUpon>201702191141280_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\201703051003558_SyncStatusCompositeKey.resx">
+      <DependentUpon>201703051003558_SyncStatusCompositeKey.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

@@ -53,8 +53,10 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Collections" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -117,8 +119,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Realmius.Contracts\Realmius.Contracts.csproj">
-      <Project>{eec4eb66-de49-47b1-b29c-3f20edce2178}</Project>
+    <ProjectReference Include="..\Realmius.Contracts.Another\Realmius.Contracts.csproj">
+      <Project>{f19882e2-06d4-4af9-bd04-91ef1a3e983a}</Project>
       <Name>Realmius.Contracts</Name>
     </ProjectReference>
   </ItemGroup>

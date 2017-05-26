@@ -67,10 +67,10 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="Realmius.Contracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Realmius.Contracts.1.0.2\lib\portable45-net45+win8+wpa81\Realmius.Contracts.dll</HintPath>
+      <HintPath>..\packages\Realmius.Contracts.1.0.3\lib\netstandard1.4\Realmius.Contracts.dll</HintPath>
     </Reference>
     <Reference Include="Realmius.Server, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Realmius.Server.1.0.2\lib\netstandard1.4\Realmius.Server.dll</HintPath>
+      <HintPath>..\packages\Realmius.Server.1.0.3\lib\netstandard1.4\Realmius.Server.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
