@@ -18,9 +18,8 @@
 
 using System;
 using System.Windows.Forms;
-using Client;
 
-namespace FormsClient
+namespace Client
 {
     static class Program
     {

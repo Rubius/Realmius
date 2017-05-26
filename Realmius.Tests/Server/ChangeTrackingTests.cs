@@ -33,12 +33,12 @@ namespace Realmius.Tests.Server
     public class ChangeTrackingTests : TestBase
     {
         private Func<LocalDbContext> _contextFunc;
-        private ShareEverythingRealmiusServerConfiguration _config;
+        private ShareEverythingConfiguration _config;
         private Func<SyncStatusDbContext> _syncContextFunc;
 
         public ChangeTrackingTests()
         {
-            _config = new ShareEverythingRealmiusServerConfiguration(typeof(DbSyncObject), typeof(DbSyncObjectWithIgnoredFields));
+            _config = new ShareEverythingConfiguration(typeof(DbSyncObject), typeof(DbSyncObjectWithIgnoredFields));
             _contextFunc = () => new LocalDbContext(_config);
             _syncContextFunc = () => new SyncStatusDbContext(_contextFunc().Database.Connection.ConnectionString);
         }

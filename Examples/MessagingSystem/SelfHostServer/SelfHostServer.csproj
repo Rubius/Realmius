@@ -81,10 +81,8 @@
   <ItemGroup>
     <Compile Include="Entities\Message.cs" />
     <Compile Include="Entities\MessagingContext.cs" />
-    <Compile Include="Sync\Client.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sync\SyncConfiguration.cs" />
     <Compile Include="Sync\SyncHub.cs" />
   </ItemGroup>
   <ItemGroup>

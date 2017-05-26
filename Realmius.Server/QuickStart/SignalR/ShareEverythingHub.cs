@@ -17,24 +17,24 @@
 ////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
+using Microsoft.AspNet.SignalR.Hubs;
 using Realmius.Server.Models;
 
-namespace Realmius.Server.ServerConfiguration
+namespace Realmius.Server.QuickStart
 {
     /// <summary>
-    /// Do not implement this! Implement IRealmiusServerConfiguration<TUser> instead!
+    /// SignalR hub without access restrictions
     /// </summary>
-    public interface IRealmiusServerDbConfiguration
+    public class ShareEverythingHub : RealmiusHub<RootUser>
     {
-        IList<Type> TypesToSync { get; }
-        IList<string> GetTagsForObject(ChangeTrackingDbContext db, IRealmiusObjectServer obj);
-    }
+        public ShareEverythingHub(Func<ChangeTrackingDbContext> dbContextFactoryFunc, params Type[] syncedTypes) :
+            base(new RealmiusServerProcessor<RootUser>(dbContextFactoryFunc, new ShareEverythingConfiguration<RootUser>(syncedTypes)))
+        {
+        }
 
-    public interface IRealmiusServerConfiguration<TUser> : IRealmiusServerDbConfiguration
-        where TUser : ISyncUser
-    {
-        bool CheckAndProcess(CheckAndProcessArgs<TUser> args);
-        object[] KeyForType(Type type, string itemPrimaryKey);
+        protected override RootUser CreateUserInfo(HubCallerContext context)
+        {
+            return new RootUser();
+        }
     }
 }

@@ -24,8 +24,9 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Realmius.Contracts.Models;
 using Realmius.Server;
+using Realmius.Server.Configurations;
 using Realmius.Server.Models;
-using Realmius.Server.ServerConfiguration;
+using Realmius.Server.QuickStart;
 using Realmius.Tests.Server.Models;
 
 namespace Realmius.Tests.Server
@@ -37,9 +38,9 @@ namespace Realmius.Tests.Server
         private RealmiusServerProcessor _processor;
         private Config _config;
 
-        public class Config : SyncConfigurationBase<ISyncUser>
+        public class Config : RealmiusConfigurationBase<IRealmiusUser>
         {
-            public override bool CheckAndProcess(CheckAndProcessArgs<ISyncUser> args)
+            public override bool CheckAndProcess(CheckAndProcessArgs<IRealmiusUser> args)
             {
                 return true;
             }
@@ -85,21 +86,21 @@ namespace Realmius.Tests.Server
                         }),
                     }
                 }
-            }, new SyncUser());
+            }, new RootUser());
 
 
             var result = _processor.Download(new DownloadDataRequest()
             {
                 LastChangeTime = new DateTimeOffset(DateTime.Now).AddHours(-1).ToDictionary(),
                 Types = new[] { nameof(DbSyncObject) },
-            }, new SyncUserTagged(new[] { "u2" }));
+            }, new LimitedUser(new[] { "u2" }));
             result.ChangedObjects.Should().BeEmpty();
 
             var result2 = _processor.Download(new DownloadDataRequest()
             {
                 LastChangeTime = new DateTimeOffset(DateTime.Now).AddHours(-1).ToDictionary(),
                 Types = new[] { nameof(DbSyncObject) },
-            }, new SyncUserTagged(new[] { "u1" }));
+            }, new LimitedUser(new[] { "u1" }));
             result2.ChangedObjects.Count.Should().Be(1);
         }
 
@@ -121,7 +122,7 @@ namespace Realmius.Tests.Server
                         }),
                     }
                 }
-            }, new SyncUser());
+            }, new RootUser());
 
 
             var result = _processor.Download(new DownloadDataRequest()
@@ -129,7 +130,7 @@ namespace Realmius.Tests.Server
                 LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.MinValue } },
                 Types = new[] { nameof(DbSyncObject) },
                 OnlyDownloadSpecifiedTags = true,
-            }, new SyncUserTagged(new[] { "u1" }));
+            }, new LimitedUser(new[] { "u1" }));
             result.ChangedObjects.Should().BeEmpty();
 
             var result2 = _processor.Download(new DownloadDataRequest()
@@ -137,7 +138,7 @@ namespace Realmius.Tests.Server
                 LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "u1", DateTimeOffset.MinValue } },
                 Types = new[] { nameof(DbSyncObject) },
                 OnlyDownloadSpecifiedTags = true
-            }, new SyncUserTagged(new[] { "u1" }));
+            }, new LimitedUser(new[] { "u1" }));
             result2.ChangedObjects.Count.Should().Be(1);
 
             var result3 = _processor.Download(new DownloadDataRequest()
@@ -145,7 +146,7 @@ namespace Realmius.Tests.Server
                 LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.MinValue } },
                 Types = new[] { nameof(DbSyncObject) },
                 OnlyDownloadSpecifiedTags = false,
-            }, new SyncUserTagged(new[] { "u1" }));
+            }, new LimitedUser(new[] { "u1" }));
             result2.ChangedObjects.Count.Should().Be(1);
         }
 
@@ -185,7 +186,7 @@ namespace Realmius.Tests.Server
             );
             syncStatusContext.SaveChanges();
 
-            var user = new SyncUserTagged(new[] { "all", "tag0", "tag1" });
+            var user = new LimitedUser(new[] { "all", "tag0", "tag1" });
             var result1 = _processor.CreateQuery(new DownloadDataRequest()
             {
                 LastChangeTime = new Dictionary<string, DateTimeOffset>()

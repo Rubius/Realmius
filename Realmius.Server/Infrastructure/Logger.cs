@@ -16,20 +16,31 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using Realmius.Server;
-using Realmius.Server.ServerConfiguration;
+using System;
 
-namespace Server.Entities
+namespace Realmius.Server.Infrastructure
 {
-    [Table("Clients")]
-    public class Client : IRealmiusObjectServer, ISyncUser
+    internal class Logger
     {
-        public string Id { get; set; }
-        
-        public string MobilePrimaryKey => Id;
+        public static Logger Log { get; } = new Logger();
 
-        public IList<string> Tags { get; } = new List<string> {"all"};
+        private Logger()
+        {
+        }
+
+        public void Exception(Exception ex, string text = null)
+        {
+            System.Diagnostics.Debug.WriteLine($"Exception: {ex}, {text}");
+        }
+
+        public void Info(string text)
+        {
+            System.Diagnostics.Debug.WriteLine(text);
+        }
+
+        public void Debug(string text)
+        {
+            System.Diagnostics.Debug.WriteLine(text);
+        }
     }
 }

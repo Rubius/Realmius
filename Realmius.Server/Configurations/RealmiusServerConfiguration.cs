@@ -19,10 +19,11 @@
 using System;
 using System.Collections.Generic;
 using Realmius.Server.Models;
+using Realmius.Server.QuickStart;
 
-namespace Realmius.Server.ServerConfiguration
+namespace Realmius.Server.Configurations
 {
-    public class RealmiusServerConfiguration : SyncConfigurationBase<SyncUser>
+    public class RealmiusServerConfiguration : RealmiusConfigurationBase<RootUser>
     {
         private readonly Func<IRealmiusObjectServer, IList<string>> _getTagsFunc;
         public override IList<Type> TypesToSync { get; }
@@ -33,7 +34,7 @@ namespace Realmius.Server.ServerConfiguration
             TypesToSync = typesToSync;
         }
 
-        public override bool CheckAndProcess(CheckAndProcessArgs<SyncUser> args)
+        public override bool CheckAndProcess(CheckAndProcessArgs<RootUser> args)
         {
             return true;
         }
