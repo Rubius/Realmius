@@ -18,10 +18,8 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 using Realmius;
-using Realmius.Contracts.Models;
 using Realmius.SyncService;
 using Realms;
 using Message = Client.Models.Message;
@@ -59,11 +57,7 @@ namespace Client
                           messagesBox.AppendText(FormatMessage(collection[change]));
                       }
                   }
-
-
-                  
               });
-            
         }
 
         protected internal virtual IRealmiusSyncService CreateSyncService()
@@ -119,7 +113,6 @@ namespace Client
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-
         }
     }
 }
