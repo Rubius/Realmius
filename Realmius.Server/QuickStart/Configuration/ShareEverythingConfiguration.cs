@@ -18,53 +18,48 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNet.SignalR;
 using Realmius.Server.Configurations;
 using Realmius.Server.Models;
 
 namespace Realmius.Server.QuickStart
 {
-    public class ShareEverythingConfiguration : ShareEverythingConfiguration<IRealmiusUser>
+    public class ShareEverythingConfiguration : RealmiusConfigurationBase
     {
-        public ShareEverythingConfiguration(IList<Type> typesToSync)
-            : base(typesToSync)
-        {
-        }
-
-        public ShareEverythingConfiguration(Type typeToSync, params Type[] typesToSync)
-            : base(typeToSync, typesToSync)
-        {
-        }
-    }
-
-    public class ShareEverythingConfiguration<T> : RealmiusConfigurationBase<T>
-        where T : IRealmiusUser
-    {
-        public override bool CheckAndProcess(CheckAndProcessArgs<T> args)
-        {
-            return true;
-        }
-
         public override IList<Type> TypesToSync { get; }
         public override IList<string> GetTagsForObject(ChangeTrackingDbContext db, IRealmiusObjectServer obj)
         {
             return new[] { "all" };
         }
 
-        public virtual IList<string> GetTagsForUser(ChangeTrackingDbContext db, IRealmiusObjectServer obj)
+        public override IList<string> GetTagsForUser(object user, ChangeTrackingDbContext db)
         {
             return new[] { "all" };
         }
 
-        public ShareEverythingConfiguration(IList<Type> typesToSync)
+        public ShareEverythingConfiguration(Func<ChangeTrackingDbContext> contextFactoryFunc, IList<Type> typesToSync)
+            : base(contextFactoryFunc)
         {
             TypesToSync = typesToSync;
         }
 
-        public ShareEverythingConfiguration(Type typeToSync, params Type[] typesToSync)
+        public ShareEverythingConfiguration(Func<ChangeTrackingDbContext> contextFactoryFunc, Type typeToSync, params Type[] typesToSync)
+            : base(contextFactoryFunc)
         {
             var types = new List<Type> { typeToSync };
             types.AddRange(typesToSync);
             TypesToSync = types;
+        }
+
+        public override bool CheckAndProcess(CheckAndProcessArgs<object> args)
+        {
+            return true;
+        }
+
+
+        public override object AuthenticateUser(IRequest request)
+        {
+            return new { };
         }
     }
 }

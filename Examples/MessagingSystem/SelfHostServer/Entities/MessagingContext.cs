@@ -25,10 +25,5 @@ namespace Server.Entities
     public class MessagingContext : ChangeTrackingDbContext
     {
         public IDbSet<Message> Messages { get; set; }
-
-        public MessagingContext()
-            : base(new ShareEverythingConfiguration(typeof(Message)))
-        {
-        }
     }
 }

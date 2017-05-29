@@ -50,6 +50,7 @@
     <Compile Include="Models\UploadDataResponse.cs" />
     <Compile Include="Models\UploadRequestItem.cs" />
     <Compile Include="Models\UploadDataResponseItem.cs" />
+    <Compile Include="SignalR\MethodConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">

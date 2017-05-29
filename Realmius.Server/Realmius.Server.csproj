@@ -68,6 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exchange\PersistentConnectionUpdatedDataHandler.cs" />
     <Compile Include="Expressions\ParameterRebinder.cs" />
     <Compile Include="Expressions\Utility.cs" />
     <Compile Include="Infrastructure\RealmServerObjectResolver.cs" />
@@ -89,20 +90,17 @@
     <Compile Include="Models\SyncTypeInfo.cs" />
     <Compile Include="QuickStart\Configuration\ShareEverythingConfiguration.cs" />
     <Compile Include="Configurations\CheckAndProcessArgs.cs" />
-    <Compile Include="Configurations\RealmiusServerConfiguration.cs" />
     <Compile Include="Configurations\IRealmiusServerConfiguration.cs" />
-    <Compile Include="Configurations\IRealmiusUser.cs" />
     <Compile Include="Models\ChangeTrackingDbContext.cs" />
     <Compile Include="Models\IDbEntityWithVersionSupport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Exchange\RealmiusPersistentConnection.cs" />
+    <Compile Include="QuickStart\RealmiusServer.cs" />
     <Compile Include="RealmiusServerProcessor.cs" />
     <Compile Include="Configurations\RealmiusConfigurationBase.cs" />
-    <Compile Include="QuickStart\SignalR\RealmiusHub.cs" />
+    <Compile Include="Exchange\RealmiusHub.cs" />
     <Compile Include="Models\SyncStatusDbContext.cs" />
     <Compile Include="Models\SyncStatusServerObject.cs" />
-    <Compile Include="QuickStart\Access\LimitedUser.cs" />
-    <Compile Include="QuickStart\Access\RootUser.cs" />
-    <Compile Include="QuickStart\SignalR\ShareEverythingHub.cs" />
     <Compile Include="Exchange\UpdatedDataBatch.cs" />
     <Compile Include="Exchange\UpdatedDataHandler.cs" />
     <Compile Include="Exchange\UpdatedDataItem.cs" />

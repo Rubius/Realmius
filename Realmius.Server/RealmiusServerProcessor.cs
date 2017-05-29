@@ -35,41 +35,16 @@ using Realmius.Server.QuickStart;
 
 namespace Realmius.Server
 {
-    public class RealmiusServerProcessor : RealmiusServerProcessor<IRealmiusUser>
-    {
-        public static void FixSignalREncoding()
-        {
-            var serializer = new JsonSerializer();
-            serializer.StringEscapeHandling = StringEscapeHandling.EscapeNonAscii;
-            GlobalHost.DependencyResolver.Register(typeof(JsonSerializer), () => serializer);
-        }
-
-        public RealmiusServerProcessor(Func<ChangeTrackingDbContext> dbContextFactoryFunc,
-            IRealmiusServerConfiguration<IRealmiusUser> configuration)
-            : base(dbContextFactoryFunc, configuration)
-        {
-        }
-
-        /// <summary>
-        /// this will all the types between all users!
-        /// </summary>
-        public RealmiusServerProcessor(Func<ChangeTrackingDbContext> dbContextFactoryFunc, Type typeToSync, params Type[] typesToSync)
-            : base(dbContextFactoryFunc, new ShareEverythingConfiguration(typeToSync, typesToSync))
-        {
-        }
-    }
-
     public class RealmiusServerProcessor<TUser>
-        where TUser : IRealmiusUser
     {
         private readonly Func<ChangeTrackingDbContext> _dbContextFactoryFunc;
         public IRealmiusServerConfiguration<TUser> Configuration { get; }
         private readonly Dictionary<string, Type> _syncedTypes;
         private readonly string _connectionString;
 
-        public RealmiusServerProcessor(Func<ChangeTrackingDbContext> dbContextFactoryFunc, IRealmiusServerConfiguration<TUser> configuration)
+        public RealmiusServerProcessor(IRealmiusServerConfiguration<TUser> configuration)
         {
-            _dbContextFactoryFunc = dbContextFactoryFunc;
+            _dbContextFactoryFunc = configuration.ContextFactoryFunction;
             Configuration = configuration;
             _syncedTypes = Configuration.TypesToSync.ToDictionary(x => x.Name, x => x);
             var syncObjectInterface = typeof(IRealmiusObjectServer);
@@ -79,7 +54,7 @@ namespace Realmius.Server
                     throw new InvalidOperationException($"Type {type} does not implement IRealmiusObjectServer, unable to continue");
             }
 
-            _connectionString = dbContextFactoryFunc().Database.Connection.ConnectionString;
+            _connectionString = _dbContextFactoryFunc().Database.Connection.ConnectionString;
         }
 
         public UploadDataResponse Upload(UploadDataRequest request, TUser user)
@@ -235,16 +210,21 @@ namespace Realmius.Server
             return result;
         }
 
+        public virtual IList<string> GetTagsForUser(TUser user)
+        {
+            var ef = _dbContextFactoryFunc();
+            return Configuration.GetTagsForUser(user, ef);
+        }
 
         public DownloadDataResponse Download(DownloadDataRequest request, TUser user)
         {
-            //var ef = _dbContextFactoryFunc();
             if (user == null)
                 throw new NullReferenceException("user arg cannot be null");
 
+
             var response = new DownloadDataResponse()
             {
-                LastChange = user.Tags.ToDictionary(x => x, x => DateTimeOffset.UtcNow),
+                LastChange = GetTagsForUser(user).ToDictionary(x => x, x => DateTimeOffset.UtcNow),
             };
 
 
@@ -314,7 +294,7 @@ namespace Realmius.Server
         internal IQueryable<SyncStatusServerObject> CreateQuery(DownloadDataRequest request, TUser user, SyncStatusDbContext context)
         {
             Expression<Func<SyncStatusServerObject, bool>> whereExpression = null;
-            foreach (string userTag in user.Tags)
+            foreach (string userTag in GetTagsForUser(user))
             {
                 DateTimeOffset lastChange;
 

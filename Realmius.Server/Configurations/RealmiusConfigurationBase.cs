@@ -18,16 +18,28 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNet.SignalR;
 using Realmius.Server.Models;
 
 namespace Realmius.Server.Configurations
 {
+    public abstract class RealmiusConfigurationBase : RealmiusConfigurationBase<object>
+    {
+        protected RealmiusConfigurationBase(Func<ChangeTrackingDbContext> contextFactoryFunc) : base(contextFactoryFunc)
+        {
+        }
+    }
+
     public abstract class RealmiusConfigurationBase<TUser> : IRealmiusServerConfiguration<TUser>
-        where TUser : IRealmiusUser
     {
         public abstract IList<Type> TypesToSync { get; }
         public abstract IList<string> GetTagsForObject(ChangeTrackingDbContext db, IRealmiusObjectServer obj);
         public abstract bool CheckAndProcess(CheckAndProcessArgs<TUser> args);
+
+        protected RealmiusConfigurationBase(Func<ChangeTrackingDbContext> contextFactoryFunc)
+        {
+            ContextFactoryFunction = contextFactoryFunc;
+        }
 
         public bool CheckAndProcess(ChangeTrackingDbContext ef, IRealmiusObjectServer deserialized, TUser user)
         {
@@ -44,5 +56,9 @@ namespace Realmius.Server.Configurations
         {
             return new object[] { itemPrimaryKey };
         }
+
+        public abstract IList<string> GetTagsForUser(TUser user, ChangeTrackingDbContext db);
+        public abstract TUser AuthenticateUser(IRequest request);
+        public Func<ChangeTrackingDbContext> ContextFactoryFunction { get; set; }
     }
 }

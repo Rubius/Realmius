@@ -36,9 +36,11 @@ using Realmius.Server.QuickStart;
 
 namespace Realmius.Server.Models
 {
-    public class ChangeTrackingDbContext : DbContext
+    public abstract class ChangeTrackingDbContext : DbContext
     {
         public object User { get; set; }
+
+        internal static Dictionary<Type, IRealmiusServerDbConfiguration> Configurations = new Dictionary<Type, IRealmiusServerDbConfiguration>();
 
         public static event EventHandler<UpdatedDataBatch> DataUpdated;
         protected virtual void OnDataUpdated(UpdatedDataBatch e)
@@ -52,40 +54,26 @@ namespace Realmius.Server.Models
         private IRealmiusServerDbConfiguration _syncConfiguration;
         private Dictionary<string, SyncTypeInfo> _syncedTypes;
 
-        public ChangeTrackingDbContext(string nameOrConnectionString, IRealmiusServerDbConfiguration syncConfiguration)
+        protected ChangeTrackingDbContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
         {
             _nameOrConnectionString = nameOrConnectionString;
-            Initialize(syncConfiguration);
-        }
-        public ChangeTrackingDbContext(IRealmiusServerDbConfiguration syncConfiguration)
-        {
-            _nameOrConnectionString = Database.Connection.ConnectionString;
-            Initialize(syncConfiguration);
+            Initialize();
         }
 
-        /// <summary>
-        /// this will share everything!
-        /// </summary>
-        public ChangeTrackingDbContext(string nameOrConnectionString, Type typeToSync, params Type[] typesToSync)
-            : base(nameOrConnectionString)
-        {
-            _nameOrConnectionString = nameOrConnectionString;
-            Initialize(typeToSync, typesToSync);
-        }
-        /// <summary>
-        /// this will share everything!
-        /// </summary>
-        public ChangeTrackingDbContext(Type typeToSync, params Type[] typesToSync)
+        protected ChangeTrackingDbContext()
         {
             _nameOrConnectionString = Database.Connection.ConnectionString;
-            Initialize(typeToSync, typesToSync);
+            Initialize();
         }
 
-        private void Initialize(Type typeToSync, Type[] typesToSync)
+        private void Initialize()
         {
-            var syncConfiguration = new ShareEverythingConfiguration(typeToSync, typesToSync);
-            Initialize(syncConfiguration);
+            IRealmiusServerDbConfiguration configuration;
+            if (Configurations.TryGetValue(this.GetType(), out configuration))
+            {
+                Initialize(configuration);
+            }
         }
 
         private void Initialize(IRealmiusServerDbConfiguration syncConfiguration)
@@ -134,6 +122,8 @@ namespace Realmius.Server.Models
             {
                 return base.SaveChanges();
             }
+            if (_syncConfiguration == null)
+                throw new InvalidOperationException($"{nameof(ChangeTrackingDbContext)} was not initialized (_syncConfiguration is null)!");
 
             int result = 0;
             try

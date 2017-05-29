@@ -45,6 +45,7 @@
     <Compile Include="SyncServiceFactory.cs" />
     <Compile Include="SyncService\ApiClient\ApiClientStartOptions.cs" />
     <Compile Include="SyncService\ApiClient\IApiClient.cs" />
+    <Compile Include="SyncService\ApiClient\SignalRPersistentConnectionSyncApiClient.cs" />
     <Compile Include="SyncService\FileUploadedEventArgs.cs" />
     <Compile Include="SyncService\IRealmiusObjectWithSyncStatusClient.cs" />
     <Compile Include="SyncService\IRealmiusSyncService.cs" />

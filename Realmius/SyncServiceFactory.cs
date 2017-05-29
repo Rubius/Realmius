@@ -35,13 +35,15 @@ namespace Realmius
 
             return syncService;
         }
-
-        public static IRealmiusSyncService CreateUsingSignalR(Func<Realm> realmFactoryMethod, Uri uri, string hubName, Type[] typesToSync, bool deleteDatabase = false)
+        
+        public static IRealmiusSyncService CreateUsingSignalR(Func<Realm> realmFactoryMethod, Uri uri, Type[] typesToSync, bool deleteDatabase = false)
         {
-            var apiClient = new SignalRSyncApiClient(uri, hubName);
+            var apiClient = new SignalRPersistentConnectionSyncApiClient(uri);
             var syncService = new RealmiusSyncService(realmFactoryMethod, apiClient, deleteDatabase, typesToSync);
 
             return syncService;
         }
+
+        
     }
 }

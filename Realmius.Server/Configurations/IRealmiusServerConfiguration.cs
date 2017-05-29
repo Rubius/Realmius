@@ -18,23 +18,24 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNet.SignalR;
 using Realmius.Server.Models;
 
 namespace Realmius.Server.Configurations
 {
-    /// <summary>
-    /// Do not implement this! Implement IRealmiusServerConfiguration<TUser> instead!
-    /// </summary>
     public interface IRealmiusServerDbConfiguration
     {
         IList<Type> TypesToSync { get; }
         IList<string> GetTagsForObject(ChangeTrackingDbContext db, IRealmiusObjectServer obj);
     }
-
     public interface IRealmiusServerConfiguration<TUser> : IRealmiusServerDbConfiguration
-        where TUser : IRealmiusUser
     {
+        IList<string> GetTagsForUser(TUser user, ChangeTrackingDbContext db);
+
         bool CheckAndProcess(CheckAndProcessArgs<TUser> args);
         object[] KeyForType(Type type, string itemPrimaryKey);
+        TUser AuthenticateUser(IRequest request);
+
+        Func<ChangeTrackingDbContext> ContextFactoryFunction { get; set; }
     }
 }

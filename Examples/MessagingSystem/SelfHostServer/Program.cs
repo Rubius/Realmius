@@ -21,6 +21,7 @@ using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Cors;
 using Microsoft.Owin.Hosting;
 using Owin;
+using Realmius.Server.QuickStart;
 using Server.Entities;
 
 namespace Server
@@ -61,10 +62,9 @@ namespace Server
         public void Configuration(IAppBuilder app)
         {
             app.UseCors(CorsOptions.AllowAll);
-            app.MapSignalR("/signalr", new HubConfiguration
-            {
-                EnableDetailedErrors = true,
-            });
+
+            RealmiusServer.SetupShareEverythingSignalRServer("/Realmius", app, 
+                () => new MessagingContext(), typeof(Message));
         }
     }
 }

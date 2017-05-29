@@ -66,8 +66,7 @@ namespace Client
 
             var syncService = SyncServiceFactory.CreateUsingSignalR(
                 GetRealm,
-                new Uri(_serverUrl + $"/signalr?clientId={clientId}"),
-                "SignalRSyncHub",
+                new Uri(_serverUrl + $"/Realmius?clientId={clientId}"),
                 new[]
                 {
                     typeof(Message)
@@ -94,7 +93,7 @@ namespace Client
             var realm = GetRealm();
 
             realm.Write(() => realm.Add(msg));
-            
+
             messageBox.Text = string.Empty;
         }
 
