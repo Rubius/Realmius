@@ -35,6 +35,14 @@ using Realmius.Server.QuickStart;
 
 namespace Realmius.Server
 {
+    public class RealmiusServerProcessor : RealmiusServerProcessor<object>
+    {
+        public RealmiusServerProcessor(IRealmiusServerConfiguration<object> configuration) 
+            : base(configuration)
+        {
+        }
+    }
+
     public class RealmiusServerProcessor<TUser>
     {
         private readonly Func<ChangeTrackingDbContext> _dbContextFactoryFunc;

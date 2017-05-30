@@ -8,14 +8,6 @@ using Realmius.Server.Models;
 
 namespace Realmius.Server.QuickStart
 {
-    public class Tst : PersistentConnection
-    {
-        protected override Task OnConnected(IRequest request, string connectionId)
-        {
-            return base.OnConnected(request, connectionId);
-        }
-    }
-
     public class RealmiusServer
     {
         public static void SetupSignalRServer<T>(
@@ -23,8 +15,6 @@ namespace Realmius.Server.QuickStart
             IAppBuilder app,
             IRealmiusServerConfiguration<T> configuration)
         {
-            Configurations[typeof(T)] = configuration;
-            ChangeTrackingDbContext.Configurations[configuration.ContextFactoryFunction().GetType()] = configuration;
             app.MapSignalR<RealmiusPersistentConnection<T>>(url);
         }
 
@@ -38,7 +28,7 @@ namespace Realmius.Server.QuickStart
             SetupSignalRServer(url, app, configuration);
         }
 
-        private static readonly Dictionary<Type, object> Configurations = new Dictionary<Type, object>();
+        internal static readonly Dictionary<Type, object> Configurations = new Dictionary<Type, object>();
         internal static IRealmiusServerConfiguration<T> GetConfiguration<T>()
         {
             return (IRealmiusServerConfiguration<T>)Configurations[typeof(T)];

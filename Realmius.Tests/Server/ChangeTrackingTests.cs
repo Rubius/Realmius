@@ -36,17 +36,15 @@ namespace Realmius.Tests.Server
         private ShareEverythingConfiguration _config;
         private Func<SyncStatusDbContext> _syncContextFunc;
 
-        public ChangeTrackingTests()
-        {
-            _config = new ShareEverythingConfiguration(typeof(DbSyncObject), typeof(DbSyncObjectWithIgnoredFields));
-            _contextFunc = () => new LocalDbContext(_config);
-            _syncContextFunc = () => new SyncStatusDbContext(_contextFunc().Database.Connection.ConnectionString);
-        }
-
         [SetUp]
         public override void Setup()
         {
             base.Setup();
+
+            _contextFunc = () => new LocalDbContext();
+            _config = new ShareEverythingConfiguration(_contextFunc, typeof(DbSyncObject), typeof(DbSyncObjectWithIgnoredFields));
+
+            _syncContextFunc = () => new SyncStatusDbContext(_contextFunc().Database.Connection.ConnectionString);
         }
 
         [Test]
@@ -103,7 +101,7 @@ namespace Realmius.Tests.Server
             idChange.Should().Be(tagsChange);
             textChange.Should().BeAfter(idChange);
         }
-        
+
         [Test]
         public void AddData_IgnoredFieldsNotSerialized()
         {

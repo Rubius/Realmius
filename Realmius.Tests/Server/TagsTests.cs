@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
+using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Realmius.Contracts.Models;
@@ -31,16 +32,36 @@ using Realmius.Tests.Server.Models;
 
 namespace Realmius.Tests.Server
 {
+    public class LimitedUser
+    {
+        public IList<string> Tags { get; set; }
+
+        public LimitedUser(params string[] tags)
+        {
+            Tags = tags;
+        }
+    }
+
     [TestFixture]
     public class TagsTests : TestBase
     {
         private Func<LocalDbContext> _contextFunc;
-        private RealmiusServerProcessor _processor;
+        private RealmiusServerProcessor<LimitedUser> _processor;
         private Config _config;
 
-        public class Config : RealmiusConfigurationBase<IRealmiusUser>
+        public class Config : RealmiusConfigurationBase<LimitedUser>
         {
-            public override bool CheckAndProcess(CheckAndProcessArgs<IRealmiusUser> args)
+            public override IList<string> GetTagsForUser(LimitedUser user, ChangeTrackingDbContext db)
+            {
+                return user.Tags;
+            }
+
+            public override LimitedUser AuthenticateUser(IRequest request)
+            {
+                return new LimitedUser() { };
+            }
+
+            public override bool CheckAndProcess(CheckAndProcessArgs<LimitedUser> args)
             {
                 return true;
             }
@@ -54,19 +75,20 @@ namespace Realmius.Tests.Server
 
                 return (dbObj.Tags ?? "").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             }
-        }
 
-        public TagsTests()
-        {
-            _config = new Config();
-            _contextFunc = () => new LocalDbContext(_config);
+            public Config(Func<ChangeTrackingDbContext> contextFactoryFunc) : base(contextFactoryFunc)
+            {
+            }
         }
 
         [SetUp]
         public override void Setup()
         {
             base.Setup();
-            _processor = new RealmiusServerProcessor(_contextFunc, _config);
+
+            _contextFunc = () => new LocalDbContext();
+            _config = new Config(_contextFunc);
+            _processor = new RealmiusServerProcessor<LimitedUser>(_config);
         }
 
         [Test]
@@ -86,7 +108,7 @@ namespace Realmius.Tests.Server
                         }),
                     }
                 }
-            }, new RootUser());
+            }, new LimitedUser());
 
 
             var result = _processor.Download(new DownloadDataRequest()
@@ -122,7 +144,7 @@ namespace Realmius.Tests.Server
                         }),
                     }
                 }
-            }, new RootUser());
+            }, new LimitedUser());
 
 
             var result = _processor.Download(new DownloadDataRequest()

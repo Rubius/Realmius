@@ -34,21 +34,20 @@ namespace Realmius.Tests.Server
     public class DownloadTests : TestBase
     {
         private Func<LocalDbContext> _contextFunc;
-        private RealmiusServerProcessor _controller;
+        private RealmiusServerProcessor<object> _controller;
         private ShareEverythingConfiguration _config;
-
-        public DownloadTests()
-        {
-            _config = new ShareEverythingConfiguration(typeof(DbSyncObject), typeof(RefSyncObject));
-            _contextFunc = () => new LocalDbContext(_config);
-        }
+        private object _user;
 
         [SetUp]
         public override void Setup()
         {
             base.Setup();
 
-            _controller = new RealmiusServerProcessor(_contextFunc, _config);
+            _contextFunc = () => new LocalDbContext();
+            _config = new ShareEverythingConfiguration(_contextFunc, typeof(DbSyncObject), typeof(RefSyncObject));
+
+            _user = new { };
+            _controller = new RealmiusServerProcessor(_config);
         }
 
         [Test]
@@ -58,7 +57,7 @@ namespace Realmius.Tests.Server
             {
                 LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.Now } },
                 Types = new[] { nameof(DbSyncObject) },
-            }, new RootUser());
+            }, _user);
 
             result.ChangedObjects.Should().BeEmpty();
         }
@@ -92,7 +91,7 @@ namespace Realmius.Tests.Server
             {
                 LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", DateTimeOffset.MinValue } },
                 Types = new[] { nameof(RefSyncObject) },
-            }, new RootUser());
+            }, _user);
 
             string.Join(", ", result.ChangedObjects)
                 .Should().BeEquivalentTo("Type: RefSyncObject, Key: 1, SerializedObject: { \"Text\": \"123\", \"References\": null, \"Id\": \"1\"}, Type: RefSyncObject, Key: 2, SerializedObject: { \"Text\": \"zxc\", \"References\": null, \"Id\": \"2\"}, Type: RefSyncObject, Key: 3, SerializedObject: { \"Text\": \"asd\", \"References\": [  \"1\",  \"2\" ], \"Id\": \"3\"}");
@@ -113,7 +112,7 @@ namespace Realmius.Tests.Server
             {
                 LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.Now } },
                 Types = new[] { nameof(DbSyncObject) },
-            }, new RootUser());
+            }, _user);
 
             result.ChangedObjects.Should().BeEmpty();
         }
@@ -140,7 +139,7 @@ namespace Realmius.Tests.Server
             {
                 LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", time } },
                 Types = new[] { nameof(DbSyncObject) },
-            }, new RootUser());
+            }, _user);
 
             string.Join(", ", result.ChangedObjects)
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, Deleted");
@@ -162,7 +161,7 @@ namespace Realmius.Tests.Server
             {
                 LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", new DateTimeOffset(DateTime.Now.AddDays(-2)) } },
                 Types = new[] { nameof(DbSyncObject) },
-            }, new RootUser());
+            }, _user);
 
             result.ChangedObjects.Select(x => x.MobilePrimaryKey).Should().BeEquivalentTo(obj.Id);
 
@@ -197,7 +196,7 @@ namespace Realmius.Tests.Server
             {
                 LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", date } },
                 Types = new[] { nameof(DbSyncObject) },
-            }, new RootUser());
+            }, _user);
 
             result.ChangedObjects.Select(x => x.MobilePrimaryKey).Should().BeEquivalentTo(new[] { obj.Id });
             //result.ChangedObjects.Select(x => x.SerializedObject).Should().BeEquivalentTo(""{\r\n  \"Text\": \"123456\",\r\n  \"Tags\": null,\r\n  \"Id\": \"b3586bfb-6e34-4daa-95c1-ddbeb02b4006\"\r\n}"");
@@ -229,7 +228,7 @@ namespace Realmius.Tests.Server
             {
                 LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", date } },
                 Types = new[] { nameof(DbSyncObject) },
-            }, new RootUser());
+            }, _user);
 
             result.ChangedObjects.Select(x => x.MobilePrimaryKey).Should().BeEquivalentTo(obj.Id);
             result.ChangedObjects[0].SerializedObject.Should().NotContainEquivalentOf($"\"{nameof(DbSyncObject.Id)}\"");
@@ -257,7 +256,7 @@ namespace Realmius.Tests.Server
                 LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", new DateTimeOffset(DateTime.Now.AddDays(-2)) } },
 
                 Types = new[] { nameof(DbSyncObject) },
-            }, new RootUser());
+            }, _user);
 
             result.ChangedObjects.Count.Should().Be(1);
 
@@ -265,7 +264,7 @@ namespace Realmius.Tests.Server
             {
                 LastChangeTime = result.LastChange,
                 Types = new[] { nameof(DbSyncObject) },
-            }, new RootUser());
+            }, _user);
             result2.ChangedObjects.Count.Should().Be(0);
 
             Thread.Sleep(10);
@@ -276,7 +275,7 @@ namespace Realmius.Tests.Server
             {
                 LastChangeTime = result2.LastChange,
                 Types = new[] { nameof(DbSyncObject) },
-            }, new RootUser());
+            }, _user);
             result3.ChangedObjects.Count.Should().Be(1);
         }
 
@@ -302,7 +301,7 @@ namespace Realmius.Tests.Server
                 LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.MinValue } },
 
                 Types = new[] { nameof(UnknownSyncObjectServer), nameof(DbSyncObject) },
-            }, new RootUser());
+            }, _user);
             string.Join(", ", res.ChangedObjects.Select(x => x.Type)).Should().BeEquivalentTo("DbSyncObject");
         }
     }

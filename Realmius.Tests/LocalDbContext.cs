@@ -31,11 +31,6 @@ namespace Realmius.Tests
             Database.SetInitializer(new DropCreateDatabaseAlways<LocalDbContext>());
         }
 
-        public LocalDbContext(IRealmiusServerDbConfiguration config) 
-            : base(config)
-        {
-        }
-
         public DbSet<DbSyncObject> DbSyncObjects { get; set; }
         public DbSet<UnknownSyncObjectServer> UnknownSyncObjectServers { get; set; }
         public DbSet<DbSyncObjectWithIgnoredFields> DbSyncObjectWithIgnoredFields { get; set; }

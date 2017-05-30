@@ -33,18 +33,20 @@ namespace Realmius.Tests.Server
     public class CreateSyncObjectsFromAlreadyPersistedObjectsTests : TestBase
     {
         private Func<LocalDbContext> _contextFunc;
-        private RealmiusServerProcessor _processor;
+        private RealmiusServerProcessor<object> _processor;
+        private object _user;
 
         public CreateSyncObjectsFromAlreadyPersistedObjectsTests()
         {
-            _contextFunc = () => new LocalDbContext(new ShareEverythingConfiguration(typeof(DbSyncObject)));
+            _contextFunc = () => new LocalDbContext();
         }
 
         [SetUp]
         public override void Setup()
         {
             base.Setup();
-            _processor = new RealmiusServerProcessor(_contextFunc, new ShareEverythingConfiguration(typeof(DbSyncObject)));
+            _user = new { };
+            _processor = new RealmiusServerProcessor<object>(new ShareEverythingConfiguration(_contextFunc, typeof(DbSyncObject)));
         }
 
         [Test]
@@ -78,7 +80,7 @@ namespace Realmius.Tests.Server
                 Id = 4,
                 Text = "5",
             });
-            
+
             // Act
             db.SaveChanges();
             var db2 = _contextFunc();
@@ -111,8 +113,7 @@ namespace Realmius.Tests.Server
                         nameof(DbSyncObject)
                     },
                     LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", DateTimeOffset.MinValue } },
-                },
-                new RootUser());
+                }, _user);
             res.ChangedObjects.Count.Should().Be(0);
 
             db.EnableSyncTracking = true;
@@ -126,8 +127,7 @@ namespace Realmius.Tests.Server
                     {
                         nameof(DbSyncObject)
                     }
-                },
-                new RootUser());
+                }, _user);
 
             string.Join(", ", res2.ChangedObjects)
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, SerializedObject: { \"Text\": \"x\", \"Tags\": null, \"Id\": \"2\"}");
@@ -161,8 +161,7 @@ namespace Realmius.Tests.Server
                         nameof(DbSyncObject)
                     },
                     LastChangeTime = DateTimeOffset.MinValue.ToDictionary(),
-                },
-                new RootUser());
+                }, _user);
             string.Join(", ", res.ChangedObjects)
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, SerializedObject: { \"Text\": \"x\", \"Tags\": \"c\", \"Id\": \"2\"}");
 
@@ -179,8 +178,7 @@ namespace Realmius.Tests.Server
                     {
                         nameof(DbSyncObject)
                     }
-                },
-                new RootUser());
+                }, _user);
 
             string.Join(", ", res2.ChangedObjects)
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, SerializedObject: { \"Text\": \"qwe\", \"Tags\": \"c\", \"Id\": \"2\"}");
@@ -208,7 +206,7 @@ namespace Realmius.Tests.Server
             db.DbSyncObjects.Remove(obj);
             db.SaveChanges();
 
-            
+
             var res = _processor.Download(
                 new DownloadDataRequest
                 {
@@ -217,8 +215,7 @@ namespace Realmius.Tests.Server
                         nameof(DbSyncObject)
                     },
                     LastChangeTime = new Dictionary<string, DateTimeOffset> { { "all", time } },
-                },
-                new RootUser());
+                }, _user);
             string.Join(", ", res.ChangedObjects)
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, SerializedObject: { \"Text\": \"x\", \"Tags\": \"c\", \"Id\": \"2\"}");
 
@@ -231,8 +228,7 @@ namespace Realmius.Tests.Server
                         nameof(DbSyncObject)
                     },
                     LastChangeTime = new Dictionary<string, DateTimeOffset>() { { "all", time } },
-                },
-                new RootUser());
+                }, _user);
 
             string.Join(", ", res2.ChangedObjects)
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, Deleted");

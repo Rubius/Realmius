@@ -38,8 +38,10 @@ namespace Realmius.Tests.Server
         [SetUp]
         public virtual void Setup()
         {
-            var config = new ShareEverythingConfiguration(typeof(DbSyncObject));
-            var context = new LocalDbContext(config);
+            var context = new LocalDbContext();
+
+            var config = new ShareEverythingConfiguration(() => new LocalDbContext(), typeof(DbSyncObject));
+            context.EnableSyncTracking = false;
             context.DbSyncObjects.Delete();
             context.IdIntObjects.Delete();
             context.IdGuidObjects.Delete();

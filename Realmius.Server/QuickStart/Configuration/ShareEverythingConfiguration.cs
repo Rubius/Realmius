@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNet.SignalR;
 using Realmius.Server.Configurations;
 using Realmius.Server.Models;
@@ -44,11 +45,8 @@ namespace Realmius.Server.QuickStart
         }
 
         public ShareEverythingConfiguration(Func<ChangeTrackingDbContext> contextFactoryFunc, Type typeToSync, params Type[] typesToSync)
-            : base(contextFactoryFunc)
+            : this(contextFactoryFunc, typesToSync.Union(new[] { typeToSync }).ToList())
         {
-            var types = new List<Type> { typeToSync };
-            types.AddRange(typesToSync);
-            TypesToSync = types;
         }
 
         public override bool CheckAndProcess(CheckAndProcessArgs<object> args)

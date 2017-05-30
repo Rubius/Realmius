@@ -39,6 +39,9 @@ namespace Realmius.Server.Configurations
         protected RealmiusConfigurationBase(Func<ChangeTrackingDbContext> contextFactoryFunc)
         {
             ContextFactoryFunction = contextFactoryFunc;
+
+            Realmius.Server.QuickStart.RealmiusServer.Configurations[GetType()] = this;
+            ChangeTrackingDbContext.Configurations[contextFactoryFunc().GetType()] = this;
         }
 
         public bool CheckAndProcess(ChangeTrackingDbContext ef, IRealmiusObjectServer deserialized, TUser user)
