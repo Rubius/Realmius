@@ -23,7 +23,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Client;
-using Microsoft.AspNet.SignalR.Client.Hubs;
 using Microsoft.AspNet.SignalR.Client.Infrastructure;
 using Newtonsoft.Json;
 using Realmius.Contracts;
@@ -40,16 +39,16 @@ namespace Realmius.SyncService.ApiClient
         public Uri Uri { get; set; }
         public Task DownloadingInitialData => _downloadingInitialData.Task;
         private Action _hubUnsubscribe = () => { };
-        private static JsonSerializerSettings SerializerSettings;
+        private static JsonSerializerSettings _serializerSettings;
 
-        internal readonly Dictionary<string, Action<object>> _callbacks = new Dictionary<string, Action<object>>();
+        internal readonly Dictionary<string, Action<object>> Callbacks = new Dictionary<string, Action<object>>();
         private int _callbackId;
         private string _uploadDataCallbackId;
 
         public SignalRPersistentConnectionSyncApiClient(Uri uri)
         {
             Uri = uri;
-            SerializerSettings = new JsonSerializerSettings()
+            _serializerSettings = new JsonSerializerSettings()
             {
                 StringEscapeHandling = StringEscapeHandling.EscapeNonAscii,
             };
@@ -86,12 +85,14 @@ namespace Realmius.SyncService.ApiClient
 
                 var parameters = GetParameters(Uri);
                 parameters[Constants.LastDownloadParameterName] =
-                    WebUtility.UrlEncode(JsonConvert.SerializeObject(_startOptions.LastDownloaded ?? new Dictionary<string, DateTimeOffset>()));
+                    WebUtility.UrlEncode(
+                        JsonConvert.SerializeObject(_startOptions.LastDownloaded ??
+                                                    new Dictionary<string, DateTimeOffset>()));
                 parameters[Constants.SyncTypesParameterName] = string.Join(",", _startOptions.Types);
                 var connectionUri = Uri.ToString();
                 if (!string.IsNullOrEmpty(Uri.Query))
                 {
-                    connectionUri = connectionUri.Replace(Uri.Query, "");
+                    connectionUri = connectionUri.Replace(Uri.Query, string.Empty);
                 }
                 var connection = new Connection(connectionUri, parameters);
                 _connection = connection;
@@ -115,32 +116,19 @@ namespace Realmius.SyncService.ApiClient
                 Logger.Log.Info("OnConnected finished");
 
             }
-            catch (HttpRequestException webEx)
-            {
-                LogAndReconnectWithDelay(webEx);
-            }
-            catch (WebException webEx)
-            {
-                LogAndReconnectWithDelay(webEx);
-            }
-            catch (HttpClientException webEx)
-            {
-                LogAndReconnectWithDelay(webEx);
-            }
-            catch (TimeoutException webEx)
-            {
-                LogAndReconnectWithDelay(webEx);
-            }
-            catch (StartException webEx)
-            {
-                LogAndReconnectWithDelay(webEx);
-            }
-            catch (ObjectDisposedException webEx)
-            {
-                LogAndReconnectWithDelay(webEx);
-            }
             catch (Exception ex)
             {
+                if (ex is HttpRequestException ||
+                    ex is WebException ||
+                    ex is HttpClientException ||
+                    ex is TimeoutException ||
+                    ex is StartException ||
+                    ex is ObjectDisposedException)
+                {
+                    LogAndReconnectWithDelay(ex);
+                    return;
+                }
+
                 Logger.Log.Info($"Unknown error in Reconnect! Stop Reconnections!!! {ex}");
 #if DEBUG
                 throw;
@@ -158,23 +146,23 @@ namespace Realmius.SyncService.ApiClient
 
             switch (command)
             {
-                case MethodConstants.Client_DataDownloaded:
+                case MethodConstants.ClientDataDownloaded:
                     OnNewDataDownloaded(Deserialize<DownloadDataResponse>(parameter));
                     break;
 
-                case MethodConstants.Client_Unauthorized:
+                case MethodConstants.ClientUnauthorized:
                     OnUnauthorized(Deserialize<UnauthorizedResponse>(parameter));
                     break;
 
-                case MethodConstants.Server_UploadData:
+                case MethodConstants.ServerUploadData:
                     var value = Deserialize<UploadDataResponse>(parameter);
-                    if (!_callbacks.ContainsKey(_uploadDataCallbackId))
+                    if (!Callbacks.ContainsKey(_uploadDataCallbackId))
                     {
                         Logger.Log.Exception(new Exception("UploadDataResponse received but there's no callback to call!"));
                         return;
                     }
 
-                    _callbacks[_uploadDataCallbackId](value);
+                    Callbacks[_uploadDataCallbackId](value);
                     break;
 
                 default:
@@ -186,12 +174,12 @@ namespace Realmius.SyncService.ApiClient
 
         protected static T Deserialize<T>(string data)
         {
-            return JsonConvert.DeserializeObject<T>(data, SerializerSettings);
+            return JsonConvert.DeserializeObject<T>(data, _serializerSettings);
         }
 
         internal static string Serialize(object obj)
         {
-            return JsonConvert.SerializeObject(obj, SerializerSettings);
+            return JsonConvert.SerializeObject(obj, _serializerSettings);
         }
 
         private Dictionary<string, string> GetParameters(Uri uri)
@@ -222,14 +210,14 @@ namespace Realmius.SyncService.ApiClient
             };
         }
 
-        void LogAndReconnectWithDelay(Exception exception)
+        private void LogAndReconnectWithDelay(Exception exception)
         {
             const int delay = 1000;
             Logger.Log.Info($"Unable to connect, will attempt to reconnect in {delay / 1000} seconds!!!");
-            Task.Delay(delay).ContinueWith((x) => Reconnect());
+            Task.Delay(delay).ContinueWith(_ => Reconnect());
         }
 
-        void ConnectionClosed()
+        private void ConnectionClosed()
         {
             Logger.Log.Info("Connection closed, will start reconnecting...");
             ClearInvocationCallbacks("close");
@@ -251,7 +239,7 @@ namespace Realmius.SyncService.ApiClient
                 if (_connection?.State != ConnectionState.Connected)
                     return Task.FromResult(new UploadDataResponse());
 
-                var task = SendAndReceive<UploadDataResponse>(MethodConstants.Server_UploadData, request);
+                var task = SendAndReceive<UploadDataResponse>(MethodConstants.ServerUploadData, request);
 
                 return task;
             }
@@ -285,17 +273,16 @@ namespace Realmius.SyncService.ApiClient
 
             var callbackId = RegisterCallback(result =>
             {
-                var exception = result as Exception;
-                if (exception != null)
+                if (result is Exception exception)
                 {
                     tcs.TrySetException(exception);
                 }
                 else
                 {
-                    tcs.TrySetResult((TResult)result);
+                    tcs.TrySetResult((TResult) result);
                 }
             });
-            if (command == MethodConstants.Server_UploadData)
+            if (command == MethodConstants.ServerUploadData)
             {
                 _uploadDataCallbackId = callbackId;
             }
@@ -324,10 +311,10 @@ namespace Realmius.SyncService.ApiClient
 
         string RegisterCallback(Action<object> callback)
         {
-            lock (_callbacks)
+            lock (Callbacks)
             {
                 string id = _callbackId.ToString();
-                _callbacks[id] = callback;
+                Callbacks[id] = callback;
                 _callbackId++;
                 return id;
             }
@@ -335,9 +322,9 @@ namespace Realmius.SyncService.ApiClient
 
         void RemoveCallback(string callbackId)
         {
-            lock (_callbacks)
+            lock (Callbacks)
             {
-                _callbacks.Remove(callbackId);
+                Callbacks.Remove(callbackId);
             }
         }
         private void ClearInvocationCallbacks(string error)
@@ -348,10 +335,10 @@ namespace Realmius.SyncService.ApiClient
 
             Action<object>[] callbacks;
 
-            lock (_callbacks)
+            lock (Callbacks)
             {
-                callbacks = _callbacks.Values.ToArray();
-                _callbacks.Clear();
+                callbacks = Callbacks.Values.ToArray();
+                Callbacks.Clear();
             }
 
             foreach (var callback in callbacks)

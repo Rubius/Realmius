@@ -27,9 +27,9 @@ namespace Realmius
     {
         public static async Task<string> CopyFileToUserLocation(string path)
         {
-            var sourceFile = await PCLStorage.FileSystem.Current.GetFileFromPathAsync(path);
+            var sourceFile = await FileSystem.Current.GetFileFromPathAsync(path);
             var newFileName = Guid.NewGuid() + Path.GetExtension(path);
-            var newFile = await PCLStorage.FileSystem.Current.LocalStorage.CreateFileAsync(newFileName,
+            var newFile = await FileSystem.Current.LocalStorage.CreateFileAsync(newFileName,
                 CreationCollisionOption.ReplaceExisting);
 
             using (var writeStream = await newFile.OpenAsync(FileAccess.ReadAndWrite))

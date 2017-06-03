@@ -56,7 +56,7 @@
     <Compile Include="SyncService\ApiClient\PollingSyncApiClient.cs" />
     <Compile Include="SyncService\RealmObjectResolver.cs" />
     <Compile Include="SyncService\RealmObjectTypeInfo.cs" />
-    <Compile Include="SyncService\RealmiusObjectExtenstions.cs" />
+    <Compile Include="SyncService\RealmiusObjectExtensions.cs" />
     <Compile Include="SyncService\RealmiusSyncService.cs" />
     <Compile Include="SyncService\RealmModels\SyncState.cs" />
     <Compile Include="SyncService\SyncConfiguration.cs" />

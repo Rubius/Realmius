@@ -29,12 +29,12 @@ namespace Realmius.Server.Infrastructure
 
     public class RealmServerCollectionConverter : JsonConverter
     {
-        private static Type _enumerableType = typeof(IEnumerable);
+        private static readonly Type EnumerableType = typeof(IEnumerable);
         public ChangeTrackingDbContext Database { get; set; }
 
         public override bool CanConvert(Type objectType)
         {
-            return objectType != typeof(string) && _enumerableType.GetTypeInfo().IsAssignableFrom(objectType);
+            return objectType != typeof(string) && EnumerableType.GetTypeInfo().IsAssignableFrom(objectType);
         }
 
         public override object ReadJson(
@@ -72,10 +72,8 @@ namespace Realmius.Server.Infrastructure
                     {
                         throw new InvalidOperationException("Referenced object is not found");
                     }
-                    else
-                    {
-                        addMethod.Invoke(existingValue, new[] { referencedObject });
-                    }
+
+                    addMethod.Invoke(existingValue, new[] { referencedObject });
 
                     reader.Read();
                 }
@@ -84,26 +82,22 @@ namespace Realmius.Server.Infrastructure
             return existingValue;
         }
 
-
         private object GetReferencedObject(ChangeTrackingDbContext database, JsonReader reader, Type objectType)
         {
             return database.GetObjectByKey(objectType.Name, reader.Value.ToString());
         }
 
-
-        public override void WriteJson(JsonWriter writer, object value,
-            JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var list = value as IEnumerable;
-            if (list != null)
+            if (list == null) return;
+
+            writer.WriteStartArray();
+            foreach (var obj in list.OfType<IRealmiusObjectServer>())
             {
-                writer.WriteStartArray();
-                foreach (var obj in list.OfType<IRealmiusObjectServer>())
-                {
-                    writer.WriteValue(obj.MobilePrimaryKey);
-                }
-                writer.WriteEndArray();
+                writer.WriteValue(obj.MobilePrimaryKey);
             }
+            writer.WriteEndArray();
         }
     }
 }

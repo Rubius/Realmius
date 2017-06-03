@@ -18,7 +18,6 @@
 
 using System.Data.Entity;
 using Realmius.Server.Models;
-using Realmius.Server.QuickStart;
 
 namespace Server.Entities
 {

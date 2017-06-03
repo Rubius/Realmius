@@ -40,6 +40,7 @@ namespace Server.Entities
         [NotMapped]
         [JsonIgnore]
         public virtual Message Reply { get; set; }
+
         [NotMapped]
         public string ReplyId { get; set; }
     }

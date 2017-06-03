@@ -26,24 +26,24 @@ namespace Realmius.Server.Expressions
     {
         public class ReplaceParameterVisitor<TResult> : ExpressionVisitor
         {
-            private readonly ParameterExpression parameter;
-            private readonly Expression replacement;
+            private readonly ParameterExpression _parameter;
+            private readonly Expression _replacement;
 
             public ReplaceParameterVisitor(ParameterExpression parameter, Expression replacement)
             {
-                this.parameter = parameter;
-                this.replacement = replacement;
+                _parameter = parameter;
+                _replacement = replacement;
             }
 
             public Expression<TResult> Visit<T>(Expression<T> node)
             {
-                var parameters = node.Parameters.Where(p => p != parameter);
+                var parameters = node.Parameters.Where(p => p != _parameter);
                 return Expression.Lambda<TResult>(Visit(node.Body), parameters);
             }
 
             protected override Expression VisitParameter(ParameterExpression node)
             {
-                return node == parameter ? replacement : base.VisitParameter(node);
+                return node == _parameter ? _replacement : base.VisitParameter(node);
             }
         }
 
@@ -51,6 +51,7 @@ namespace Realmius.Server.Expressions
         {
             return new ReplaceParameterVisitor<Func<TResult>>(left.Parameters[0], right.Parameters[0]).Visit(left);
         }
+
         public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> left, Expression<Func<T, bool>> right)
         {
             return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(left.Body, right.WithParametersOf(left).Body), left.Parameters);

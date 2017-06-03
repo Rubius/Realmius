@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNet.SignalR;
 using Owin;
 using Realmius.Server.Configurations;
+using Realmius.Server.Exchange;
 using Realmius.Server.Models;
 
 namespace Realmius.Server.QuickStart
@@ -28,10 +27,10 @@ namespace Realmius.Server.QuickStart
             SetupSignalRServer(url, app, configuration);
         }
 
-        internal static readonly Dictionary<Type, object> Configurations = new Dictionary<Type, object>();
+        internal static readonly Dictionary<Type, IRealmiusServerDbConfiguration> Configurations = new Dictionary<Type, IRealmiusServerDbConfiguration>();
         internal static IRealmiusServerConfiguration<T> GetConfiguration<T>()
         {
-            return (IRealmiusServerConfiguration<T>)Configurations[typeof(T)];
+            return (IRealmiusServerConfiguration<T>) Configurations[typeof(T)];
         }
     }
 }

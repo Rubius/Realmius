@@ -136,7 +136,7 @@ namespace Realmius.SyncService
 
         public SyncState GetFileSyncState(string mobilePrimaryKey)
         {
-            return SyncState.Unsynced;
+            return SyncState.UnSynced;
         }
 
         private static RealmConfiguration RealmiusConfiguration => new RealmConfiguration(RealmiusDbPath)
@@ -365,7 +365,7 @@ namespace Realmius.SyncService
                         Type = className,
                         MobilePrimaryKey = obj.MobilePrimaryKey,
                         SerializedObject = null,
-                        SyncState = (int)SyncState.Unsynced,
+                        SyncState = (int)SyncState.UnSynced,
                     };
                     realmiusData.Add(syncStatusObject);
                 });
@@ -404,12 +404,12 @@ namespace Realmius.SyncService
                                 });
                             syncStatusObject.SerializedObject = serializedCurrent;
                             syncStatusObject.IsDeleted = isDeleted;
-                            syncStatusObject.SyncState = (int)SyncState.Unsynced;
+                            syncStatusObject.SyncState = (int)SyncState.UnSynced;
                         });
 
 
                     if (_typesToSync[className].ImplementsSyncState)
-                        SetSyncState(realm, obj, SyncState.Unsynced);
+                        SetSyncState(realm, obj, SyncState.UnSynced);
                 }
             }
         }
@@ -599,7 +599,7 @@ namespace Realmius.SyncService
                                 });
                             continue;
                         }
-                        var serializedObject = MergeJsonStrings(uploadRequestItemRealm.Select(x => x.SerializedObject));
+                        var serializedObject = MergeJsonStrings(uploadRequestItemRealm.Select(x => x.SerializedObject).ToList());
                         var changeNotification = new UploadRequestItem()
                         {
                             SerializedObject = serializedObject,
@@ -618,11 +618,15 @@ namespace Realmius.SyncService
                     using (var realmius = CreateRealmius())
                     {
                         realmius.Refresh();
-                        var notSynced = changes.ChangeNotifications.Select(x => new { x.Type, x.PrimaryKey })
-                            .Except(result.Results.Where(x => x.IsSuccess).Select(x => new { x.Type, PrimaryKey = x.MobilePrimaryKey }));
-                        if (notSynced.Any())
+                        var notSynced = changes.ChangeNotifications
+                            .Select(x => new { x.Type, x.PrimaryKey })
+                            .Except(result.Results.Where(x => x.IsSuccess)
+                            .Select(x => new { x.Type, PrimaryKey = x.MobilePrimaryKey }))
+                            .ToList();
+                        if (notSynced.Count > 0)
                         {
-                            Logger.Log.Info($"Some objects were not accepted by the server: {string.Join("; ", notSynced.Select(x => x.Type + ": " + x.PrimaryKey))}");
+                            var notSyncedObjects = notSynced.Select(x => $"{x.Type}: {x.PrimaryKey}");
+                            Logger.Log.Info($"Some objects were not accepted by the server: {string.Join("; ", notSyncedObjects)}");
                         }
                         using (var realm = _realmFactoryMethod())
                         {
@@ -719,10 +723,10 @@ namespace Realmius.SyncService
                 });
         }
 
-        private string MergeJsonStrings(IEnumerable<string> objects)
+        private string MergeJsonStrings(IList<string> objects)
         {
             JObject o1 = null;
-            if (objects.Count() == 1)
+            if (objects.Count == 1)
                 return objects.First();
 
             var mergeSettings = new JsonMergeSettings

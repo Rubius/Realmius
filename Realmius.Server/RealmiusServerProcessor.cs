@@ -23,7 +23,6 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Realmius.Contracts.Models;
@@ -31,7 +30,6 @@ using Realmius.Server.Configurations;
 using Realmius.Server.Expressions;
 using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
-using Realmius.Server.QuickStart;
 
 namespace Realmius.Server
 {
@@ -97,13 +95,13 @@ namespace Realmius.Server
                         throw;
                     }
 
-                    var referencesConverter = new RealmServerCollectionConverter()
+                    var referencesConverter = new RealmServerCollectionConverter
                     {
                         Database = ef,
                     };
-                    var settings = new JsonSerializerSettings()
+                    var settings = new JsonSerializerSettings
                     {
-                        Converters = new List<JsonConverter>()
+                        Converters = new List<JsonConverter>
                         {
                             referencesConverter
                         },
@@ -123,7 +121,7 @@ namespace Realmius.Server
 
                             JsonConvert.PopulateObject(item.SerializedObject, dbEntity, settings);
 
-                            var args = new CheckAndProcessArgs<TUser>()
+                            var args = new CheckAndProcessArgs<TUser>
                             {
                                 Database = ef,
                                 OriginalDbEntity = untouchedEntityClone,
@@ -160,7 +158,7 @@ namespace Realmius.Server
                             dbEntity = (IRealmiusObjectServer)JsonConvert.DeserializeObject(item.SerializedObject,
                                 type, settings);
 
-                            var args = new CheckAndProcessArgs<TUser>()
+                            var args = new CheckAndProcessArgs<TUser>
                             {
                                 Database = ef,
                                 OriginalDbEntity = null,
@@ -229,12 +227,10 @@ namespace Realmius.Server
             if (user == null)
                 throw new NullReferenceException("user arg cannot be null");
 
-
-            var response = new DownloadDataResponse()
+            var response = new DownloadDataResponse
             {
                 LastChange = GetTagsForUser(user).ToDictionary(x => x, x => DateTimeOffset.UtcNow),
             };
-
 
             request.Types = request.Types.Intersect(_syncedTypes.Keys).ToList();
             //if (types.Count > 0)
@@ -262,7 +258,6 @@ namespace Realmius.Server
                         jObject.Remove(property.Name);
                     }
                 }
-                ;
                 var downloadResponseItem = new DownloadResponseItem
                 {
                     Type = changedObject.Type,
@@ -286,10 +281,9 @@ namespace Realmius.Server
                 syncStatusServerObject.Tag3,
             };
             var lastChangeTime = DateTimeOffset.MinValue;
-            foreach (string tag in tags.Where(x => !string.IsNullOrEmpty(x)))
+            foreach (var tag in tags.Where(x => !string.IsNullOrEmpty(x)))
             {
-                DateTimeOffset time;
-                if (request.LastChangeTime.TryGetValue(tag, out time))
+                if (request.LastChangeTime.TryGetValue(tag, out DateTimeOffset time))
                 {
                     if (time > lastChangeTime)
                         lastChangeTime = time;
@@ -302,21 +296,20 @@ namespace Realmius.Server
         internal IQueryable<SyncStatusServerObject> CreateQuery(DownloadDataRequest request, TUser user, SyncStatusDbContext context)
         {
             Expression<Func<SyncStatusServerObject, bool>> whereExpression = null;
-            foreach (string userTag in GetTagsForUser(user))
+            foreach (var userTag in GetTagsForUser(user))
             {
-                DateTimeOffset lastChange;
-
                 Expression<Func<SyncStatusServerObject, bool>> condition = null;
-                if (request.LastChangeTime.TryGetValue(userTag, out lastChange))
+                if (request.LastChangeTime.TryGetValue(userTag, out DateTimeOffset lastChange))
                 {
-                    condition =
-                        x =>
-                            (x.Tag0 == userTag || x.Tag1 == userTag || x.Tag2 == userTag || x.Tag3 == userTag) &&
-                            x.LastChange > lastChange;
+                    condition = x =>
+                        (x.Tag0 == userTag || x.Tag1 == userTag || x.Tag2 == userTag || x.Tag3 == userTag) &&
+                        x.LastChange > lastChange;
                 }
                 else if (!request.OnlyDownloadSpecifiedTags)
                 {
-                    condition = x => !x.IsDeleted && (x.Tag0 == userTag || x.Tag1 == userTag || x.Tag2 == userTag || x.Tag3 == userTag);
+                    condition = x =>
+                        !x.IsDeleted &&
+                        (x.Tag0 == userTag || x.Tag1 == userTag || x.Tag2 == userTag || x.Tag3 == userTag);
                 }
 
                 if (condition != null)

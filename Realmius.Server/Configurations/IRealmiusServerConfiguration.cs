@@ -28,6 +28,7 @@ namespace Realmius.Server.Configurations
         IList<Type> TypesToSync { get; }
         IList<string> GetTagsForObject(ChangeTrackingDbContext db, IRealmiusObjectServer obj);
     }
+
     public interface IRealmiusServerConfiguration<TUser> : IRealmiusServerDbConfiguration
     {
         IList<string> GetTagsForUser(TUser user, ChangeTrackingDbContext db);

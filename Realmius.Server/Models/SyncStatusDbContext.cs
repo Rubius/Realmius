@@ -27,7 +27,7 @@ namespace Realmius.Server.Models
 
         static SyncStatusDbContext()
         {
-            Database.SetInitializer<SyncStatusDbContext>(new MigrateDatabaseToLatestVersion<SyncStatusDbContext, Configuration>(true));
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<SyncStatusDbContext, Configuration>(true));
             //Database.SetInitializer<SyncStatusDbContext>(new DropCreateDatabaseIfModelChanges<SyncStatusDbContext>());
         }
 

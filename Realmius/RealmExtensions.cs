@@ -36,12 +36,10 @@ namespace Realmius
         public static void SkipUpload<T>(this Realm realm, T obj)
             where T : RealmObject, IRealmiusObjectClient
         {
-            ForAllServices(
-                realm,
-                syncService =>
-                {
-                    syncService?.SkipUpload(obj);
-                });
+            ForAllServices(realm, syncService =>
+            {
+                syncService?.SkipUpload(obj);
+            });
         }
 
         internal static void AddSkipUpload(this Realm realm, IRealmiusObjectClient obj, bool update = false)
@@ -53,12 +51,10 @@ namespace Realmius
 
         internal static void SkipUpload(this Realm realm, IRealmiusObjectClient obj)
         {
-            ForAllServices(
-                realm,
-                (syncService) =>
-                {
-                    syncService?.SkipUpload(obj);
-                });
+            ForAllServices(realm, syncService =>
+            {
+                syncService?.SkipUpload(obj);
+            });
         }
 
         private static void ForAllServices(Realm realm, Action<RealmiusSyncService> action)
@@ -79,7 +75,7 @@ namespace Realmius
         }
 
         /// <summary>
-        /// Removes item rom Realm and sync the changes
+        /// Removes item from Realm and sync the changes
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="realm"></param>
@@ -87,12 +83,11 @@ namespace Realmius
         public static void RemoveAndSync<T>(this Realm realm, T obj)
             where T : RealmObject, IRealmiusObjectClient
         {
-            ForAllServices(realm,
-                           (syncService) =>
-                           {
-                               syncService?.RemoveObject(obj);
-                               realm.Remove(obj);
-                           });
+            ForAllServices(realm, syncService =>
+            {
+                syncService?.RemoveObject(obj);
+                realm.Remove(obj);
+            });
         }
     }
 }

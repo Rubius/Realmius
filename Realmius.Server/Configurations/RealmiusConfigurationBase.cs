@@ -40,7 +40,7 @@ namespace Realmius.Server.Configurations
         {
             ContextFactoryFunction = contextFactoryFunc;
 
-            Realmius.Server.QuickStart.RealmiusServer.Configurations[GetType()] = this;
+            QuickStart.RealmiusServer.Configurations[typeof(TUser)] = this;
             ChangeTrackingDbContext.Configurations[contextFactoryFunc().GetType()] = this;
         }
 

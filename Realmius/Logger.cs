@@ -23,24 +23,20 @@ namespace Realmius
     internal class Logger
     {
         public static Logger Log { get; } = new Logger();
-        public string Id { get; set; }
-        private Logger()
-        {
-        }
 
         public void Exception(Exception ex, string text = null)
         {
-            System.Diagnostics.Debug.WriteLine($"Id: {Id}, Exception: {ex}, {text}");
+            System.Diagnostics.Debug.WriteLine($"Exception: {ex}, {text}");
         }
 
         public void Info(string text)
         {
-            System.Diagnostics.Debug.WriteLine($"Id: {Id}, " + text);
+            System.Diagnostics.Debug.WriteLine(text);
         }
 
         public void Debug(string text)
         {
-            System.Diagnostics.Debug.WriteLine($"Id: {Id}, " + text);
+            System.Diagnostics.Debug.WriteLine(text);
         }
     }
 }

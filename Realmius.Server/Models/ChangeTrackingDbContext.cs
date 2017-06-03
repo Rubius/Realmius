@@ -32,7 +32,6 @@ using Realmius.Contracts.Models;
 using Realmius.Server.Configurations;
 using Realmius.Server.Exchange;
 using Realmius.Server.Infrastructure;
-using Realmius.Server.QuickStart;
 
 namespace Realmius.Server.Models
 {
@@ -125,7 +124,7 @@ namespace Realmius.Server.Models
             if (_syncConfiguration == null)
                 throw new InvalidOperationException($"{nameof(ChangeTrackingDbContext)} was not initialized (_syncConfiguration is null)!");
 
-            int result = 0;
+            int result;
             try
             {
                 var syncStatusContext = CreateSyncStatusContext();
@@ -142,8 +141,8 @@ namespace Realmius.Server.Models
                     {
                         ModifiedProperties = x.State == EntityState.Deleted ? new Dictionary<string, bool>() : x.CurrentValues.PropertyNames.ToDictionary(z => z, z => x.Property(z).IsModified),
                         Entity = x.Entity,
-                        CurrentValues = x.State == EntityState.Deleted ? null : x?.CurrentValues?.Clone(),
-                        OriginalValues = x.State == EntityState.Added ? null : x?.OriginalValues?.Clone(),
+                        CurrentValues = x.State == EntityState.Deleted ? null : x.CurrentValues?.Clone(),
+                        OriginalValues = x.State == EntityState.Added ? null : x.OriginalValues?.Clone(),
                         State = x.State
                     }).ToList();
 
@@ -176,15 +175,18 @@ namespace Realmius.Server.Models
                         else
                         {
                             var jsonDiff = JsonHelper.GetJsonDiffAsJObject(
-                                syncStatusObject.FullObjectAsJson ?? "{}",
+                                syncStatusObject?.FullObjectAsJson ?? "{}",
                                 serializedCurrent);
 
-                            foreach (var property in jsonDiff.Properties())
+                            if (syncStatusObject != null)
                             {
-                                var propName = property.Name;
-
-                                syncStatusObject.ColumnChangeDates[propName] = dateTimeNow;
+                                foreach (var property in jsonDiff.Properties())
+                                {
+                                    var propName = property.Name;
+                                    syncStatusObject.ColumnChangeDates[propName] = dateTimeNow;
+                                }
                             }
+
                             changes = jsonDiff.ToString();
                         }
 
@@ -230,10 +232,11 @@ namespace Realmius.Server.Models
             return result;
         }
 
-        public static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
+        public static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
         {
             ContractResolver = new RealmServerObjectResolver(),
         };
+
         internal virtual string SerializeObject(IRealmiusObjectServer obj)
         {
             return JsonConvert.SerializeObject(obj, JsonSerializerSettings);
@@ -320,6 +323,7 @@ namespace Realmius.Server.Models
             ProcessChanges();
             return base.SaveChangesAsync(cancellationToken);
         }
+
         #region Audit
         private void SaveLogs(List<EfEntityInfo> entries)
         {
@@ -394,19 +398,15 @@ namespace Realmius.Server.Models
         private string GetEfTypeName(object entity)
         {
             var name = entity.GetType().Name;
-            var lastUnderscore = name.LastIndexOf("_");
-            if (lastUnderscore > 0)
-            {
-                return name.Substring(0, lastUnderscore);
-            }
-            return name;
+            var lastUnderscore = name.LastIndexOf("_", StringComparison.Ordinal);
+            return lastUnderscore > 0 ? name.Substring(0, lastUnderscore) : name;
         }
         #endregion
 
         private string Serialize(DbPropertyValues values)
         {
             var dict = new Dictionary<string, object>();
-            foreach (string valuesPropertyName in values.PropertyNames)
+            foreach (var valuesPropertyName in values.PropertyNames)
             {
                 dict[valuesPropertyName] = values[valuesPropertyName];
             }
@@ -482,13 +482,7 @@ namespace Realmius.Server.Models
         public object GetObjectByKey(string type, string keyString)
         {
             var keyType = GetKeyType(type);
-            object key;
-            if (keyType == typeof(Guid))
-            {
-                key = Guid.Parse(keyString);
-            }
-            else
-                key = Convert.ChangeType(keyString, keyType);
+            var key = keyType == typeof(Guid) ? Guid.Parse(keyString) : Convert.ChangeType(keyString, keyType);
 
             var entitySet = GetEntitySet(type);
 
