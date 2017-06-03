@@ -347,6 +347,7 @@ namespace Realmius.SyncService
 
             var serializedCurrent = SerializeObject(obj);
 
+            realmiusData.Refresh();
             var syncStatusObject = FindSyncStatus(realmiusData, className, obj.MobilePrimaryKey);
             if (syncStatusObject != null && syncStatusObject.SerializedObject == serializedCurrent && syncStatusObject.IsDeleted == isDeleted)
             {
