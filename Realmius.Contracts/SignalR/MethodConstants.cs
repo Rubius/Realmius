@@ -2,8 +2,10 @@
 {
     public class MethodConstants
     {
-        public const string Client_Unauthorized = "UNAT";
-        public const string Client_DataDownloaded= "DDNL";
-        public const string Server_UploadData= "UPLD";
+        public const int CommandNameLength = 4;
+
+        public const string ClientUnauthorized = "UNAT";
+        public const string ClientDataDownloaded = "DDNL";
+        public const string ServerUploadData = "UPLD";
     }
 }

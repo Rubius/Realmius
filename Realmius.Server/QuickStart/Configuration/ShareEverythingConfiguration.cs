@@ -54,7 +54,6 @@ namespace Realmius.Server.QuickStart
             return true;
         }
 
-
         public override object AuthenticateUser(IRequest request)
         {
             return new { };

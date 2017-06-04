@@ -62,22 +62,13 @@ namespace Realmius.Server.Models
         private string _columnChangeDatesSerialized;
         public string ColumnChangeDatesSerialized
         {
-            get
-            {
-                return _columnChangeDatesSerialized;
-            }
+            get => _columnChangeDatesSerialized;
             set
             {
                 _columnChangeDatesSerialized = value;
-
-                if (value == null)
-                {
-                    ColumnChangeDates = null;
-                }
-                else
-                {
-                    ColumnChangeDates = JsonConvert.DeserializeObject<Dictionary<string, DateTimeOffset>>(value);
-                }
+                ColumnChangeDates = value == null
+                    ? null
+                    : JsonConvert.DeserializeObject<Dictionary<string, DateTimeOffset>>(value);
             }
         }
 
@@ -91,7 +82,6 @@ namespace Realmius.Server.Models
 
         public SyncStatusServerObject()
         {
-
         }
 
         public SyncStatusServerObject(string type, string mobilePrimaryKey)

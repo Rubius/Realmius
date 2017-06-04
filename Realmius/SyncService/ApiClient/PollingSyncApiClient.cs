@@ -33,7 +33,7 @@ namespace Realmius.SyncService.ApiClient
         private ApiClientStartOptions _startOptions;
         public Uri DownloadServerUri { get; set; }
         public Uri UploadServerUri { get; set; }
-        public Action<HttpClient> HttpClientConfigurationCallback { get; set; } = (x) => { };
+        public Action<HttpClient> HttpClientConfigurationCallback { get; set; } = x => { };
 
         public event EventHandler<DownloadDataResponse> NewDataDownloaded;
         protected virtual void OnNewDataDownloaded(DownloadDataResponse e)
@@ -52,7 +52,6 @@ namespace Realmius.SyncService.ApiClient
             DownloadServerUri = downloadServerUri;
             UploadServerUri = uploadServerUri;
         }
-
 
         private HttpClient GetHttpClient()
         {
@@ -103,7 +102,6 @@ namespace Realmius.SyncService.ApiClient
             }
         }
 
-
         public Task Start(ApiClientStartOptions startOptions)
         {
             _startOptions = startOptions;
@@ -121,12 +119,11 @@ namespace Realmius.SyncService.ApiClient
             });
             OnNewDataDownloaded(result);
         }
+
         public void Stop()
         {
             _timer?.Dispose();
             _timer = null;
         }
-
-        
     }
 }

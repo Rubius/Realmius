@@ -51,10 +51,7 @@ namespace Realmius.SyncService.RealmModels
         [Ignored]
         public string Type
         {
-            get
-            {
-                return _type;
-            }
+            get { return _type; }
             set
             {
                 _type = value;

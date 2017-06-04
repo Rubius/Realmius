@@ -25,12 +25,12 @@ using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using Realmius.Contracts;
 using Realmius.Contracts.Models;
-using Realmius.Server.Exchange;
+using Realmius.Contracts.SignalR;
 using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
-using Realmius.Contracts.SignalR;
+using Realmius.Server.QuickStart;
 
-namespace Realmius.Server.QuickStart
+namespace Realmius.Server.Exchange
 {
     public class RealmiusPersistentConnection<TUser> : PersistentConnection
     {
@@ -80,20 +80,19 @@ namespace Realmius.Server.QuickStart
             };
         }
 
-
         protected override Task OnReceived(IRequest request, string connectionId, string data)
         {
-            if (data.Length < 4)
+            if (data.Length < MethodConstants.CommandNameLength)
                 return Task.FromResult(true);
 
-            var command = data.Substring(0, 4);
-            var parameter = data.Substring(4);
+            var command = data.Substring(0, MethodConstants.CommandNameLength);
+            var parameter = data.Substring(MethodConstants.CommandNameLength);
 
             switch (command)
             {
-                case MethodConstants.Server_UploadData:
+                case MethodConstants.ServerUploadData:
                     var result = UploadData(Deserialize<UploadDataRequest>(parameter), connectionId);
-                    Send(connectionId, MethodConstants.Server_UploadData, result);
+                    Send(connectionId, MethodConstants.ServerUploadData, result);
                     break;
 
                 default:
@@ -151,7 +150,7 @@ namespace Realmius.Server.QuickStart
                     LastChange = new Dictionary<string, DateTimeOffset>() { { group, DateTimeOffset.UtcNow } },
                     LastChangeContainsNewTags = true,
                 };
-                connection.Connection.Send(connectionId.Key, MethodConstants.Client_DataDownloaded + Serialize(downloadData));
+                connection.Connection.Send(connectionId.Key, MethodConstants.ClientDataDownloaded + Serialize(downloadData));
             }
 
         }
@@ -207,11 +206,11 @@ namespace Realmius.Server.QuickStart
 
         private void CallUnauthorize(string connectionId, UnauthorizedResponse unauthorizedResponse)
         {
-            Send(connectionId, MethodConstants.Client_Unauthorized, unauthorizedResponse);
+            Send(connectionId, MethodConstants.ClientUnauthorized, unauthorizedResponse);
         }
         private void CallDataDownloaded(string connectionId, DownloadDataResponse data)
         {
-            Send(connectionId, MethodConstants.Client_DataDownloaded, data);
+            Send(connectionId, MethodConstants.ClientDataDownloaded, data);
         }
 
         private void Send(string connectionId, string command, object data)

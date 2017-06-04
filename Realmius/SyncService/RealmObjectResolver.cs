@@ -30,15 +30,16 @@ namespace Realmius.SyncService
 {
     internal class RealmObjectResolver : DefaultContractResolver
     {
-        private static readonly Dictionary<Type, IList<JsonProperty>> _propertyCache = new Dictionary<Type, IList<JsonProperty>>();
+        private static readonly Dictionary<Type, IList<JsonProperty>> PropertyCache = new Dictionary<Type, IList<JsonProperty>>();
+
         protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
         {
-            if (!_propertyCache.ContainsKey(type))
+            if (!PropertyCache.ContainsKey(type))
             {
                 IList<JsonProperty> props = base.CreateProperties(type, memberSerialization);
                 var realmObjectTypeInfo = typeof(RealmObject).GetTypeInfo();
                 var enumerableTypeInfo = typeof(IEnumerable).GetTypeInfo();
-                _propertyCache[type] = props.Where(p => p.PropertyName != "Realm"
+                PropertyCache[type] = props.Where(p => p.PropertyName != "Realm"
                                         && p.PropertyName != "ObjectSchema"
                                         && p.PropertyName != "IsManaged"
                                         && p.PropertyName != "IsValid"
@@ -51,7 +52,7 @@ namespace Realmius.SyncService
                 ).ToList();
             }
 
-            return _propertyCache[type];
+            return PropertyCache[type];
         }
     }
 }

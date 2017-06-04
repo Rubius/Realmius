@@ -20,7 +20,7 @@ using Realmius.SyncService.RealmModels;
 
 namespace Realmius.SyncService
 {
-    public static class RealmiusObjectExtenstions
+    public static class RealmiusObjectExtensions
     {
         public static SyncState GetSyncState(this ObjectSyncStatusRealm obj)
         {

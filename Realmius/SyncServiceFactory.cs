@@ -26,7 +26,7 @@ namespace Realmius
 {
     public class SyncServiceFactory
     {
-        internal static Dictionary<string, IList<RealmiusSyncService>> SyncServices { get; private set; } = new Dictionary<string, IList<RealmiusSyncService>>();
+        internal static Dictionary<string, IList<RealmiusSyncService>> SyncServices { get; } = new Dictionary<string, IList<RealmiusSyncService>>();
 
         public static IRealmiusSyncService CreateUsingPolling(Func<Realm> realmFactoryMethod, Uri uploadUri, Uri downloadUri, Type[] typesToSync, bool deleteDatabase = false)
         {

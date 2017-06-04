@@ -30,12 +30,7 @@ namespace Realmius.Contracts.Helpers
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            if (objectType == typeof(int))
-            {
-                return int.Parse(reader.Value.ToString());
-            }
-
-            return reader.Value;
+            return objectType == typeof(int) ? int.Parse(reader.Value.ToString()) : reader.Value;
         }
 
         public override bool CanConvert(Type objectType)
