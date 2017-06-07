@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
     <metadata>
         <id>Realmius.Server</id>
-        <version>1.0.2</version>
+        <version>$version$</version>
         <title>Realmius.Server</title>
         <authors>Rubius</authors>
         <owners>Rubius</owners>

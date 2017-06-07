@@ -36,6 +36,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="FileExtensions.cs" />
     <Compile Include="Infrastructure\DeserializerSettings.cs" />
     <Compile Include="Infrastructure\DoNotUploadAttribute.cs" />

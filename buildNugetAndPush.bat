@@ -1,5 +1,7 @@
-buildNuget.bat
+SET NugetApiKey=
 
-%NugetExe% push Realmius.Contracts.%Version%.nupkg %NugetApiKey% -Source https://www.nuget.org/api/v2/package
-%NugetExe% push Realmius.%Version%.nupkg %NugetApiKey% -Source https://www.nuget.org/api/v2/package
-%NugetExe% push Realmius.Server.%Version%.nupkg %NugetApiKey% -Source https://www.nuget.org/api/v2/package
+call buildNuget.bat
+
+%NugetExe% push Realmius.Contracts.* %NugetApiKey% -Source https://www.nuget.org/api/v2/package
+%NugetExe% push Realmius.* %NugetApiKey% -Source https://www.nuget.org/api/v2/package
+%NugetExe% push Realmius.Server.* %NugetApiKey% -Source https://www.nuget.org/api/v2/package
