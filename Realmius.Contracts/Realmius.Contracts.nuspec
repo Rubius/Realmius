@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>Realmius.Contracts</id>
+        <version>1.0.2</version>
+        <title>Realmius.Contracts</title>
+        <authors>Rubius</authors>
+        <owners>Rubius</owners>
+        <licenseUrl>http://github.com/RubiusGroup/Realmius/blob/master/LICENSE</licenseUrl>
+        <projectUrl>http://github.com/RubiusGroup/Realmius</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Provides contracts between server and client parts of Realmius sync engine.</description>
+        <copyright>© Rubius.  All rights reserved.</copyright>
+        <dependencies>
+            <group targetFramework=".NETPortable0.0-net45+sl5+wp8+wpa81+win8+monoandroid+Xamarin.iOS10+monotouch+Xamarin.Mac">
+                <dependency id="Newtonsoft.Json" version="10.0.2" />
+            </group>
+        </dependencies>
+    </metadata>
+</package>

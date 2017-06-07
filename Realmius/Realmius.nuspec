@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>Realmius</id>
+        <version>1.0.2</version>
+        <title>Realmius</title>
+        <authors>Rubius</authors>
+        <owners>Rubius</owners>
+        <licenseUrl>http://github.com/RubiusGroup/Realmius/blob/master/LICENSE</licenseUrl>
+        <projectUrl>http://github.com/RubiusGroup/Realmius</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Provides client part of Realmius sync engine.</description>
+        <copyright>© Rubius.  All rights reserved.</copyright>
+        <dependencies>
+            <group targetFramework="NETPortable0.0-net45+sl5+wp8+wpa81+win8+monoandroid+Xamarin.iOS10+monotouch+Xamarin.Mac">
+                <dependency id="Realmius.Contracts" version="1.0.2" />
+                <dependency id="Newtonsoft.Json" version="10.0.2" />
+                <dependency id="Microsoft.AspNet.SignalR.Client" version="2.2.2" />
+                <dependency id="PCLStorage" version="1.0.2" />
+                <dependency id="System.Reflection.TypeExtensions" version="4.3.0" />
+                <dependency id="Realm.Database" version="1.4.0" />
+            </group>
+        </dependencies>
+    </metadata>
+</package>
