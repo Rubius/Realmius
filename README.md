@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/RubiusGroup/Realmius.svg?branch=master)](https://travis-ci.org/RubiusGroup/Realmius)
 [![NuGet](https://img.shields.io/nuget/dt/Realmius.svg)]()
 [![NuGet](https://img.shields.io/nuget/dt/Realmius.Server.svg)]()
-[![NuGet](https://img.shields.io/nuget/dt/Realmius.Contracts.svg)]()
 
 ## Sync engine for Realm databases with Sql Server backend
 
@@ -23,5 +22,4 @@ The stable release packages will be published to [nuget.org](https://www.nuget.o
 Package | Targets
 --------|---------------
 Realmius | Portable class library, Xamarin.Ios, Xamarin.Android
-Realmius.Contracts | NET46
-Realmius.Server | NET46
+Realmius.Server | .NET 4.6.1
