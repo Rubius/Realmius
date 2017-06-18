@@ -35,6 +35,9 @@ namespace Realmius.SyncService.ApiClient
         public Uri UploadServerUri { get; set; }
         public Action<HttpClient> HttpClientConfigurationCallback { get; set; } = x => { };
 
+        public bool IsConnected => true;
+        public event EventHandler ConnectedStateChanged;
+
         public event EventHandler<DownloadDataResponse> NewDataDownloaded;
         protected virtual void OnNewDataDownloaded(DownloadDataResponse e)
         {

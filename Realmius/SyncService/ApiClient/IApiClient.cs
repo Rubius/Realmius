@@ -30,5 +30,11 @@ namespace Realmius.SyncService.ApiClient
         Task Start(ApiClientStartOptions startOptions);
         void Stop();
         Task<UploadDataResponse> UploadData(UploadDataRequest request);
+
+        bool IsConnected { get; }
+        /// <summary>
+        /// Should be raised when IsConnected flag is changed (especially important when it changes from false to true) 
+        /// </summary>
+        event EventHandler ConnectedStateChanged;
     }
 }

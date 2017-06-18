@@ -58,7 +58,7 @@ namespace Realmius.SyncService
         private string _realmDatabasePath;
         private static int _downloadIndex;
         private string _syncServiceId;
-
+        private Timer _delayedUploadsTriggerTimer;
         public RealmiusSyncService(Func<Realm> realmFactoryMethod, IApiClient apiClient, bool deleteSyncDatabase, params Type[] typesToSync)
         {
             _typesToSync = typesToSync.ToDictionary(x => x.Name, x => new RealmObjectTypeInfo(x));
@@ -149,7 +149,7 @@ namespace Realmius.SyncService
                 typeof(UploadRequestItemRealm),
                 typeof(SyncConfiguration),
             },
-            SchemaVersion = 10,
+            SchemaVersion = 12,
         };
 
         private Realm CreateRealmius()
@@ -246,6 +246,16 @@ namespace Realmius.SyncService
                 }
 
                 _strongReferencedRealmius = CreateRealmius();
+                var now = DateTimeOffset.Now.AddSeconds(-1);
+                var notUploaded = _strongReferencedRealmius.All<UploadRequestItemRealm>().Where(x => x.NextUploadAttemptDate > now);
+                _strongReferencedRealmius.Write(() =>
+                {
+                    foreach (var item in notUploaded)
+                    {
+                        item.NextUploadAttemptDate = now;
+                        item.UploadAttempts = 0;
+                    }
+                });
                 var subscribe1 = _strongReferencedRealmius.All<UploadRequestItemRealm>().SubscribeForNotifications(UploadRequestItemChanged);
                 _unsubscribeFromRealm += () => { subscribe1.Dispose(); };
 
@@ -254,7 +264,29 @@ namespace Realmius.SyncService
 
                 _apiClient.Unauthorized += ApiClientOnUnauthorized;
                 _apiClient.NewDataDownloaded += HandleDownloadedData;
+                _apiClient.ConnectedStateChanged += ConnectedStateChanged;
+
                 _apiClient.Start(new ApiClientStartOptions(syncOptions.LastDownloadedTags, _typesToSync.Keys));
+
+                _delayedUploadsTriggerTimer = new Timer(TriggerDelayedUploads, null, 0, 10000, true);
+            }
+        }
+
+        private async Task TriggerDelayedUploads(object state)
+        {
+            if (!_apiClient.IsConnected)
+                return;
+
+            Upload();
+            UploadFiles();
+        }
+
+        void ConnectedStateChanged(object sender, EventArgs e)
+        {
+            if (_apiClient.IsConnected == true)
+            {
+                Upload();
+                UploadFiles();
             }
         }
 
@@ -430,6 +462,9 @@ namespace Realmius.SyncService
         public int ParallelFileUploads { get; set; } = 2;
         public virtual async Task UploadFiles()
         {
+            if (!_apiClient.IsConnected)
+                return;
+
             if (_fileUploadsInProgress >= ParallelFileUploads)
                 return;
 
@@ -492,7 +527,7 @@ namespace Realmius.SyncService
                         var result = await client.PostAsync(url, content);
                         result.EnsureSuccessStatusCode();
 
-                        Logger.Log.Info($"File Uploading: finished successfully {file.PathToFile}");
+                        Logger.Log.Info($"File Uploading: finished successfully {path}");
 
                         using (var realmius2 = CreateRealmius())
                         {
@@ -547,6 +582,9 @@ namespace Realmius.SyncService
             {
                 return;
             }
+            if (!_apiClient.IsConnected)
+                return;
+
             if (!InTests)
             {
                 lock (_uploadLock)
@@ -630,56 +668,87 @@ namespace Realmius.SyncService
                         }
                         using (var realm = _realmFactoryMethod())
                         {
-
-                            foreach (var realmiusObject in result.Results.Where(x => x.IsSuccess))
+                            foreach (var realmiusObject in result.Results)
                             {
-                                var syncStateObject = FindSyncStatus(
+                                if (realmiusObject.IsSuccess)
+                                {
+                                    var syncStateObject = FindSyncStatus(
                                     realmius,
                                     realmiusObject.Type,
                                     realmiusObject.MobilePrimaryKey);
 
-                                realmius.Write(
-                                    () =>
+                                    realmius.Write(
+                                        () =>
+                                        {
+                                            try
+                                            {
+                                                foreach (var key in changesIds[GetSyncStatusKey(realmiusObject.Type, realmiusObject.MobilePrimaryKey)])
+                                                {
+                                                    try
+                                                    {
+                                                        var uploadRequestItemRealm = realmius.Find<UploadRequestItemRealm>(key);
+                                                        Logger.Log.Debug(
+                                                            $"Removed UploadRequest {uploadRequestItemRealm?.Id} for {realmiusObject.Type}:{realmiusObject.MobilePrimaryKey}");
+
+                                                        if (uploadRequestItemRealm != null)
+                                                            realmius.Remove(uploadRequestItemRealm);
+                                                    }
+                                                    catch (Exception e)
+                                                    {
+                                                    //System.Console.WriteLine(e);
+                                                    throw;
+                                                    }
+                                                }
+
+                                                syncStateObject.SetSyncState(SyncState.Synced);
+                                            }
+                                            catch (Exception e)
+                                            {
+                                            //System.Console.WriteLine(e);
+                                            throw;
+                                            }
+                                        });
+
+                                    if (_typesToSync[realmiusObject.Type].ImplementsSyncState)
                                     {
-                                        try
+                                        var obj =
+                                            (IRealmiusObjectWithSyncStatusClient)
+                                            realm.Find(realmiusObject.Type, realmiusObject.MobilePrimaryKey);
+
+                                        realm.Write(
+                                            () =>
+                                            {
+                                                obj.SyncStatus = (int)SyncState.Synced;
+                                            });
+                                    }
+                                }
+                                else
+                                {
+                                    realmius.Write(
+                                        () =>
                                         {
                                             foreach (var key in changesIds[GetSyncStatusKey(realmiusObject.Type, realmiusObject.MobilePrimaryKey)])
                                             {
-                                                try
-                                                {
-                                                    var uploadRequestItemRealm = realmius.Find<UploadRequestItemRealm>(key);
-                                                    Logger.Log.Debug(
-                                                        $"Removed UploadRequest {uploadRequestItemRealm?.Id} for {realmiusObject.Type}:{realmiusObject.MobilePrimaryKey}");
+                                                var uploadRequestItemRealm =
+                                                    realmius.Find<UploadRequestItemRealm>(key);
 
-                                                    if (uploadRequestItemRealm != null)
-                                                        realmius.Remove(uploadRequestItemRealm);
-                                                }
-                                                catch (Exception e)
+                                                uploadRequestItemRealm.UploadAttempts++;
+                                                if (uploadRequestItemRealm.UploadAttempts > 30)
                                                 {
-                                                    //System.Console.WriteLine(e);
-                                                    throw;
+                                                    Logger.Log.Debug($"UploadRequest {realmiusObject.Type}.{realmiusObject.MobilePrimaryKey}, failed for attempts {uploadRequestItemRealm.UploadAttempts}, removing");
+
+                                                    realmius.Remove(uploadRequestItemRealm);
+                                                }
+                                                else
+                                                {
+                                                    if (uploadRequestItemRealm.UploadAttempts > 3)
+                                                    {
+                                                        uploadRequestItemRealm.NextUploadAttemptDate = DateTimeOffset.Now.AddSeconds(10 * uploadRequestItemRealm.UploadAttempts);
+                                                    }
+
+                                                    Logger.Log.Debug($"Delaying UploadRequest {realmiusObject.Type}.{realmiusObject.MobilePrimaryKey}, attempt {uploadRequestItemRealm.UploadAttempts}, scheduled for {uploadRequestItemRealm.NextUploadAttemptDate}");
                                                 }
                                             }
-
-                                            syncStateObject.SetSyncState(SyncState.Synced);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            //System.Console.WriteLine(e);
-                                            throw;
-                                        }
-                                    });
-
-                                if (_typesToSync[realmiusObject.Type].ImplementsSyncState)
-                                {
-                                    var obj =
-                                        (IRealmiusObjectWithSyncStatusClient)
-                                        realm.Find(realmiusObject.Type, realmiusObject.MobilePrimaryKey);
-
-                                    realm.Write(
-                                        () =>
-                                        {
-                                            obj.SyncStatus = (int)SyncState.Synced;
                                         });
                                 }
                             }
@@ -798,129 +867,129 @@ namespace Realmius.SyncService
 
             realmLocal.Write(() =>
             {
-            foreach (var changeObject in changedObjects)
-            {
-                _downloadIndex++;
-                Logger.Log.Debug(
-                    $"Down:{_downloadIndex}, {changeObject.Type}.{changeObject.MobilePrimaryKey}: {changeObject.SerializedObject}");
-                try
+                foreach (var changeObject in changedObjects)
                 {
-                    var syncStateObject = FindSyncStatus(realmiusData, changeObject.Type, changeObject.MobilePrimaryKey);
-                    if (syncStateObject == null)
+                    _downloadIndex++;
+                    Logger.Log.Debug(
+                        $"Down:{_downloadIndex}, {changeObject.Type}.{changeObject.MobilePrimaryKey}: {changeObject.SerializedObject}");
+                    try
                     {
-                        syncStateObject = new ObjectSyncStatusRealm
+                        var syncStateObject = FindSyncStatus(realmiusData, changeObject.Type, changeObject.MobilePrimaryKey);
+                        if (syncStateObject == null)
                         {
-                            Type = changeObject.Type,
-                            MobilePrimaryKey = changeObject.MobilePrimaryKey,
-                            SyncState = (int)SyncState.Synced,
-                        };
-                        realmiusData.Write(() =>
-                        {
-                            realmiusData.Add(syncStateObject);
-                        });
-                        //Logger.Log.Debug($"  Created SyncStatus {changeObject.MobilePrimaryKey}");
-                    }
-
-                    var objInDb = (IRealmiusObjectClient)realmLocal.Find(changeObject.Type, changeObject.MobilePrimaryKey);
-                    if (objInDb == null)
-                    {
-                        //object not found in database - let's create new one
-                        if (!changeObject.IsDeleted)
-                        {
-                            IRealmiusObjectClient obj =
-                                (IRealmiusObjectClient)Activator.CreateInstance(_typesToSync[changeObject.Type].Type);
-
-                            try
+                            syncStateObject = new ObjectSyncStatusRealm
                             {
-                                _skipObjectChanges = true;
-                                //realmLocal.Write(
-                                //    () =>
-                                //    {
-                                        AssignKey(obj, changeObject.MobilePrimaryKey, realmLocal);
-                                        var success = Populate(changeObject.SerializedObject, obj, realmLocal);
-                                        realmLocal.AddSkipUpload(obj, false);
-
-                                        if (!success)
-                                        {
-                                            problematicChangedObjects.Add(changeObject);
-                                        }
-                                    //});
-                            }
-                            finally
+                                Type = changeObject.Type,
+                                MobilePrimaryKey = changeObject.MobilePrimaryKey,
+                                SyncState = (int)SyncState.Synced,
+                            };
+                            realmiusData.Write(() =>
                             {
-                                _skipObjectChanges = false;
-                            }
+                                realmiusData.Add(syncStateObject);
+                            });
+                            //Logger.Log.Debug($"  Created SyncStatus {changeObject.MobilePrimaryKey}");
                         }
-                    }
-                    else
-                    {
-                        //object exists in database, let's update it
-                        var uploadItems =
-                            realmiusData.All<UploadRequestItemRealm>()
-                                .Where(
-                                    x =>
-                                        x.Type == changeObject.Type &&
-                                        x.PrimaryKey == changeObject.MobilePrimaryKey);
 
-                        if (changeObject.IsDeleted)
+                        var objInDb = (IRealmiusObjectClient)realmLocal.Find(changeObject.Type, changeObject.MobilePrimaryKey);
+                        if (objInDb == null)
                         {
-                            //realmLocal.Write(
-                            //    () =>
-                            //    {
-                                    realmiusData.Write(
-                                        () =>
-                                        {
-                                            syncStateObject.SerializedObject = SerializeObject(objInDb);
-                                            syncStateObject.IsDeleted = changeObject.IsDeleted;
-                                        });
+                            //object not found in database - let's create new one
+                            if (!changeObject.IsDeleted)
+                            {
+                                IRealmiusObjectClient obj =
+                                    (IRealmiusObjectClient)Activator.CreateInstance(_typesToSync[changeObject.Type].Type);
 
-                                    realmLocal.Remove((RealmObject)objInDb);
-                                //});
+                                try
+                                {
+                                    _skipObjectChanges = true;
+                                    //realmLocal.Write(
+                                    //    () =>
+                                    //    {
+                                    AssignKey(obj, changeObject.MobilePrimaryKey, realmLocal);
+                                    var success = Populate(changeObject.SerializedObject, obj, realmLocal);
+                                    realmLocal.AddSkipUpload(obj, false);
+
+                                    if (!success)
+                                    {
+                                        problematicChangedObjects.Add(changeObject);
+                                    }
+                                    //});
+                                }
+                                finally
+                                {
+                                    _skipObjectChanges = false;
+                                }
+                            }
                         }
                         else
                         {
-                            try
+                            //object exists in database, let's update it
+                            var uploadItems =
+                                realmiusData.All<UploadRequestItemRealm>()
+                                    .Where(
+                                        x =>
+                                            x.Type == changeObject.Type &&
+                                            x.PrimaryKey == changeObject.MobilePrimaryKey);
+
+                            if (changeObject.IsDeleted)
                             {
-                                _skipObjectChanges = true;
                                 //realmLocal.Write(
                                 //    () =>
                                 //    {
+                                realmiusData.Write(
+                                    () =>
+                                    {
+                                        syncStateObject.SerializedObject = SerializeObject(objInDb);
+                                        syncStateObject.IsDeleted = changeObject.IsDeleted;
+                                    });
+
+                                realmLocal.Remove((RealmObject)objInDb);
+                                //});
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    _skipObjectChanges = true;
+                                    //realmLocal.Write(
+                                    //    () =>
+                                    //    {
 
 
-                                        var success = Populate(changeObject.SerializedObject, objInDb, realmLocal);
-                                        if (!success)
-                                        {
-                                            problematicChangedObjects.Add(changeObject);
-                                        }
+                                    var success = Populate(changeObject.SerializedObject, objInDb, realmLocal);
+                                    if (!success)
+                                    {
+                                        problematicChangedObjects.Add(changeObject);
+                                    }
 
-                                        //we need to apply all "uploads" to our object to keep it consistent
-                                        foreach (UploadRequestItemRealm uploadRequestItemRealm in uploadItems)
-                                        {
-                                            Populate(uploadRequestItemRealm.SerializedObject, objInDb, realmLocal);
-                                        }
+                                    //we need to apply all "uploads" to our object to keep it consistent
+                                    foreach (UploadRequestItemRealm uploadRequestItemRealm in uploadItems)
+                                    {
+                                        Populate(uploadRequestItemRealm.SerializedObject, objInDb, realmLocal);
+                                    }
 
-                                        realmiusData.Write(
-                                        () =>
-                                        {
-                                            syncStateObject.SerializedObject = SerializeObject(objInDb);
-                                            syncStateObject.IsDeleted = changeObject.IsDeleted;
-                                        });
+                                    realmiusData.Write(
+                                    () =>
+                                    {
+                                        syncStateObject.SerializedObject = SerializeObject(objInDb);
+                                        syncStateObject.IsDeleted = changeObject.IsDeleted;
+                                    });
 
                                     //});
+                                }
+                                finally
+                                {
+                                    _skipObjectChanges = false;
+                                }
                             }
-                            finally
-                            {
-                                _skipObjectChanges = false;
-                            }
+                            //Logger.Log.Info("     syncState.Change.Finished");
                         }
-                        //Logger.Log.Info("     syncState.Change.Finished");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log.Debug($"error applying changed objects {ex}");
                     }
                 }
-                catch (Exception ex)
-                {
-                    Logger.Log.Debug($"error applying changed objects {ex}");
-                }
-            }
             });
 
             if (problematicChangedObjects.Count < changedObjects.Count)

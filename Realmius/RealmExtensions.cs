@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Realmius.SyncService;
 using Realms;
 
@@ -61,16 +62,19 @@ namespace Realmius
         {
             var databasePath = realm.Config.DatabasePath;
             IList<RealmiusSyncService> syncServices;
-            if (SyncServiceFactory.SyncServices.TryGetValue(databasePath, out syncServices))
+            lock (SyncServiceFactory.SyncServices)
             {
-                foreach (RealmiusSyncService syncService in syncServices)
+                if (SyncServiceFactory.SyncServices.TryGetValue(databasePath, out syncServices))
                 {
-                    action(syncService);
+                    foreach (RealmiusSyncService syncService in syncServices.ToList())
+                    {
+                        action(syncService);
+                    }
                 }
-            }
-            else
-            {
-                action(null);
+                else
+                {
+                    action(null);
+                }
             }
         }
 

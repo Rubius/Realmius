@@ -30,5 +30,14 @@ namespace Realmius.SyncService.RealmModels
         public DateTimeOffset DateTime { get; set; }
         public string SerializedObject { get; set; }
         public bool IsDeleted { get; set; }
+
+
+        /// <summary>
+        /// how many attempts there were made to upload this item without success
+        /// </summary>
+        public int UploadAttempts { get; set; }
+
+        [Indexed]
+        public DateTimeOffset NextUploadAttemptDate { get; set; } = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
     }
 }

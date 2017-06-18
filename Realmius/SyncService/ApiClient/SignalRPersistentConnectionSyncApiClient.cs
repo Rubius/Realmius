@@ -54,6 +54,14 @@ namespace Realmius.SyncService.ApiClient
             };
         }
 
+        public bool IsConnected { get; set; }
+        public event EventHandler ConnectedStateChanged;
+        protected virtual void OnConnectedStateChanged()
+        {
+            Logger.Log.Info("OnConnectedStateChanged");
+            ConnectedStateChanged?.Invoke(this, EventArgs.Empty);
+        }
+
         public event EventHandler<DownloadDataResponse> NewDataDownloaded;
         protected virtual void OnNewDataDownloaded(DownloadDataResponse e)
         {
@@ -79,6 +87,12 @@ namespace Realmius.SyncService.ApiClient
         {
             try
             {
+                if (IsConnected)
+                {
+                    IsConnected = false;
+                    OnConnectedStateChanged();
+                }
+
                 Logger.Log.Info("Reconnect started");
                 _hubUnsubscribe();
                 _hubUnsubscribe = () => { };
@@ -208,6 +222,8 @@ namespace Realmius.SyncService.ApiClient
             {
                 hubConnection.Closed -= ConnectionClosed;
             };
+            IsConnected = true;
+            OnConnectedStateChanged();
         }
 
         private void LogAndReconnectWithDelay(Exception exception)

@@ -39,7 +39,13 @@ namespace Realmius.SyncService.ApiClient
         public string HubName { get; set; }
         public Uri Uri { get; set; }
         public Task DownloadingInitialData => _downloadingInitialData.Task;
-
+        public bool IsConnected { get; set; }
+        public event EventHandler ConnectedStateChanged;
+        protected virtual void OnConnectedStateChanged()
+        {
+            Logger.Log.Info("OnConnectedStateChanged");
+            ConnectedStateChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         public SignalRSyncApiClient(Uri uri, string hubName)
         {
@@ -75,6 +81,12 @@ namespace Realmius.SyncService.ApiClient
         {
             try
             {
+                if (IsConnected)
+                {
+                    IsConnected = false;
+                    OnConnectedStateChanged();
+                }
+
                 Logger.Log.Info("Reconnect started");
                 _hubUnsubscribe();
                 _hubUnsubscribe = () => { };
@@ -172,6 +184,8 @@ namespace Realmius.SyncService.ApiClient
             {
                 hubConnection.Closed -= _hubConnection_Closed;
             };
+            IsConnected = true;
+            OnConnectedStateChanged();
         }
 
         void LogAndReconnectWithDelay(Exception exception)
