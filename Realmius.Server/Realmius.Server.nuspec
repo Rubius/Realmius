@@ -17,7 +17,7 @@
                 <dependency id="Microsoft.AspNet.SignalR.Core" version="2.2.2" />
                 <dependency id="Newtonsoft.Json" version="10.0.2" />
                 <dependency id="Owin" version="1.0" />
-                <dependency id="Realmius.Contracts" version="1.0.2" />
+                <dependency id="Realmius.Contracts" version="$version$" />
                 <dependency id="Microsoft.Owin" version="3.1.0" />
                 <dependency id="Microsoft.Owin.Security" version="3.1.0" />
             </group>

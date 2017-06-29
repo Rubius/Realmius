@@ -13,11 +13,10 @@
         <copyright>© Rubius.  All rights reserved.</copyright>
         <dependencies>
             <group targetFramework="NETPortable0.0-net45+sl5+wp8+wpa81+win8+monoandroid+Xamarin.iOS10+monotouch+Xamarin.Mac">
-                <dependency id="Realmius.Contracts" version="1.0.2" />
+                <dependency id="Realmius.Contracts" version="$version$" />
                 <dependency id="Newtonsoft.Json" version="10.0.2" />
                 <dependency id="Microsoft.AspNet.SignalR.Client" version="2.2.2" />
                 <dependency id="PCLStorage" version="1.0.2" />
-                <dependency id="System.Reflection.TypeExtensions" version="4.3.0" />
                 <dependency id="Realm.Database" version="1.4.0" />
             </group>
         </dependencies>
