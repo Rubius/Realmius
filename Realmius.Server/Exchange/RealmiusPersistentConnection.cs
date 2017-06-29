@@ -73,10 +73,13 @@ namespace Realmius.Server.Exchange
                 StringEscapeHandling = StringEscapeHandling.EscapeNonAscii,
             };
 
-            ChangeTrackingDbContext.DataUpdated += async (sender, data) =>
+            ChangeTrackingDbContext.DataUpdated += (sender, data) =>
             {
-                await Task.Delay(20);
-                PersistentConnectionUpdatedDataHandler.HandleDataChanges<TUser>(sender, data);
+                Task.Factory.StartNew(() =>
+                {
+                    //await Task.Delay(20);
+                    PersistentConnectionUpdatedDataHandler.HandleDataChanges<TUser>(sender, data);
+                });
             };
         }
 
