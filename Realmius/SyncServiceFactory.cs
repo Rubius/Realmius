@@ -28,17 +28,29 @@ namespace Realmius
     {
         internal static Dictionary<string, IList<RealmiusSyncService>> SyncServices { get; } = new Dictionary<string, IList<RealmiusSyncService>>();
 
-        public static IRealmiusSyncService CreateUsingPolling(Func<Realm> realmFactoryMethod, Uri uploadUri, Uri downloadUri, Type[] typesToSync, bool deleteDatabase = false)
+        public static IRealmiusSyncService CreateUsingPolling(Func<Realm> realmFactoryMethod, Uri uploadUri, Uri downloadUri, Type[] typesToSync, bool deleteDatabase = false, ILogger logger = null)
         {
             var apiClient = new PollingSyncApiClient(uploadUri, downloadUri);
+
+            if (logger != null)
+            {
+                apiClient.Logger = logger;
+            }
+
             var syncService = new RealmiusSyncService(realmFactoryMethod, apiClient, deleteDatabase, typesToSync);
 
             return syncService;
         }
         
-        public static IRealmiusSyncService CreateUsingSignalR(Func<Realm> realmFactoryMethod, Uri uri, Type[] typesToSync, bool deleteDatabase = false)
+        public static IRealmiusSyncService CreateUsingSignalR(Func<Realm> realmFactoryMethod, Uri uri, Type[] typesToSync, bool deleteDatabase = false, ILogger logger = null)
         {
             var apiClient = new SignalRPersistentConnectionSyncApiClient(uri);
+
+            if (logger != null)
+            {
+                apiClient.Logger = logger;
+            }
+
             var syncService = new RealmiusSyncService(realmFactoryMethod, apiClient, deleteDatabase, typesToSync);
 
             return syncService;

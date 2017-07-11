@@ -36,6 +36,9 @@ namespace Realmius.SyncService.ApiClient
         public Action<HttpClient> HttpClientConfigurationCallback { get; set; } = x => { };
 
         public bool IsConnected => true;
+
+        public ILogger Logger { get; set; } = new Logger();
+
         public event EventHandler ConnectedStateChanged;
 
         public event EventHandler<DownloadDataResponse> NewDataDownloaded;

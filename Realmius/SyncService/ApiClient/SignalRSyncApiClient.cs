@@ -40,10 +40,12 @@ namespace Realmius.SyncService.ApiClient
         public Uri Uri { get; set; }
         public Task DownloadingInitialData => _downloadingInitialData.Task;
         public bool IsConnected { get; set; }
+        public ILogger Logger { get; set; } = new Logger();
+
         public event EventHandler ConnectedStateChanged;
         protected virtual void OnConnectedStateChanged()
         {
-            Logger.Log.Info("OnConnectedStateChanged");
+            Logger.Info("OnConnectedStateChanged");
             ConnectedStateChanged?.Invoke(this, EventArgs.Empty);
         }
 
@@ -56,14 +58,14 @@ namespace Realmius.SyncService.ApiClient
         public event EventHandler<DownloadDataResponse> NewDataDownloaded;
         protected virtual void OnNewDataDownloaded(DownloadDataResponse e)
         {
-            Logger.Log.Info("OnNewDataDownloaded");
+            Logger.Info("OnNewDataDownloaded");
             NewDataDownloaded?.Invoke(this, e);
         }
 
         public event EventHandler<UnauthorizedResponse> Unauthorized;
         protected virtual void OnUnauthorized(UnauthorizedResponse e)
         {
-            Logger.Log.Info("OnUnauthorized");
+            Logger.Info("OnUnauthorized");
             Unauthorized?.Invoke(this, e);
         }
 
@@ -87,7 +89,7 @@ namespace Realmius.SyncService.ApiClient
                     OnConnectedStateChanged();
                 }
 
-                Logger.Log.Info("Reconnect started");
+                Logger.Info("Reconnect started");
                 _hubUnsubscribe();
                 _hubUnsubscribe = () => { };
 
@@ -113,16 +115,16 @@ namespace Realmius.SyncService.ApiClient
                     _unauthorizedHandler?.Dispose();
                     _hubConnection?.Dispose();
                 };
-                Logger.Log.Info(
+                Logger.Info(
                     $"  --Connections configured, connecting to {Uri}?{string.Join("&", parameters.Select(x => x.Key + "=" + x.Value))}");
 
                 await _hubConnection.Start();
 
-                Logger.Log.Info("  --Connected");
+                Logger.Info("  --Connected");
 
                 OnConnected();
 
-                Logger.Log.Info("OnConnected finished");
+                Logger.Info("OnConnected finished");
 
             }
             catch (HttpRequestException webEx)
@@ -151,7 +153,7 @@ namespace Realmius.SyncService.ApiClient
             }
             catch (Exception ex)
             {
-                Logger.Log.Info($"Unknown error in Reconnect! Stop Reconnections!!! {ex}");
+                Logger.Info($"Unknown error in Reconnect! Stop Reconnections!!! {ex}");
 #if DEBUG
                 throw;
 #endif
@@ -191,19 +193,19 @@ namespace Realmius.SyncService.ApiClient
         void LogAndReconnectWithDelay(Exception exception)
         {
             const int delay = 1000;
-            Logger.Log.Info($"Unable to connect, will attempt to reconnect in {delay / 1000} seconds!!!");
+            Logger.Info($"Unable to connect, will attempt to reconnect in {delay / 1000} seconds!!!");
             Task.Delay(delay).ContinueWith((x) => Reconnect());
         }
 
         void _hubConnection_Closed()
         {
-            Logger.Log.Info("Connection closed, will start reconnecting...");
+            Logger.Info("Connection closed, will start reconnecting...");
             Reconnect();
         }
 
         public void Stop()
         {
-            Logger.Log.Info("Connection Stopped.");
+            Logger.Info("Connection Stopped.");
 
             _hubUnsubscribe();
             _hubUnsubscribe = () => { };
@@ -222,7 +224,7 @@ namespace Realmius.SyncService.ApiClient
             }
             catch (Exception e)
             {
-                Logger.Log.Exception(e);
+                Logger.Exception(e);
                 return new UploadDataResponse();
             }
         }

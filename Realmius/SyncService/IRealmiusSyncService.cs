@@ -34,6 +34,8 @@ namespace Realmius.SyncService
 
         bool UIUploadInProgress { get; }
 
+        ILogger Logger { get; }
+
         Uri ServerUri { get; set; }
 
         SyncState GetSyncState(Type type, string mobilePrimaryKey);
