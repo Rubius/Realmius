@@ -74,7 +74,11 @@ namespace Realmius.Server
             foreach (var item in request.ChangeNotifications)
             {
                 UploadDataResponseItem objectInfo = null;
-                Logger.Log.Debug($"User {user}, Saving entity: {JsonConvert.SerializeObject(item)}");
+                string upObjectInfo = !item.IsDeleted
+                    ? "Saving entity: " + item.SerializedObject
+                    : "Deleting entity: {" + $"\n\"{nameof(item.Type)}\": \"{item.Type}\",\n\"Key\": \"{item.PrimaryKey}\"\n" + "}"; ;
+                //ChangeTrackingDbContext.Logger.Debug($"User {user}, Saving entity: {JsonConvert.SerializeObject(item)}");
+                ChangeTrackingDbContext.Logger.Debug($"User: {user}, {upObjectInfo}"); 
                 IRealmiusObjectServer dbEntity = null;
                 try
                 {
@@ -91,7 +95,7 @@ namespace Realmius.Server
                     }
                     catch (Exception e)
                     {
-                        Logger.Log.Exception(e, $"Error getting key, {item.PrimaryKey}");
+                        ChangeTrackingDbContext.Logger.Exception(e, $"Error getting key, {item.PrimaryKey}");
                         throw;
                     }
 
@@ -191,7 +195,7 @@ namespace Realmius.Server
                     //});
                     if (!string.IsNullOrEmpty(objectInfo.Error))
                     {
-                        Logger.Log.Debug($"Error saving the entity {objectInfo.Error}");
+                        ChangeTrackingDbContext.Logger.Debug($"Error saving the entity {objectInfo.Error}");
                     }
                     ef.SaveChanges();
                 }
@@ -205,7 +209,7 @@ namespace Realmius.Server
                     {
                         ef.Entry(dbEntity).State = EntityState.Detached; //if one entity fails EF validation, we should still save all the others (if possible)
                     }
-                    Logger.Log.Info($"Exception saving the entity {e}");
+                    ChangeTrackingDbContext.Logger.Info($"Exception saving the entity {e}");
                     //continue processing anyway
                     //throw;
                 }

@@ -99,7 +99,7 @@ namespace Realmius.Server.Exchange
                     break;
 
                 default:
-                    Logger.Log.Exception(new InvalidOperationException($"Unknown command {command}"));
+                    ChangeTrackingDbContext.Logger.Exception(new InvalidOperationException($"Unknown command {command}"));
                     break;
             }
 
@@ -110,7 +110,7 @@ namespace Realmius.Server.Exchange
         {
             if (!Connections.ContainsKey(connectionId))
             {
-                Logger.Log.Info($"User with ConnectionId {connectionId} not found in the connections pool (not authorized?)");
+                ChangeTrackingDbContext.Logger.Info($"User with ConnectionId {connectionId} not found in the connections pool (not authorized?)");
                 return new UploadDataResponse();
             }
 
