@@ -75,10 +75,9 @@ namespace Realmius.Server
             {
                 UploadDataResponseItem objectInfo = null;
                 string upObjectInfo = !item.IsDeleted
-                    ? "Saving entity: " + item.SerializedObject
-                    : "Deleting entity: {" + $"\n\"{nameof(item.Type)}\": \"{item.Type}\",\n\"Key\": \"{item.PrimaryKey}\"\n" + "}"; ;
-                //ChangeTrackingDbContext.Logger.Debug($"User {user}, Saving entity: {JsonConvert.SerializeObject(item)}");
-                ChangeTrackingDbContext.Logger.Debug($"User: {user}, {upObjectInfo}"); 
+                    ? item.SerializedObject
+                    : "{" + $"\n  \"{nameof(item.Type)}\": \"{item.Type}\",\n  \"{nameof(item.PrimaryKey)}\": \"{item.PrimaryKey}\"\n  \"{nameof(item.IsDeleted)}\": \"{item.IsDeleted}\"\n" + "}";
+                ChangeTrackingDbContext.Logger.Debug($"User {user}, Saving entity: {upObjectInfo}"); //{JsonConvert.SerializeObject(item)}
                 IRealmiusObjectServer dbEntity = null;
                 try
                 {
