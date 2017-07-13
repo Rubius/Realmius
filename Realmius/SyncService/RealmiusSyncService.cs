@@ -49,8 +49,27 @@ namespace Realmius.SyncService
 
         public ILogger Logger
         {
-            get { return _apiClient.Logger; }
-            set { _apiClient.Logger = value; }
+            get { return _logger; }
+            set
+            {
+                _logger = value;
+                //if api contains property for logger - fill it
+                var t = _apiClient.GetType();
+                var propertyInfo = t.GetRuntimeProperties().ToList();
+                //search property which implements ILogger interface
+                var interfaceName = this.Logger.GetType().GetTypeInfo().ImplementedInterfaces.First();
+                var property = propertyInfo.FirstOrDefault(
+                    x => x.PropertyType.GetTypeInfo().ImplementedInterfaces.Contains(interfaceName) || x.PropertyType == interfaceName);
+                if (property != null)
+                {
+                    property.SetValue(_apiClient, value);
+                }
+                else
+                {
+                    //may be useful
+                    //value.Info($"Logger not found in ApiClient\nFound properties:\n{String.Join("\n", propertyInfo)}");
+                }
+            }
         }
 
         public event EventHandler<UnauthorizedResponse> Unauthorized;
@@ -60,6 +79,7 @@ namespace Realmius.SyncService
         private Func<Realm> _realmFactoryMethod;
         private readonly Dictionary<string, RealmObjectTypeInfo> _typesToSync;
         private IApiClient _apiClient;
+        private ILogger _logger;
         private JsonSerializerSettings _jsonSerializerSettings;
         private readonly object _handleDownloadDataLock = new object();
         private string _realmDatabasePath;
@@ -89,6 +109,7 @@ namespace Realmius.SyncService
             _syncServiceId = Guid.NewGuid().ToString();
             _realmFactoryMethod = realmFactoryMethod;
             _apiClient = apiClient;
+            Logger = new Logger();
 
             _jsonSerializerSettings = new JsonSerializerSettings
             {

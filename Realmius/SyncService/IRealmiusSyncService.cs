@@ -34,7 +34,7 @@ namespace Realmius.SyncService
 
         bool UIUploadInProgress { get; }
 
-        ILogger Logger { get; }
+        ILogger Logger { get; set; }
 
         Uri ServerUri { get; set; }
 
