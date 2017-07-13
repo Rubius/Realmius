@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNet.SignalR;
+using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
 
 namespace Realmius.Server.Configurations
@@ -26,6 +27,7 @@ namespace Realmius.Server.Configurations
     public interface IRealmiusServerDbConfiguration
     {
         IList<Type> TypesToSync { get; }
+        ILogger Logger { get; set; }
         IList<string> GetTagsForObject(ChangeTrackingDbContext db, IRealmiusObjectServer obj);
     }
 

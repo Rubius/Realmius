@@ -13,14 +13,8 @@ namespace Realmius.Server.QuickStart
         public static void SetupSignalRServer<T>(
             string url,
             IAppBuilder app,
-            IRealmiusServerConfiguration<T> configuration,
-            ILogger logger = null)
+            IRealmiusServerConfiguration<T> configuration)
         {
-            if (logger != null)
-            {
-                ChangeTrackingDbContext.Logger = logger;
-            }
-
             app.MapSignalR<RealmiusPersistentConnection<T>>(url);
         }
 
@@ -28,11 +22,10 @@ namespace Realmius.Server.QuickStart
             string url,
             IAppBuilder app,
             Func<ChangeTrackingDbContext> contextFunc,
-            ILogger logger = null,
             params Type[] types)
         {
             var configuration = new ShareEverythingConfiguration(contextFunc, types);
-            SetupSignalRServer(url, app, configuration, logger);
+            SetupSignalRServer(url, app, configuration);
         }
 
         internal static readonly Dictionary<Type, IRealmiusServerDbConfiguration> Configurations = new Dictionary<Type, IRealmiusServerDbConfiguration>();

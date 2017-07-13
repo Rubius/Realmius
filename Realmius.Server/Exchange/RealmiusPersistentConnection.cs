@@ -39,6 +39,7 @@ namespace Realmius.Server.Exchange
         private static readonly ConcurrentDictionary<string, TUser> Connections = new ConcurrentDictionary<string, TUser>();
         private static JsonSerializerSettings SerializerSettings;
         private static bool _initialized;
+        private ILogger _logger => RealmiusServer.GetConfiguration<TUser>()?.Logger;
 
         protected static T Deserialize<T>(string data)
         {
@@ -99,7 +100,7 @@ namespace Realmius.Server.Exchange
                     break;
 
                 default:
-                    ChangeTrackingDbContext.Logger.Exception(new InvalidOperationException($"Unknown command {command}"));
+                    _logger.Exception(new InvalidOperationException($"Unknown command {command}"));
                     break;
             }
 
@@ -110,7 +111,7 @@ namespace Realmius.Server.Exchange
         {
             if (!Connections.ContainsKey(connectionId))
             {
-                ChangeTrackingDbContext.Logger.Info($"User with ConnectionId {connectionId} not found in the connections pool (not authorized?)");
+                _logger.Info($"User with ConnectionId {connectionId} not found in the connections pool (not authorized?)");
                 return new UploadDataResponse();
             }
 

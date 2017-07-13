@@ -43,8 +43,6 @@ namespace Realmius.Server.Models
 
         public static event EventHandler<UpdatedDataBatch> DataUpdated;
 
-        public static ILogger Logger { get; set; } = new Logger();
-
         protected virtual void OnDataUpdated(UpdatedDataBatch e)
         {
             DataUpdated?.Invoke(this, e);
@@ -54,6 +52,7 @@ namespace Realmius.Server.Models
 
         private readonly string _nameOrConnectionString;
         private IRealmiusServerDbConfiguration _syncConfiguration;
+        private ILogger _logger => _syncConfiguration.Logger;
         private Dictionary<string, SyncTypeInfo> _syncedTypes;
 
         protected ChangeTrackingDbContext(string nameOrConnectionString)
@@ -430,7 +429,7 @@ namespace Realmius.Server.Models
                 }
                 catch (Exception e)
                 {
-                    Logger.Exception(e, $"Error attaching object {obj.MobilePrimaryKey}");
+                    _logger.Exception(e, $"Error attaching object {obj.MobilePrimaryKey}");
                 }
             }
 
