@@ -52,7 +52,7 @@ namespace Realmius.Server.Models
 
         private readonly string _nameOrConnectionString;
         private IRealmiusServerDbConfiguration _syncConfiguration;
-        private ILogger _logger => _syncConfiguration.Logger;
+        private ILogger Logger => _syncConfiguration.Logger;
         private Dictionary<string, SyncTypeInfo> _syncedTypes;
 
         protected ChangeTrackingDbContext(string nameOrConnectionString)
@@ -429,7 +429,7 @@ namespace Realmius.Server.Models
                 }
                 catch (Exception e)
                 {
-                    _logger.Exception(e, $"Error attaching object {obj.MobilePrimaryKey}");
+                    Logger.Exception(e, $"Error attaching object {obj.MobilePrimaryKey}");
                 }
             }
 

@@ -45,7 +45,7 @@ namespace Realmius.Server
     {
         private readonly Func<ChangeTrackingDbContext> _dbContextFactoryFunc;
         public IRealmiusServerConfiguration<TUser> Configuration { get; }
-        private ILogger _logger => Configuration.Logger;
+        private ILogger Logger => Configuration.Logger;
         private readonly Dictionary<string, Type> _syncedTypes;
         private readonly string _connectionString;
 
@@ -82,7 +82,7 @@ namespace Realmius.Server
                 string upObjectInfo = !item.IsDeleted
                     ? item.SerializedObject
                     : "{" + $"\n  \"{nameof(item.Type)}\": \"{item.Type}\",\n  \"{nameof(item.PrimaryKey)}\": \"{item.PrimaryKey}\"\n  \"{nameof(item.IsDeleted)}\": \"{item.IsDeleted}\"\n" + "}";
-                _logger.Debug($"User {user}, Saving entity: {upObjectInfo}"); //{JsonConvert.SerializeObject(item)}
+                Logger.Debug($"User {user}, Saving entity: {upObjectInfo}"); //{JsonConvert.SerializeObject(item)}
                 IRealmiusObjectServer dbEntity = null;
                 try
                 {
@@ -99,7 +99,7 @@ namespace Realmius.Server
                     }
                     catch (Exception e)
                     {
-                        _logger.Exception(e, $"Error getting key, {item.PrimaryKey}");
+                        Logger.Exception(e, $"Error getting key, {item.PrimaryKey}");
                         throw;
                     }
 
@@ -199,7 +199,7 @@ namespace Realmius.Server
                     //});
                     if (!string.IsNullOrEmpty(objectInfo.Error))
                     {
-                        _logger.Debug($"Error saving the entity {objectInfo.Error}");
+                        Logger.Debug($"Error saving the entity {objectInfo.Error}");
                     }
                     ef.SaveChanges();
                 }
@@ -213,7 +213,7 @@ namespace Realmius.Server
                     {
                         ef.Entry(dbEntity).State = EntityState.Detached; //if one entity fails EF validation, we should still save all the others (if possible)
                     }
-                    _logger.Info($"Exception saving the entity {e}");
+                    Logger.Info($"Exception saving the entity {e}");
                     //continue processing anyway
                     //throw;
                 }
