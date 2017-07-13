@@ -42,6 +42,7 @@ namespace Realmius.Server.Models
         internal static Dictionary<Type, IRealmiusServerDbConfiguration> Configurations = new Dictionary<Type, IRealmiusServerDbConfiguration>();
 
         public static event EventHandler<UpdatedDataBatch> DataUpdated;
+
         protected virtual void OnDataUpdated(UpdatedDataBatch e)
         {
             DataUpdated?.Invoke(this, e);
@@ -51,6 +52,7 @@ namespace Realmius.Server.Models
 
         private readonly string _nameOrConnectionString;
         private IRealmiusServerDbConfiguration _syncConfiguration;
+        private ILogger Logger => _syncConfiguration.Logger;
         private Dictionary<string, SyncTypeInfo> _syncedTypes;
 
         protected ChangeTrackingDbContext(string nameOrConnectionString)
@@ -427,7 +429,7 @@ namespace Realmius.Server.Models
                 }
                 catch (Exception e)
                 {
-                    Logger.Log.Exception(e, $"Error attaching object {obj.MobilePrimaryKey}");
+                    Logger.Exception(e, $"Error attaching object {obj.MobilePrimaryKey}");
                 }
             }
 

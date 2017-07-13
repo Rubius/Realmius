@@ -67,6 +67,7 @@ namespace Realmius.Tests.Server
             }
 
             public override IList<Type> TypesToSync => new[] { typeof(DbSyncObject) };
+
             public override IList<string> GetTagsForObject(ChangeTrackingDbContext db, IRealmiusObjectServer obj)
             {
                 var dbObj = obj as DbSyncObject;

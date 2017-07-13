@@ -45,11 +45,16 @@ namespace Realmius.Server
     {
         private readonly Func<ChangeTrackingDbContext> _dbContextFactoryFunc;
         public IRealmiusServerConfiguration<TUser> Configuration { get; }
+        private ILogger Logger => Configuration.Logger;
         private readonly Dictionary<string, Type> _syncedTypes;
         private readonly string _connectionString;
 
         public RealmiusServerProcessor(IRealmiusServerConfiguration<TUser> configuration)
         {
+            if (configuration.Logger == null)
+            {
+                configuration.Logger = new Logger();
+            }
             _dbContextFactoryFunc = configuration.ContextFactoryFunction;
             Configuration = configuration;
             _syncedTypes = Configuration.TypesToSync.ToDictionary(x => x.Name, x => x);
@@ -74,7 +79,10 @@ namespace Realmius.Server
             foreach (var item in request.ChangeNotifications)
             {
                 UploadDataResponseItem objectInfo = null;
-                Logger.Log.Debug($"User {user}, Saving entity: {JsonConvert.SerializeObject(item)}");
+                string upObjectInfo = !item.IsDeleted
+                    ? item.SerializedObject
+                    : "{" + $"\n  \"{nameof(item.Type)}\": \"{item.Type}\",\n  \"{nameof(item.PrimaryKey)}\": \"{item.PrimaryKey}\"\n  \"{nameof(item.IsDeleted)}\": \"{item.IsDeleted}\"\n" + "}";
+                Logger.Debug($"User {user}, Saving entity: {upObjectInfo}"); //{JsonConvert.SerializeObject(item)}
                 IRealmiusObjectServer dbEntity = null;
                 try
                 {
@@ -91,7 +99,7 @@ namespace Realmius.Server
                     }
                     catch (Exception e)
                     {
-                        Logger.Log.Exception(e, $"Error getting key, {item.PrimaryKey}");
+                        Logger.Exception(e, $"Error getting key, {item.PrimaryKey}");
                         throw;
                     }
 
@@ -191,7 +199,7 @@ namespace Realmius.Server
                     //});
                     if (!string.IsNullOrEmpty(objectInfo.Error))
                     {
-                        Logger.Log.Debug($"Error saving the entity {objectInfo.Error}");
+                        Logger.Debug($"Error saving the entity {objectInfo.Error}");
                     }
                     ef.SaveChanges();
                 }
@@ -205,7 +213,7 @@ namespace Realmius.Server
                     {
                         ef.Entry(dbEntity).State = EntityState.Detached; //if one entity fails EF validation, we should still save all the others (if possible)
                     }
-                    Logger.Log.Info($"Exception saving the entity {e}");
+                    Logger.Info($"Exception saving the entity {e}");
                     //continue processing anyway
                     //throw;
                 }
