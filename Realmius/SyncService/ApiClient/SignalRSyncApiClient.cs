@@ -30,7 +30,7 @@ using Realmius.Contracts.Models;
 
 namespace Realmius.SyncService.ApiClient
 {
-    public class SignalRSyncApiClient : IApiClient
+    public class SignalRSyncApiClient : IApiClient, ILoggerAware
     {
         private IHubProxy _hubProxy;
         private HubConnection _hubConnection;

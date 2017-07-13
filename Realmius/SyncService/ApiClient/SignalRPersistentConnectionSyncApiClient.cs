@@ -31,7 +31,7 @@ using Realmius.Contracts.SignalR;
 
 namespace Realmius.SyncService.ApiClient
 {
-    public class SignalRPersistentConnectionSyncApiClient : IApiClient
+    public class SignalRPersistentConnectionSyncApiClient : IApiClient, ILoggerAware
     {
         private Connection _connection;
         private ApiClientStartOptions _startOptions;

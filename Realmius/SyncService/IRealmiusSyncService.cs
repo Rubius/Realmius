@@ -19,11 +19,12 @@
 using System;
 using System.ComponentModel;
 using Realmius.Contracts.Models;
+using Realmius.SyncService.ApiClient;
 using Realmius.SyncService.RealmModels;
 
 namespace Realmius.SyncService
 {
-    public interface IRealmiusSyncService : IDisposable, INotifyPropertyChanged
+    public interface IRealmiusSyncService : IDisposable, INotifyPropertyChanged, ILoggerAware
     {
         /// <summary>
         /// Raised by the SyncServer when backend tells us we are not authorized to upload
@@ -33,8 +34,6 @@ namespace Realmius.SyncService
         event EventHandler<FileUploadedEventArgs> FileUploaded;
 
         bool UIUploadInProgress { get; }
-
-        ILogger Logger { get; set; }
 
         Uri ServerUri { get; set; }
 

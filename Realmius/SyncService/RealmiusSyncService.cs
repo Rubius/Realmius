@@ -53,21 +53,9 @@ namespace Realmius.SyncService
             set
             {
                 _logger = value;
-                //if api contains property for logger - fill it
-                var t = _apiClient.GetType();
-                var propertyInfo = t.GetRuntimeProperties().ToList();
-                //search property which implements ILogger interface
-                var interfaceName = this.Logger.GetType().GetTypeInfo().ImplementedInterfaces.First();
-                var property = propertyInfo.FirstOrDefault(
-                    x => x.PropertyType.GetTypeInfo().ImplementedInterfaces.Contains(interfaceName) || x.PropertyType == interfaceName);
-                if (property != null)
+                if (_apiClient is ILoggerAware apiILoggerAware)
                 {
-                    property.SetValue(_apiClient, value);
-                }
-                else
-                {
-                    //may be useful
-                    //value.Info($"Logger not found in ApiClient\nFound properties:\n{String.Join("\n", propertyInfo)}");
+                    apiILoggerAware.Logger = value;
                 }
             }
         }
