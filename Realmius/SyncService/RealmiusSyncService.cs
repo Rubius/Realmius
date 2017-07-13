@@ -46,6 +46,20 @@ namespace Realmius.SyncService
         internal bool InTests { get; set; }
         public string FileUploadUrl { get; set; }
         public string FileParameterName { get; set; } = "file";
+
+        public ILogger Logger
+        {
+            get { return _logger; }
+            set
+            {
+                _logger = value;
+                if (_apiClient is ILoggerAware apiILoggerAware)
+                {
+                    apiILoggerAware.Logger = value;
+                }
+            }
+        }
+
         public event EventHandler<UnauthorizedResponse> Unauthorized;
         public event EventHandler DataDownloaded;
         public event EventHandler<FileUploadedEventArgs> FileUploaded;
@@ -53,6 +67,7 @@ namespace Realmius.SyncService
         private Func<Realm> _realmFactoryMethod;
         private readonly Dictionary<string, RealmObjectTypeInfo> _typesToSync;
         private IApiClient _apiClient;
+        private ILogger _logger;
         private JsonSerializerSettings _jsonSerializerSettings;
         private readonly object _handleDownloadDataLock = new object();
         private string _realmDatabasePath;
@@ -82,6 +97,7 @@ namespace Realmius.SyncService
             _syncServiceId = Guid.NewGuid().ToString();
             _realmFactoryMethod = realmFactoryMethod;
             _apiClient = apiClient;
+            Logger = new Logger();
 
             _jsonSerializerSettings = new JsonSerializerSettings
             {
@@ -292,7 +308,7 @@ namespace Realmius.SyncService
 
         private void ApiClientOnUnauthorized(object sender, UnauthorizedResponse unauthorizedResponse)
         {
-            Logger.Log.Info($"Unauthorized - reconnections stop. {unauthorizedResponse.Error}");
+            Logger.Info($"Unauthorized - reconnections stop. {unauthorizedResponse.Error}");
             _apiClient.Stop();
             OnUnauthorized(unauthorizedResponse);
         }
@@ -365,7 +381,7 @@ namespace Realmius.SyncService
                 }
                 catch (Exception e)
                 {
-                    Logger.Log.Exception(e);
+                    Logger.Exception(e);
                     throw;
                 }
             }
@@ -401,7 +417,7 @@ namespace Realmius.SyncService
                     };
                     realmiusData.Add(syncStatusObject);
                 });
-                Logger.Log.Debug($"  Created SyncStatus {obj.MobilePrimaryKey}");
+                Logger.Debug($"  Created SyncStatus {obj.MobilePrimaryKey}");
             }
 
             if (skipUpload)
@@ -485,7 +501,7 @@ namespace Realmius.SyncService
                         return;
                     }
 
-                    Logger.Log.Info($"File Uploading: started {file.PathToFile}");
+                    Logger.Info($"File Uploading: started {file.PathToFile}");
 
                     id = file.Id;
                     var path = file.PathToFile;
@@ -527,7 +543,7 @@ namespace Realmius.SyncService
                         var result = await client.PostAsync(url, content);
                         result.EnsureSuccessStatusCode();
 
-                        Logger.Log.Info($"File Uploading: finished successfully {path}");
+                        Logger.Info($"File Uploading: finished successfully {path}");
 
                         using (var realmius2 = CreateRealmius())
                         {
@@ -542,7 +558,7 @@ namespace Realmius.SyncService
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log.Exception(ex, "Error during file upload");
+                    Logger.Exception(ex, "Error during file upload");
                     if (id != null)
                         using (var realmius2 = CreateRealmius())
                         {
@@ -646,7 +662,7 @@ namespace Realmius.SyncService
                             IsDeleted = uploadRequestItemRealm.Any(x => x.IsDeleted),
                         };
                         changes.ChangeNotifications.Add(changeNotification);
-                        Logger.Log.Debug($"Up: {changeNotification.Type}.{changeNotification.PrimaryKey}: {changeNotification.SerializedObject}");
+                        Logger.Debug($"Up: {changeNotification.Type}.{changeNotification.PrimaryKey}: {changeNotification.SerializedObject}");
                     }
                 }
                 try
@@ -664,7 +680,7 @@ namespace Realmius.SyncService
                         if (notSynced.Count > 0)
                         {
                             var notSyncedObjects = notSynced.Select(x => $"{x.Type}: {x.PrimaryKey}");
-                            Logger.Log.Info($"Some objects were not accepted by the server: {string.Join("; ", notSyncedObjects)}");
+                            Logger.Info($"Some objects were not accepted by the server: {string.Join("; ", notSyncedObjects)}");
                         }
                         using (var realm = _realmFactoryMethod())
                         {
@@ -687,7 +703,7 @@ namespace Realmius.SyncService
                                                     try
                                                     {
                                                         var uploadRequestItemRealm = realmius.Find<UploadRequestItemRealm>(key);
-                                                        Logger.Log.Debug(
+                                                        Logger.Debug(
                                                             $"Removed UploadRequest {uploadRequestItemRealm?.Id} for {realmiusObject.Type}:{realmiusObject.MobilePrimaryKey}");
 
                                                         if (uploadRequestItemRealm != null)
@@ -735,7 +751,7 @@ namespace Realmius.SyncService
                                                 uploadRequestItemRealm.UploadAttempts++;
                                                 if (uploadRequestItemRealm.UploadAttempts > 30)
                                                 {
-                                                    Logger.Log.Debug($"UploadRequest {realmiusObject.Type}.{realmiusObject.MobilePrimaryKey}, failed for attempts {uploadRequestItemRealm.UploadAttempts}, removing");
+                                                    Logger.Debug($"UploadRequest {realmiusObject.Type}.{realmiusObject.MobilePrimaryKey}, failed for attempts {uploadRequestItemRealm.UploadAttempts}, removing");
 
                                                     realmius.Remove(uploadRequestItemRealm);
                                                 }
@@ -746,7 +762,7 @@ namespace Realmius.SyncService
                                                         uploadRequestItemRealm.NextUploadAttemptDate = DateTimeOffset.Now.AddSeconds(10 * uploadRequestItemRealm.UploadAttempts);
                                                     }
 
-                                                    Logger.Log.Debug($"Delaying UploadRequest {realmiusObject.Type}.{realmiusObject.MobilePrimaryKey}, attempt {uploadRequestItemRealm.UploadAttempts}, scheduled for {uploadRequestItemRealm.NextUploadAttemptDate}");
+                                                    Logger.Debug($"Delaying UploadRequest {realmiusObject.Type}.{realmiusObject.MobilePrimaryKey}, attempt {uploadRequestItemRealm.UploadAttempts}, scheduled for {uploadRequestItemRealm.NextUploadAttemptDate}");
                                                 }
                                             }
                                         });
@@ -781,13 +797,13 @@ namespace Realmius.SyncService
                                 await Task.Delay(DelayWhenUploadRequestFailed);
                             //ToDo: delays might be increased in case of consequent errors
 
-                            Logger.Log.Debug($"Upload requeued");
+                            Logger.Debug($"Upload requeued");
                             await Upload();
                         }
                     }
                     catch (Exception e)
                     {
-                        Logger.Log.Exception(e, $"Error in Upload");
+                        Logger.Exception(e, $"Error in Upload");
                     }
                 });
         }
@@ -825,7 +841,7 @@ namespace Realmius.SyncService
 
         private async Task HandleDownloadedData(DownloadDataResponse result)
         {
-            Logger.Log.Info($"HandleDownloadedData: {result?.LastChange}");
+            Logger.Info($"HandleDownloadedData: {result?.LastChange}");
             lock (_handleDownloadDataLock)
             {
                 try
@@ -855,8 +871,8 @@ namespace Realmius.SyncService
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log.Info("HandleDownloadedData");
-                    Logger.Log.Exception(ex);
+                    Logger.Info("HandleDownloadedData");
+                    Logger.Exception(ex);
                 }
             }
         }
@@ -870,8 +886,11 @@ namespace Realmius.SyncService
                 foreach (var changeObject in changedObjects)
                 {
                     _downloadIndex++;
-                    Logger.Log.Debug(
-                        $"Down:{_downloadIndex}, {changeObject.Type}.{changeObject.MobilePrimaryKey}: {changeObject.SerializedObject}");
+                    string changedObjectInfo = !changeObject.IsDeleted
+                        ? changeObject.SerializedObject
+                        : "{" + $"\n  \"{nameof(changeObject.Type)}\": \"{changeObject.Type}\",\n  \"{nameof(changeObject.MobilePrimaryKey)}\": \"{changeObject.MobilePrimaryKey}\"\n  \"{nameof(changeObject.IsDeleted)}\": \"{changeObject.IsDeleted}\"\n" + "}";
+                    Logger.Debug(
+                        $"Down:{_downloadIndex}, {changeObject.Type}.{changeObject.MobilePrimaryKey}: {changedObjectInfo}");
                     try
                     {
                         var syncStateObject = FindSyncStatus(realmiusData, changeObject.Type, changeObject.MobilePrimaryKey);
@@ -987,7 +1006,7 @@ namespace Realmius.SyncService
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log.Debug($"error applying changed objects {ex}");
+                        Logger.Debug($"error applying changed objects {ex}");
                     }
                 }
             });

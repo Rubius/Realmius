@@ -20,11 +20,18 @@ using System;
 
 namespace Realmius.Server.Infrastructure
 {
-    internal class Logger
+    public interface ILogger
+    {
+        void Exception(Exception ex, string text = null);
+        void Info(string text);
+        void Debug(string text);
+    }
+
+    internal class Logger : ILogger
     {
         public static Logger Log { get; } = new Logger();
 
-        private Logger()
+        public Logger()
         {
         }
 

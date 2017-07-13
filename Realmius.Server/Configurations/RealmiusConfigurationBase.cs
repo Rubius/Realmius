@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNet.SignalR;
+using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
 
 namespace Realmius.Server.Configurations
@@ -37,6 +38,8 @@ namespace Realmius.Server.Configurations
         /// </summary>
         public abstract IList<Type> TypesToSync { get; }
         
+        public virtual ILogger Logger { get; set; }
+
         /// <summary>
         /// Whenever an object is updated, this function is called to get the list of Tags associated with object.
         /// To understand how Tag-based security works please read the comment for GetTagsForUser function.

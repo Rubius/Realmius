@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNet.SignalR;
 using Realmius.Server.Configurations;
+using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
 
 namespace Realmius.Server.QuickStart
@@ -28,6 +29,9 @@ namespace Realmius.Server.QuickStart
     public class ShareEverythingConfiguration : RealmiusConfigurationBase
     {
         public override IList<Type> TypesToSync { get; }
+
+        public override ILogger Logger { get; set; } = new Logger();
+
         public override IList<string> GetTagsForObject(ChangeTrackingDbContext db, IRealmiusObjectServer obj)
         {
             return new[] { "all" };

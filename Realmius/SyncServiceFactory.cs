@@ -31,6 +31,7 @@ namespace Realmius
         public static IRealmiusSyncService CreateUsingPolling(Func<Realm> realmFactoryMethod, Uri uploadUri, Uri downloadUri, Type[] typesToSync, bool deleteDatabase = false)
         {
             var apiClient = new PollingSyncApiClient(uploadUri, downloadUri);
+
             var syncService = new RealmiusSyncService(realmFactoryMethod, apiClient, deleteDatabase, typesToSync);
 
             return syncService;
@@ -39,11 +40,10 @@ namespace Realmius
         public static IRealmiusSyncService CreateUsingSignalR(Func<Realm> realmFactoryMethod, Uri uri, Type[] typesToSync, bool deleteDatabase = false)
         {
             var apiClient = new SignalRPersistentConnectionSyncApiClient(uri);
+            
             var syncService = new RealmiusSyncService(realmFactoryMethod, apiClient, deleteDatabase, typesToSync);
 
             return syncService;
         }
-
-        
     }
 }

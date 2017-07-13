@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Owin;
 using Realmius.Server.Configurations;
 using Realmius.Server.Exchange;
+using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
 
 namespace Realmius.Server.QuickStart
