@@ -898,8 +898,11 @@ namespace Realmius.SyncService
                 foreach (var changeObject in changedObjects)
                 {
                     _downloadIndex++;
+                    string changedObjectInfo = !changeObject.IsDeleted
+                        ? changeObject.SerializedObject
+                        : "{" + $"\n  \"{nameof(changeObject.Type)}\": \"{changeObject.Type}\",\n  \"{nameof(changeObject.MobilePrimaryKey)}\": \"{changeObject.MobilePrimaryKey}\"\n  \"{nameof(changeObject.IsDeleted)}\": \"{changeObject.IsDeleted}\"\n" + "}";
                     Logger.Debug(
-                        $"Down:{_downloadIndex}, {changeObject.Type}.{changeObject.MobilePrimaryKey}: {changeObject.SerializedObject}");
+                        $"Down:{_downloadIndex}, {changeObject.Type}.{changeObject.MobilePrimaryKey}: {changedObjectInfo}");
                     try
                     {
                         var syncStateObject = FindSyncStatus(realmiusData, changeObject.Type, changeObject.MobilePrimaryKey);
