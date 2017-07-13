@@ -39,7 +39,7 @@ namespace Realmius.Server.Exchange
         private static readonly ConcurrentDictionary<string, TUser> Connections = new ConcurrentDictionary<string, TUser>();
         private static JsonSerializerSettings SerializerSettings;
         private static bool _initialized;
-        private ILogger Logger => RealmiusServer.GetConfiguration<TUser>()?.Logger;
+        private ILogger Logger => Processor.Configuration.Logger;
 
         protected static T Deserialize<T>(string data)
         {
