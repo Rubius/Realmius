@@ -21,5 +21,5 @@ The stable release packages are  published on [nuget.org](https://www.nuget.org/
 
 Package | Targets
 --------|---------------
-**[Realmius](https://www.nuget.org/packages/Realmius/)** | Portable class library (Profile 111, 76), Xamarin.Ios, Xamarin.Android
-**[Realmius.Server](https://www.nuget.org/packages/Realmius.Server/) | .NET 4.6.1
+[Realmius](https://www.nuget.org/packages/Realmius/) | Portable class library (Profile 111, 76), Xamarin.Ios, Xamarin.Android
+[Realmius.Server](https://www.nuget.org/packages/Realmius.Server/) | .NET 4.6.1
