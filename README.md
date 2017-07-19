@@ -17,9 +17,9 @@ You can find examples in the `/Examples` folder in the code repository.
 
 #### NuGet packages
 
-The stable release packages will be published to [nuget.org](https://www.nuget.org/packages?q=Realmius) soon.
+The stable release packages are  published on [nuget.org](https://www.nuget.org/packages?q=Realmius).
 
 Package | Targets
 --------|---------------
-Realmius | Portable class library (Profile 111, 76), Xamarin.Ios, Xamarin.Android
-Realmius.Server | .NET 4.6.1
+**[Realmius](https://www.nuget.org/packages/Realmius/)** | Portable class library (Profile 111, 76), Xamarin.Ios, Xamarin.Android
+**[Realmius.Server](https://www.nuget.org/packages/Realmius.Server/) | .NET 4.6.1
