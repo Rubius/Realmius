@@ -36,6 +36,7 @@ using Realmius.SyncService.ApiClient;
 using Realmius.SyncService.RealmModels;
 using Realms;
 using Realms.Schema;
+using Realmius.Contracts.Logger;
 
 namespace Realmius.SyncService
 {

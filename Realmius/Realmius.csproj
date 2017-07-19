@@ -48,7 +48,6 @@
     <Compile Include="SyncServiceFactory.cs" />
     <Compile Include="SyncService\ApiClient\ApiClientStartOptions.cs" />
     <Compile Include="SyncService\ApiClient\IApiClient.cs" />
-    <Compile Include="SyncService\ApiClient\ILoggerAware.cs" />
     <Compile Include="SyncService\ApiClient\SignalRPersistentConnectionSyncApiClient.cs" />
     <Compile Include="SyncService\FileUploadedEventArgs.cs" />
     <Compile Include="SyncService\IRealmiusObjectWithSyncStatusClient.cs" />
@@ -66,7 +65,6 @@
     <Compile Include="SyncService\SyncConfiguration.cs" />
     <Compile Include="Infrastructure\Timer.cs" />
     <Compile Include="SyncService\RealmModels\UploadFileInfo.cs" />
-    <Compile Include="Logger.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="DotNetCross.Memory.Unsafe, Version=0.2.2.0, Culture=neutral, processorArchitecture=MSIL">

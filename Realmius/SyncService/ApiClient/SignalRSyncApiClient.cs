@@ -27,6 +27,7 @@ using Microsoft.AspNet.SignalR.Client.Infrastructure;
 using Newtonsoft.Json;
 using Realmius.Contracts;
 using Realmius.Contracts.Models;
+using Realmius.Contracts.Logger;
 
 namespace Realmius.SyncService.ApiClient
 {

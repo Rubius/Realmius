@@ -21,6 +21,7 @@ using System.ComponentModel;
 using Realmius.Contracts.Models;
 using Realmius.SyncService.ApiClient;
 using Realmius.SyncService.RealmModels;
+using Realmius.Contracts.Logger;
 
 namespace Realmius.SyncService
 {

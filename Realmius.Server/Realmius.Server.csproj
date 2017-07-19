@@ -77,7 +77,6 @@
     <Compile Include="Infrastructure\RealmServerObjectResolver.cs" />
     <Compile Include="Infrastructure\RealmServerCollectionConverter.cs" />
     <Compile Include="IRealmiusObjectServer.cs" />
-    <Compile Include="Infrastructure\Logger.cs" />
     <Compile Include="Migrations\201702191141280_Initial.cs" />
     <Compile Include="Migrations\201702191141280_Initial.Designer.cs">
       <DependentUpon>201702191141280_Initial.cs</DependentUpon>
