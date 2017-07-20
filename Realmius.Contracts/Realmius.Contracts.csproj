@@ -44,8 +44,6 @@
     <Compile Include="Helpers\DepthAwareJsonTextWriter.cs" />
     <Compile Include="Helpers\JsonHelper.cs" />
     <Compile Include="Helpers\StringToIntConverter.cs" />
-    <Compile Include="Logger\ConsoleLogger.cs" />
-    <Compile Include="Logger\ILoggerAware.cs" />
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\DownloadDataRequest.cs" />

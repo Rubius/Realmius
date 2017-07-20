@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Realmius.Contracts.Logger;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Realmius.Contracts.Logger
+namespace Realmius.SyncService.ApiClient
 {
     public interface ILoggerAware
     {
