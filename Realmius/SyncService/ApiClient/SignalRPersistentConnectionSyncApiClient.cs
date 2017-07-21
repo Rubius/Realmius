@@ -28,6 +28,7 @@ using Newtonsoft.Json;
 using Realmius.Contracts;
 using Realmius.Contracts.Models;
 using Realmius.Contracts.SignalR;
+using Realmius.Contracts.Logger;
 
 namespace Realmius.SyncService.ApiClient
 {

@@ -29,6 +29,7 @@ using Realmius.Contracts.SignalR;
 using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
 using Realmius.Server.QuickStart;
+using Realmius.Contracts.Logger;
 
 namespace Realmius.Server.Exchange
 {
