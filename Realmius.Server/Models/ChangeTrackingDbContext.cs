@@ -191,7 +191,7 @@ namespace Realmius.Server.Models
 
                             changes = jsonDiff.ToString();
                         }
-
+                        syncStatusObject.IsDeleted = false;
                     }
                     else if (entity.State == EntityState.Added)
                     {
@@ -202,6 +202,7 @@ namespace Realmius.Server.Models
                         {
                             syncStatusObject.ColumnChangeDates[propName] = dateTimeNow;
                         }
+                        syncStatusObject.IsDeleted = false;
                         changes = jObject.ToString();
                     }
                     else if (entity.State == EntityState.Deleted)

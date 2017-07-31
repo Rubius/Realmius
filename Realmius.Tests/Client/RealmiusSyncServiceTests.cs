@@ -61,7 +61,7 @@ namespace Realmius.Tests.Client
                     _lastUploadRequest = x;
                     _uploadRequests.Add(x);
                 }).ReturnsAsync(new UploadDataResponse());
-
+            _apiClientMock.SetupGet(x => x.IsConnected).Returns(true);
             _realmFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             RealmiusSyncService.RealmiusDbPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + "sync");
 
@@ -82,7 +82,7 @@ namespace Realmius.Tests.Client
         private Mock<RealmiusSyncService> CreateSyncService()
         {
             Func<Realm> func = GetRealm;
-            
+
             var mock = new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, Assembly.GetExecutingAssembly())
             {
                 CallBase = true,
@@ -165,6 +165,40 @@ namespace Realmius.Tests.Client
         }
 
         [Test]
+        public void AddObject_NotConnected_DataNotSent_Connected_DataSent()
+        {
+            var realm = GetRealm();
+            _apiClientMock.SetupGet(x => x.IsConnected).Returns(false);
+
+            var obj = new DbSyncClientObject
+            {
+                Text = "zxczxczxc",
+            };
+            realm.Write(() =>
+            {
+                realm.Add(obj);
+            });
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
+
+            _uploadTask?.Wait();
+
+            _lastUploadRequest.Should().BeNull("UploadData should not be called, because client is not connected");
+
+            _apiClientMock.SetupGet(x => x.IsConnected).Returns(true);
+            _apiClientMock.Raise(x => x.ConnectedStateChanged += null, _apiClientMock.Object, EventArgs.Empty);
+
+            _uploadTask?.Wait();
+
+            _lastUploadRequest.Should().NotBeNull("UploadData should be called after client is connected");
+
+
+            string.Join(", ", _lastUploadRequest.ChangeNotifications)
+                .Should().MatchEquivalentOf($"Type: DbSyncClientObject, PrimaryKey: {obj.Id}, SerializedObject: {{ \"Id\": \"{obj.Id}\", \"Text\": \"zxczxczxc\", \"Tags\": null, \"MobilePrimaryKey\": \"{obj.Id}\"}}");
+            _apiClientMock.Verify(x => x.UploadData(It.IsAny<UploadDataRequest>()), Times.Once);
+        }
+
+        [Test]
         public void AddObject_NotSucceeded_Update_UploadDataIsCalled()
         {
             var realm = GetRealm();
@@ -236,7 +270,7 @@ namespace Realmius.Tests.Client
                 .Should().MatchEquivalentOf($"Type: DbSyncClientObject, PrimaryKey: {obj.Id}, SerializedObject: {{ \"Text\": \"555\"}}");
             _apiClientMock.Verify(x => x.UploadData(It.IsAny<UploadDataRequest>()), Times.AtLeast(2));
         }
-        
+
         [Test]
         public void DoNotUploadAttribute_Download()
         {

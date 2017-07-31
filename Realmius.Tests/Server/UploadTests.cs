@@ -724,6 +724,74 @@ namespace Realmius.Tests.Server
             obj3.Should().BeNull();
         }
 
+
+        [Test]
+        public void Upload_Delete_UploadAgain()
+        {
+            var controller = new RealmiusServerProcessor(new ShareEverythingConfiguration(_contextFunc, typeof(DbSyncObject)));
+            Func<DownloadDataResponse> getDownloaded = () => controller.Download(new DownloadDataRequest()
+            {
+                Types = new[] { nameof(DbSyncObject) },
+            }, new { });
+            Func<string> dataToCompare = () =>
+            {
+                var data = getDownloaded();
+                return string.Join(", ", data.ChangedObjects.Select(x => $"{x.IsDeleted}"));
+            };
+
+
+            var objectToSave = new DbSyncObject()
+            {
+                Text = "123123123",
+                Id = Guid.NewGuid().ToString()
+            };
+            var result1 = controller.Upload(new UploadDataRequest()
+            {
+                ChangeNotifications =
+                {
+                    new UploadRequestItem()
+                    {
+                        Type = nameof(DbSyncObject),
+                        PrimaryKey = objectToSave.MobilePrimaryKey,
+                        SerializedObject = JsonConvert.SerializeObject(objectToSave),
+                        //IsDeleted = true,
+                    }
+                }
+            }, null);
+            dataToCompare().Should().BeEquivalentTo("False");
+
+            var result2 = controller.Upload(new UploadDataRequest()
+            {
+                ChangeNotifications =
+                {
+                    new UploadRequestItem()
+                    {
+                        Type = nameof(DbSyncObject),
+                        PrimaryKey = objectToSave.MobilePrimaryKey,
+                        SerializedObject = "",
+                        IsDeleted = true,
+                    }
+                }
+            }, null);
+            //dataToCompare().Should().BeEquivalentTo("True");
+
+            objectToSave.Text = "zxc";
+            var result3 = controller.Upload(new UploadDataRequest()
+            {
+                ChangeNotifications =
+                {
+                    new UploadRequestItem()
+                    {
+                        Type = nameof(DbSyncObject),
+                        PrimaryKey = objectToSave.MobilePrimaryKey,
+                        SerializedObject = JsonConvert.SerializeObject(objectToSave),
+                        IsDeleted = false,
+                    }
+                }
+            }, null);
+            dataToCompare().Should().BeEquivalentTo("False");
+        }
+
         [Test]
         public void UploadData_ModifyObjectWithinCheckAndProcess_RequestObject()
         {
