@@ -32,6 +32,7 @@ using Realmius.Contracts.Models;
 using Realmius.Server.Configurations;
 using Realmius.Server.Exchange;
 using Realmius.Server.Infrastructure;
+using Realmius.Contracts.Logger;
 
 namespace Realmius.Server.Models
 {

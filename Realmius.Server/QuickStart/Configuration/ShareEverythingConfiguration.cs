@@ -23,6 +23,7 @@ using Microsoft.AspNet.SignalR;
 using Realmius.Server.Configurations;
 using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
+using Realmius.Contracts.Logger;
 
 namespace Realmius.Server.QuickStart
 {
