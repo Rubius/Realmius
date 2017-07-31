@@ -66,7 +66,7 @@ namespace Realmius.SyncService
         public event EventHandler<FileUploadedEventArgs> FileUploaded;
 
         private Func<Realm> _realmFactoryMethod;
-        private readonly Dictionary<string, RealmObjectTypeInfo> _typesToSync;
+        internal readonly Dictionary<string, RealmObjectTypeInfo> _typesToSync;
         private IApiClient _apiClient;
         private ILogger _logger;
         private JsonSerializerSettings _jsonSerializerSettings;
@@ -84,6 +84,7 @@ namespace Realmius.SyncService
 
         public RealmiusSyncService(Func<Realm> realmFactoryMethod, IApiClient apiClient, bool deleteSyncDatabase, Assembly assemblyWithModels)
         {
+            
             var a = assemblyWithModels.ExportedTypes.Where(
                 type => type.GetTypeInfo().IsClass &&
                         typeof(IRealmiusObjectClient).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()) &&
@@ -282,12 +283,17 @@ namespace Realmius.SyncService
                 _apiClient.Unauthorized += ApiClientOnUnauthorized;
                 _apiClient.NewDataDownloaded += HandleDownloadedData;
                 _apiClient.ConnectedStateChanged += ConnectedStateChanged;
-
-                _apiClient.Start(new ApiClientStartOptions(syncOptions.LastDownloadedTags, _typesToSync.Keys));
+                _apiClient.Start(GetOptions(syncOptions));
 
                 _delayedUploadsTriggerTimer = new Timer(TriggerDelayedUploads, null, 0, 10000, true);
             }
         }
+
+        ApiClientStartOptions GetOptions(SyncConfiguration syncOptions)
+        {
+            return new ApiClientStartOptions(syncOptions.LastDownloadedTags, _typesToSync.Keys);
+        }
+
 
         private async Task TriggerDelayedUploads(object state)
         {
@@ -877,6 +883,7 @@ namespace Realmius.SyncService
                         {
                             syncOptions.SaveLastDownloadedTags();
                         });
+                        _apiClient.UpdateOptions(GetOptions(syncOptions));
                     }
                 }
                 catch (Exception ex)
@@ -1057,6 +1064,9 @@ namespace Realmius.SyncService
         {
             _apiClient.NewDataDownloaded -= HandleDownloadedData;
             _apiClient.Unauthorized += ApiClientOnUnauthorized;
+            _apiClient.ConnectedStateChanged -= ConnectedStateChanged;
+            _delayedUploadsTriggerTimer?.Dispose();
+            _delayedUploadsTriggerTimer = null;
             _unsubscribeFromRealm();
             _unsubscribeFromRealm = () => { };
         }

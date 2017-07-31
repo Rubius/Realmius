@@ -36,5 +36,7 @@ namespace Realmius.SyncService.ApiClient
         /// Should be raised when IsConnected flag is changed (especially important when it changes from false to true) 
         /// </summary>
         event EventHandler ConnectedStateChanged;
+
+        void UpdateOptions(ApiClientStartOptions options);
     }
 }

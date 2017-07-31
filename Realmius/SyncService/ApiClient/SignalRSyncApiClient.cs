@@ -104,7 +104,7 @@ namespace Realmius.SyncService.ApiClient
                     connectionUri = connectionUri.Replace(Uri.Query, "");
                 }
                 var hubConnection = new HubConnection(connectionUri, parameters);
-                 _hubConnection = hubConnection;
+                _hubConnection = hubConnection;
 
                 _hubProxy = _hubConnection.CreateHubProxy(HubName);
                 _downloadHandler = _hubProxy.On<DownloadDataResponse>("DataDownloaded", OnNewDataDownloaded);
@@ -150,7 +150,7 @@ namespace Realmius.SyncService.ApiClient
             }
             catch (ObjectDisposedException webEx)
             {
-				LogAndReconnectWithDelay(webEx);
+                LogAndReconnectWithDelay(webEx);
             }
             catch (Exception ex)
             {
@@ -182,7 +182,7 @@ namespace Realmius.SyncService.ApiClient
             _hubConnection.Closed += _hubConnection_Closed;
             var hubConnection = _hubConnection;
             _downloadingInitialData = new TaskCompletionSource<bool>();
-            
+
             _hubUnsubscribe += () =>
             {
                 hubConnection.Closed -= _hubConnection_Closed;
@@ -210,6 +210,11 @@ namespace Realmius.SyncService.ApiClient
 
             _hubUnsubscribe();
             _hubUnsubscribe = () => { };
+        }
+
+        public void UpdateOptions(ApiClientStartOptions startOptions)
+        {
+            _startOptions = startOptions;
         }
 
         public async Task<UploadDataResponse> UploadData(UploadDataRequest request)

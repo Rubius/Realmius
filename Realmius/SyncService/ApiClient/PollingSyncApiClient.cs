@@ -124,6 +124,11 @@ namespace Realmius.SyncService.ApiClient
             OnNewDataDownloaded(result);
         }
 
+        public void UpdateOptions(ApiClientStartOptions startOptions)
+        {
+            _startOptions = startOptions;
+        }
+
         public void Stop()
         {
             _timer?.Dispose();

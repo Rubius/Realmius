@@ -326,6 +326,10 @@ namespace Realmius.SyncService.ApiClient
 
             return tcs.Task;
         }
+        public void UpdateOptions(ApiClientStartOptions startOptions)
+        {
+            _startOptions = startOptions;
+        }
 
         #region copied from SignalR
 

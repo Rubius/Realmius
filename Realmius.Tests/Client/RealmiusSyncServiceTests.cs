@@ -232,6 +232,15 @@ namespace Realmius.Tests.Client
         }
 
         [Test]
+        public void Ctor_UsingAllRealmTypes()
+        {
+            var syncService = new RealmiusSyncService(GetRealm, _apiClientMock.Object, false, Assembly.GetExecutingAssembly());
+            string.Join(", ", syncService._typesToSync.Select(x => x.Key))
+                .Should().BeEquivalentTo("UnknownSyncObject, RealmManyRef, DbSyncClientObject, DbSyncClientObject2, DbSyncWithDoNotUpload, RealmRef");
+        }
+
+
+        [Test]
         public void AddObject_NotSucceeded_DelayedDataUpload()
         {
             var realm = GetRealm();
