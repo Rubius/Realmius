@@ -291,6 +291,9 @@ namespace Realmius.SyncService
 
         private async Task TriggerDelayedUploads(object state)
         {
+            if (InTests)
+                return;
+
             if (!_apiClient.IsConnected)
                 return;
 
@@ -712,8 +715,8 @@ namespace Realmius.SyncService
                                                     }
                                                     catch (Exception e)
                                                     {
-                                                    //System.Console.WriteLine(e);
-                                                    throw;
+                                                        //System.Console.WriteLine(e);
+                                                        throw;
                                                     }
                                                 }
 
@@ -721,8 +724,8 @@ namespace Realmius.SyncService
                                             }
                                             catch (Exception e)
                                             {
-                                            //System.Console.WriteLine(e);
-                                            throw;
+                                                //System.Console.WriteLine(e);
+                                                throw;
                                             }
                                         });
 
@@ -758,7 +761,7 @@ namespace Realmius.SyncService
                                                 }
                                                 else
                                                 {
-                                                    if (uploadRequestItemRealm.UploadAttempts > 3)
+                                                    if (uploadRequestItemRealm.UploadAttempts >= 3)
                                                     {
                                                         uploadRequestItemRealm.NextUploadAttemptDate = DateTimeOffset.Now.AddSeconds(10 * uploadRequestItemRealm.UploadAttempts);
                                                     }
@@ -837,8 +840,14 @@ namespace Realmius.SyncService
 
         private IEnumerable<UploadRequestItemRealm> GetObjectsToUpload(Realm realmius)
         {
-            return realmius.All<UploadRequestItemRealm>().OrderBy(x => x.DateTime);
+            var now = DateTimeOffset.Now;
+            var items = realmius.All<UploadRequestItemRealm>()
+                                 .Where(x => x.NextUploadAttemptDate < now)
+                                 .OrderBy(x => x.DateTime);
+
+            return items;
         }
+
 
         private async Task HandleDownloadedData(DownloadDataResponse result)
         {
@@ -1055,13 +1064,30 @@ namespace Realmius.SyncService
         public void Dispose()
         {
             _disposed = true;
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    (_apiClient as IDisposable)?.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    // ignored
+                }
+            });
+
+
             Unsubscribe();
 
-            IList<RealmiusSyncService> syncServices;
-            if (SyncServiceFactory.SyncServices.TryGetValue(_realmDatabasePath, out syncServices))
+            lock (SyncServiceFactory.SyncServices)
             {
-                syncServices.Remove(this);
+                IList<RealmiusSyncService> syncServices;
+                if (SyncServiceFactory.SyncServices.TryGetValue(_realmDatabasePath, out syncServices))
+                {
+                    syncServices.Remove(this);
+                }
             }
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

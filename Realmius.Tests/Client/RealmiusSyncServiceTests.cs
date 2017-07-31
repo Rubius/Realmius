@@ -232,6 +232,54 @@ namespace Realmius.Tests.Client
         }
 
         [Test]
+        public void AddObject_NotSucceeded_DelayedDataUpload()
+        {
+            var realm = GetRealm();
+
+            _syncServiceMock.Setup(x => x.StartUploadTask()).Callback(() => { });
+            SetupIncorrectUploadResponse();
+            _apiClientMock.ResetCalls();
+            var obj = new DbSyncClientObject
+            {
+                Text = "zxczxczxc",
+            };
+            realm.Write(() =>
+            {
+                realm.Add(obj);
+            });
+            _realmiusSyncService.Realm.Refresh();
+            _realmiusSyncService.Realmius.Refresh();
+
+            _realmiusSyncService.Upload().Wait();
+            _apiClientMock.Verify(x => x.UploadData(It.IsAny<UploadDataRequest>()), Times.Exactly(1));
+
+            _realmiusSyncService.Upload().Wait();
+            _apiClientMock.Verify(x => x.UploadData(It.IsAny<UploadDataRequest>()), Times.Exactly(2));
+
+            _realmiusSyncService.Upload().Wait();
+            _apiClientMock.Verify(x => x.UploadData(It.IsAny<UploadDataRequest>()), Times.Exactly(3));
+
+            //after 3 attempts upload should be delayed for several seconds
+            _realmiusSyncService.Upload().Wait();
+            _apiClientMock.Verify(x => x.UploadData(It.IsAny<UploadDataRequest>()), Times.Exactly(3));
+
+            _realmiusSyncService.Upload().Wait();
+            _apiClientMock.Verify(x => x.UploadData(It.IsAny<UploadDataRequest>()), Times.Exactly(3));
+
+            var uploadRequestItem = _realmiusSyncService.Realmius.All<UploadRequestItemRealm>().First();
+            uploadRequestItem.NextUploadAttemptDate.Should()
+                .BeAfter(DateTimeOffset.Now + TimeSpan.FromSeconds(10))
+                .And.BeBefore(DateTimeOffset.Now + TimeSpan.FromSeconds(60));
+
+            _realmiusSyncService.Realmius.Write(() =>
+            {
+                uploadRequestItem.NextUploadAttemptDate = DateTimeOffset.Now;
+            });
+            _realmiusSyncService.Upload().Wait();
+            _apiClientMock.Verify(x => x.UploadData(It.IsAny<UploadDataRequest>()), Times.Exactly(4));
+        }
+
+        [Test]
         public void AddObject_Succeeded_Update_UploadDataIsCalled()
         {
             var realm = GetRealm();
@@ -834,6 +882,30 @@ namespace Realmius.Tests.Client
                     {
                         Results = x.ChangeNotifications
                             .Select(z => new UploadDataResponseItem(z.PrimaryKey, z.Type))
+                            .ToList(),
+                    };
+                    return Task.FromResult(response);
+                });
+        }
+
+        private void SetupIncorrectUploadResponse()
+        {
+            _apiClientMock.Setup(x => x.UploadData(It.IsAny<UploadDataRequest>()))
+                .Returns((UploadDataRequest x) =>
+                {
+                    _uploadDataCounter++;
+
+                    _lastUploadRequest = x;
+                    _uploadRequests.Add(x);
+
+                    Console.WriteLine("UploadData_1");
+                    var response = new UploadDataResponse
+                    {
+                        Results = x.ChangeNotifications
+                            .Select(z => new UploadDataResponseItem(z.PrimaryKey, z.Type)
+                            {
+                                Error = "123",
+                            })
                             .ToList(),
                     };
                     return Task.FromResult(response);
