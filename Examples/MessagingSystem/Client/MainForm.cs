@@ -87,7 +87,10 @@ namespace Client
         private void sendButton_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(_realmFileName))
+            {
+                MessageBox.Show("Please hit Connect first");
                 return;
+            }
 
             var msg = new Message { Text = messageBox.Text, ClientId = clientID.Text, DateTime = DateTimeOffset.Now };
             var realm = GetRealm();
