@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using DLToolkit.Forms.Controls;
 using Foundation;
 using UIKit;
 
@@ -23,7 +23,9 @@ namespace Realmius_mancheck.iOS
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             global::Xamarin.Forms.Forms.Init();
+            FlowListView.Init();
             LoadApplication(new App());
+
 
             return base.FinishedLaunching(app, options);
         }
