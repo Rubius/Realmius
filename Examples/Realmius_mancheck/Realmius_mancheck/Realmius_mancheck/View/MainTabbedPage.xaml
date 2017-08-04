@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Realmius_mancheck.MainTabbedPage"
+            xmlns:local="clr-namespace:Realmius_mancheck;assembly=Realmius_mancheck"
+            x:Name="mainTabbedPage">
+  <!--Pages can be added as references or inline-->
+    <local:NotesPage BindingContext="{Binding NotesPageViewModel}"/>
+    <local:PhotosPage BindingContext="{Binding PhotosPageViewModel}"/>
+    <local:ChatPage BindingContext="{Binding ChatPageViewModel}"/>
+    <local:SettingsPage BindingContext="{Binding SettingsPageViewModel}"/>
+</TabbedPage>

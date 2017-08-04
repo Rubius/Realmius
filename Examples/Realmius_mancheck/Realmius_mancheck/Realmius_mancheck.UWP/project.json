@@ -1,0 +1,25 @@
+﻿{
+  "dependencies": {
+    "DLToolkit.Forms.Controls.FlowListView": "2.0.4",
+    "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.2",
+    "Realm": "1.4.0",
+    "Realm.Database": "1.4.0",
+    "Realm.DataBinding": "1.1.0",
+    "Realmius": "1.0.12",
+    "Realmius.Contracts": "1.0.12",
+    "Xamarin.FFImageLoading": "2.2.9",
+    "Xamarin.FFImageLoading.Forms": "2.2.9",
+    "Xamarin.Forms": "2.3.4.224"
+  },
+  "frameworks": {
+    "uap10.0": {}
+  },
+  "runtimes": {
+    "win10-arm": {},
+    "win10-arm-aot": {},
+    "win10-x86": {},
+    "win10-x86-aot": {},
+    "win10-x64": {},
+    "win10-x64-aot": {}
+  }
+}

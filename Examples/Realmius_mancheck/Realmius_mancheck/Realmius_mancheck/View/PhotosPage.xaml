@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:DLToolkit.Forms.Controls;assembly=DLToolkit.Forms.Controls.FlowListView"
+             xmlns:converters="clr-namespace:Realmius_mancheck.Converters;assembly=Realmius_mancheck"
+             xmlns:forms="clr-namespace:FFImageLoading.Forms;assembly=FFImageLoading.Forms"
+             x:Class="Realmius_mancheck.PhotosPage"
+             Title="Photos">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:StringToUriConverter x:Key="StringToUriConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <controls:FlowListView FlowItemsSource="{Binding Photos}"
+                               SeparatorVisibility ="None"
+                               HasUnevenRows ="true" 
+                               FlowColumnMinWidth="150">
+            <controls:FlowListView.FlowColumnTemplate>
+                <DataTemplate>
+                    <Grid Padding="2">
+                        <forms:CachedImage HeightRequest="150"
+                                           Aspect="AspectFill"
+                                           DownsampleToViewSize="True">
+                            <forms:CachedImage.Source>
+                                <UriImageSource Uri="{Binding PhotoUri, Converter={StaticResource StringToUriConverter}}"
+                                                CacheValidity="10"
+                                                CachingEnabled="True"/>
+                            </forms:CachedImage.Source>
+                        </forms:CachedImage>
+
+                        <Label Text="{Binding Title}" 
+                                   BackgroundColor="Black" 
+                                   Opacity="0.3" 
+                                   TextColor="White" 
+                                   HorizontalOptions="Fill"
+                                   VerticalOptions="End" 
+                                   HorizontalTextAlignment="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </controls:FlowListView.FlowColumnTemplate>
+        </controls:FlowListView>
+    </ContentPage.Content>
+</ContentPage>
