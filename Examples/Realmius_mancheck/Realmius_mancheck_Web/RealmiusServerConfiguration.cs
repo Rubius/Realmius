@@ -17,7 +17,7 @@ namespace Realmius_mancheck_Web
     {
         public RealmiusServerAuthConfiguration() : base(() => new RealmiusServerContext())
         {
-            Logger = new ConsoleLogger(); //new Logger();
+            Logger = new Logger();
         }
 
         public IList<Type> TypesToSyncList { get; set; }
