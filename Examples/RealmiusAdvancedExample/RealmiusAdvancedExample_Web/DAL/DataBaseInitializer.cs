@@ -8,7 +8,7 @@ using RealmiusAdvancedExample_Web.Models;
 namespace RealmiusAdvancedExample_Web.DAL
 {
     public class DataBaseInitializer :
-        System.Data.Entity.DropCreateDatabaseAlways<RealmiusServerContext>
+        System.Data.Entity.CreateDatabaseIfNotExists<RealmiusServerContext>
     {
         protected override void Seed(RealmiusServerContext context)
         {
