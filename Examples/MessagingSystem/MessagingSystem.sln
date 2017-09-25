@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Realmius", "Realmius", "{F4F42F18-5D8B-44F2-A6A2-15898D77C318}"
 EndProject
@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelfHostServer", "SelfHostS
 	ProjectSection(ProjectDependencies) = postProject
 		{4C98245E-B143-4F96-99E5-79F0D87E9854} = {4C98245E-B143-4F96-99E5-79F0D87E9854}
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realmius.ServerCore", "..\..\Realmius.ServerCore\Realmius.ServerCore.csproj", "{CA43D966-D57F-4043-B61A-2CA1B48E2025}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{71AFA93C-6B98-4B4F-AAED-D4811F0F7566}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71AFA93C-6B98-4B4F-AAED-D4811F0F7566}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71AFA93C-6B98-4B4F-AAED-D4811F0F7566}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA43D966-D57F-4043-B61A-2CA1B48E2025}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA43D966-D57F-4043-B61A-2CA1B48E2025}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA43D966-D57F-4043-B61A-2CA1B48E2025}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA43D966-D57F-4043-B61A-2CA1B48E2025}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,5 +65,9 @@ Global
 		{197EEC4A-5985-4422-B76F-887281D7BC04} = {F4F42F18-5D8B-44F2-A6A2-15898D77C318}
 		{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178} = {F4F42F18-5D8B-44F2-A6A2-15898D77C318}
 		{2C4A00F9-0B66-4CBA-BBD0-601172B00278} = {F4F42F18-5D8B-44F2-A6A2-15898D77C318}
+		{CA43D966-D57F-4043-B61A-2CA1B48E2025} = {F4F42F18-5D8B-44F2-A6A2-15898D77C318}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B93752D7-EE19-45D5-8574-6F189DF3F356}
 	EndGlobalSection
 EndGlobal
