@@ -498,31 +498,35 @@ namespace Realmius.Server.Models
             var keyType = GetKeyType(type);
             var key = keyType == typeof(Guid) ? Guid.Parse(keyString) : Convert.ChangeType(keyString, keyType);
 
-            var entitySet = GetEntitySet(type);
+            //var entitySet = GetEntitySet(type);
 
-            var dbSet = (dynamic)GetType().GetProperty(entitySet.Name).GetValue(this, null);
+            throw new NotImplementedException("lol");
+            var dbSet = (dynamic)GetType().GetProperty("").GetValue(this, null);
             return (object)dbSet.Find(key);
         }
 
-        private EntitySet GetEntitySet(string typeName)
-        {
-            var adapter = (IObjectContextAdapter)this;
-            var context = adapter.ObjectContext;
-            var container = context.MetadataWorkspace.GetEntityContainer(context.DefaultContainerName, DataSpace.CSpace);
-            var entitySet = container.EntitySets.FirstOrDefault(x => x.ElementType.Name == typeName);
-            if (entitySet == null)
-                throw new InvalidOperationException($"Type '{typeName}' not found in the DbContext");
+        //private EntitySet GetEntitySet(string typeName)
+        //{
+        //    this.ChangeTracker.Entries().Where(x => x.Metadata.Name == typeName)
+        //    var adapter = (IObjectContextAdapter)this;
+        //    var context = adapter.ObjectContext;
+        //    var container = context.MetadataWorkspace.GetEntityContainer(context.DefaultContainerName, DataSpace.CSpace);
+        //    var entitySet = container.EntitySets.FirstOrDefault(x => x.ElementType.Name == typeName);
+        //    if (entitySet == null)
+        //        throw new InvalidOperationException($"Type '{typeName}' not found in the DbContext");
 
-            return entitySet;
-        }
+        //    return entitySet;
+        //}
 
         internal Type GetKeyType(string typeName)
         {
-            var entitySet = GetEntitySet(typeName);
+            var entityType = Model.FindEntityType(typeName);
+            // todo: rework to support multiple primary keys for entity
+            return entityType.FindPrimaryKey().Properties.FirstOrDefault()?.ClrType;
 
-            var keys = entitySet.ElementType.KeyProperties.FirstOrDefault().PrimitiveType.ClrEquivalentType;
-
-            return keys;
+            //var entitySet = GetEntitySet(typeName);
+            //var keys = entitySet.ElementType.KeyProperties.FirstOrDefault().PrimitiveType.ClrEquivalentType;
+            //return keys;
         }
 
         public T CloneWithOriginalValues<T>(T dbEntity)
