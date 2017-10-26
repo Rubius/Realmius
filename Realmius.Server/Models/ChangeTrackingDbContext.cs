@@ -18,13 +18,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Core.Metadata.Edm;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Realmius.Contracts.Helpers;
@@ -56,23 +55,20 @@ namespace Realmius.Server.Models
         private ILogger Logger => _syncConfiguration.Logger;
         private Dictionary<string, SyncTypeInfo> _syncedTypes;
 
-        protected ChangeTrackingDbContext(string nameOrConnectionString)
-            : base(nameOrConnectionString)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            _nameOrConnectionString = nameOrConnectionString;
+            optionsBuilder.UseSqlServer(_nameOrConnectionString);
             Initialize();
         }
 
-        protected ChangeTrackingDbContext()
+        protected ChangeTrackingDbContext(string nameOrConnectionString)
         {
-            _nameOrConnectionString = Database.Connection.ConnectionString;
-            Initialize();
+            _nameOrConnectionString = nameOrConnectionString;
         }
 
         private void Initialize()
         {
-            IRealmiusServerDbConfiguration configuration;
-            if (Configurations.TryGetValue(this.GetType(), out configuration))
+            if (Configurations.TryGetValue(GetType(), out var configuration))
             {
                 Initialize(configuration);
             }
@@ -142,7 +138,9 @@ namespace Realmius.Server.Models
                         || e.State == EntityState.Deleted
                     ).Select(x => new EfEntityInfo
                     {
-                        ModifiedProperties = x.State == EntityState.Deleted ? new Dictionary<string, bool>() : x.CurrentValues.PropertyNames.ToDictionary(z => z, z => x.Property(z).IsModified),
+                        ModifiedProperties = x.State == EntityState.Deleted 
+                            ? new Dictionary<string, bool>() 
+                            : x.CurrentValues.Properties.ToDictionary(z => z.Name, z => x.Property(z.Name).IsModified),
                         Entity = x.Entity,
                         CurrentValues = x.State == EntityState.Deleted ? null : x.CurrentValues?.Clone(),
                         OriginalValues = x.State == EntityState.Added ? null : x.OriginalValues?.Clone(),
@@ -236,6 +234,18 @@ namespace Realmius.Server.Models
             return result;
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SyncStatusServerObject>()
+                .HasIndex(x => x.LastChange);
+
+            modelBuilder.Entity<SyncStatusServerObject>()
+                .HasIndex(x => x.Type);
+
+            modelBuilder.Entity<SyncStatusServerObject>()
+                .HasIndex(x => x.Tag0);
+        }
+
         public static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
         {
             ContractResolver = new RealmServerObjectResolver(),
@@ -316,13 +326,13 @@ namespace Realmius.Server.Models
             syncStatusObject.UpdateColumnChangeDatesSerialized();
         }
 
-        public override Task<int> SaveChangesAsync()
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new CancellationToken())
         {
             ProcessChanges();
-            return base.SaveChangesAsync();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
             ProcessChanges();
             return base.SaveChangesAsync(cancellationToken);
@@ -407,10 +417,10 @@ namespace Realmius.Server.Models
         }
         #endregion
 
-        private string Serialize(DbPropertyValues values)
+        private string Serialize(PropertyValues values)
         {
             var dict = new Dictionary<string, object>();
-            foreach (var valuesPropertyName in values.PropertyNames)
+            foreach (var valuesPropertyName in values.Properties.Select(x => x.Name))
             {
                 dict[valuesPropertyName] = values[valuesPropertyName];
             }
@@ -488,37 +498,35 @@ namespace Realmius.Server.Models
             var keyType = GetKeyType(type);
             var key = keyType == typeof(Guid) ? Guid.Parse(keyString) : Convert.ChangeType(keyString, keyType);
 
-            var entitySet = GetEntitySet(type);
+            //var entitySet = GetEntitySet(type);
 
-            var dbSet = (dynamic)GetType().GetProperty(entitySet.Name).GetValue(this, null);
+            throw new NotImplementedException("lol");
+            var dbSet = (dynamic)GetType().GetProperty("").GetValue(this, null);
             return (object)dbSet.Find(key);
         }
 
-        private EntitySet GetEntitySet(string typeName)
-        {
-            var adapter = (IObjectContextAdapter)this;
-            var context = adapter.ObjectContext;
-            var container = context.MetadataWorkspace.GetEntityContainer(context.DefaultContainerName, DataSpace.CSpace);
-            var entitySet = container.EntitySets.FirstOrDefault(x => x.ElementType.Name == typeName);
-            if (entitySet == null)
-                throw new InvalidOperationException($"Type '{typeName}' not found in the DbContext");
+        //private EntitySet GetEntitySet(string typeName)
+        //{
+        //    this.ChangeTracker.Entries().Where(x => x.Metadata.Name == typeName)
+        //    var adapter = (IObjectContextAdapter)this;
+        //    var context = adapter.ObjectContext;
+        //    var container = context.MetadataWorkspace.GetEntityContainer(context.DefaultContainerName, DataSpace.CSpace);
+        //    var entitySet = container.EntitySets.FirstOrDefault(x => x.ElementType.Name == typeName);
+        //    if (entitySet == null)
+        //        throw new InvalidOperationException($"Type '{typeName}' not found in the DbContext");
 
-            return entitySet;
-        }
-        internal DbSet GetDbSet(string typeName)
-        {
-            var entitySet = GetEntitySet(typeName);
-
-            return (DbSet)GetType().GetProperty(entitySet.Name).GetValue(this, null);
-        }
+        //    return entitySet;
+        //}
 
         internal Type GetKeyType(string typeName)
         {
-            var entitySet = GetEntitySet(typeName);
+            var entityType = Model.FindEntityType(typeName);
+            // todo: rework to support multiple primary keys for entity
+            return entityType.FindPrimaryKey().Properties.FirstOrDefault()?.ClrType;
 
-            var keys = entitySet.ElementType.KeyProperties.FirstOrDefault().PrimitiveType.ClrEquivalentType;
-
-            return keys;
+            //var entitySet = GetEntitySet(typeName);
+            //var keys = entitySet.ElementType.KeyProperties.FirstOrDefault().PrimitiveType.ClrEquivalentType;
+            //return keys;
         }
 
         public T CloneWithOriginalValues<T>(T dbEntity)
@@ -532,7 +540,5 @@ namespace Realmius.Server.Models
 
             return untouchedEntityClone;
         }
-
-
     }
 }

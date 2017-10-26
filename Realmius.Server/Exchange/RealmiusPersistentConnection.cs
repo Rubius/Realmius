@@ -20,8 +20,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNet.SignalR;
+using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using Realmius.Contracts;
 using Realmius.Contracts.Models;
@@ -33,7 +34,7 @@ using Realmius.Contracts.Logger;
 
 namespace Realmius.Server.Exchange
 {
-    public class RealmiusPersistentConnection<TUser> : PersistentConnection
+    public class RealmiusPersistentConnection<TUser> : DynamicHub
     {
         protected readonly RealmiusServerProcessor<TUser> Processor;
         protected static RealmiusServerProcessor<TUser> ProcessorStatic;
@@ -56,6 +57,7 @@ namespace Realmius.Server.Exchange
             this(new RealmiusServerProcessor<TUser>(RealmiusServer.GetConfiguration<TUser>()))
         {
         }
+
         protected RealmiusPersistentConnection(RealmiusServerProcessor<TUser> processor)
         {
             InitializeIfNeeded();
@@ -105,7 +107,7 @@ namespace Realmius.Server.Exchange
                     break;
             }
 
-            return Task.FromResult(true);
+            return Task.CompletedTask;
         }
 
         public UploadDataResponse UploadData(UploadDataRequest request, string connectionId)
@@ -120,11 +122,11 @@ namespace Realmius.Server.Exchange
             return result;
         }
 
-        protected override Task OnConnected(IRequest request, string connectionId)
+        public override async Task OnConnectedAsync()
         {
-            UserConnected(request, connectionId);
+            await UserConnected(Context.User, Context.ConnectionId);
 
-            return base.OnConnected(request, connectionId);
+            await base.OnConnectedAsync();
         }
 
         public static void AddUserGroup(Func<TUser, bool> userPredicate, string group)
@@ -160,9 +162,9 @@ namespace Realmius.Server.Exchange
 
         }
 
-        protected virtual void UserConnected(IRequest contextRequest, string connectionId)
+        protected virtual async Task UserConnected(ClaimsPrincipal principal, string connectionId)
         {
-            var user = Processor.Configuration.AuthenticateUser(contextRequest);
+            var user = Processor.Configuration.AuthenticateUser(principal);
             if (user == null)
             {
                 CallUnauthorize(connectionId, new UnauthorizedResponse()
@@ -173,12 +175,12 @@ namespace Realmius.Server.Exchange
             }
             Connections[connectionId] = user;
 
-            var lastDownloadString = contextRequest.QueryString[Constants.LastDownloadParameterName];
+            var lastDownloadString = (string) Context.Connection.Metadata[Constants.LastDownloadParameterName];
             Dictionary<string, DateTimeOffset> lastDownload;
             var userTags = Processor.GetTagsForUser(user);
             if (string.IsNullOrEmpty(lastDownloadString))
             {
-                var lastDownloadOld = contextRequest.QueryString[Constants.LastDownloadParameterNameOld];
+                var lastDownloadOld = (string) Context.Connection.Metadata[Constants.LastDownloadParameterNameOld];
                 if (string.IsNullOrEmpty(lastDownloadOld))
                 {
                     lastDownload = new Dictionary<string, DateTimeOffset>();
@@ -193,7 +195,7 @@ namespace Realmius.Server.Exchange
             {
                 lastDownload = JsonConvert.DeserializeObject<Dictionary<string, DateTimeOffset>>(lastDownloadString);
             }
-            var types = contextRequest.QueryString[Constants.SyncTypesParameterName];
+            var types = (string) Context.Connection.Metadata[Constants.SyncTypesParameterName];
             var data = Processor.Download(new DownloadDataRequest()
             {
                 LastChangeTime = lastDownload,
@@ -205,7 +207,7 @@ namespace Realmius.Server.Exchange
 
             foreach (var userTag in userTags)
             {
-                Groups.Add(connectionId, userTag);
+                await Groups.AddAsync(connectionId, userTag);
             }
         }
 
@@ -220,28 +222,27 @@ namespace Realmius.Server.Exchange
 
         private void Send(string connectionId, string command, object data)
         {
-            Connection.Send(connectionId, command + Serialize(data));
+            Clients.Client(connectionId).InvokeAsync(command, Serialize(data));
         }
 
-        protected override Task OnDisconnected(IRequest request, string connectionId, bool stopCalled)
+        public override async Task OnDisconnectedAsync(Exception exception)
         {
-            UserDisconnected(connectionId);
+            UserDisconnected(Context.ConnectionId);
 
-            return base.OnDisconnected(request, connectionId, stopCalled);
+            await base.OnDisconnectedAsync(exception);
         }
 
         private void UserDisconnected(string connectionId)
         {
-            TUser user;
             if (Connections.ContainsKey(connectionId))
-                Connections.TryRemove(connectionId, out user);
+                Connections.TryRemove(connectionId, out _);
         }
 
-        protected override Task OnReconnected(IRequest request, string connectionId)
-        {
-            UserConnected(request, connectionId);
+        //protected override Task OnReconnected(IRequest request, string connectionId)
+        //{
+        //    UserConnected(request, connectionId);
 
-            return base.OnReconnected(request, connectionId);
-        }
+        //    return base.OnReconnected(request, connectionId);
+        //}
     }
 }

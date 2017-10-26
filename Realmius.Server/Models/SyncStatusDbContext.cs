@@ -16,18 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Realmius.Server.Migrations;
 
 namespace Realmius.Server.Models
 {
     public class SyncStatusDbContext : DbContext
     {
-        public IDbSet<SyncStatusServerObject> SyncStatusServerObjects { get; set; }
+        private readonly string _connectionString;
+        public DbSet<SyncStatusServerObject> SyncStatusServerObjects { get; set; }
 
         static SyncStatusDbContext()
         {
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<SyncStatusDbContext, Configuration>(true));
+            //Database.SetInitializer(new MigrateDatabaseToLatestVersion<SyncStatusDbContext, Configuration>(true));
             //Database.SetInitializer<SyncStatusDbContext>(new DropCreateDatabaseIfModelChanges<SyncStatusDbContext>());
         }
 
@@ -35,8 +36,14 @@ namespace Realmius.Server.Models
         {
         }
 
-        public SyncStatusDbContext(string connectionString) : base(connectionString)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            optionsBuilder.UseSqlServer(_connectionString);
+        }
+
+        public SyncStatusDbContext(string connectionString)
+        {
+            _connectionString = connectionString;
         }
     }
 }

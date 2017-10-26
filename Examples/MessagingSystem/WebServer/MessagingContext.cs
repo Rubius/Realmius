@@ -16,32 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-using System;
-using System.ComponentModel.DataAnnotations.Schema;
-using Newtonsoft.Json;
-using Realmius.Server;
+using Microsoft.EntityFrameworkCore;
+using Realmius.Server.Models;
 
-namespace Server.Entities
+namespace WebServer
 {
-    [Table("Messages")]
-    public class Message : IRealmiusObjectServer
+    public class MessagingContext : ChangeTrackingDbContext
     {
-        public string Id { get; set; }
+        public MessagingContext(string nameOrConnectionString) : base(nameOrConnectionString)
+        {
+        }
 
-        public string MobilePrimaryKey => Id;
-
-        public DateTimeOffset DateTime { get; set; }
-
-        public string ClientId { get; set; }
-
-        public string Text { get; set; }
-
-        [ForeignKey(nameof(ReplyId))]
-        [NotMapped]
-        [JsonIgnore]
-        public virtual Message Reply { get; set; }
-
-        [NotMapped]
-        public string ReplyId { get; set; }
+        public DbSet<Message> Messages { get; set; }
     }
 }

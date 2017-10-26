@@ -18,11 +18,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Validation;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Realmius.Contracts.Models;
@@ -66,7 +65,7 @@ namespace Realmius.Server
                     throw new InvalidOperationException($"Type {type} does not implement IRealmiusObjectServer, unable to continue");
             }
 
-            _connectionString = _dbContextFactoryFunc().Database.Connection.ConnectionString;
+            _connectionString = _dbContextFactoryFunc().Database.GetDbConnection().ConnectionString;
         }
 
         public UploadDataResponse Upload(UploadDataRequest request, TUser user)

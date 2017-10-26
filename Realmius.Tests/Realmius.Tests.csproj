@@ -210,10 +210,6 @@
       <Project>{eec4eb66-de49-47b1-b29c-3f20edce2178}</Project>
       <Name>Realmius.Contracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Realmius.Server\Realmius.Server.csproj">
-      <Project>{197EEC4A-5985-4422-B76F-887281D7BC04}</Project>
-      <Name>Realmius.Server</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Realmius\Realmius.csproj">
       <Project>{B1651A06-7CEC-4529-B8EE-E594D26A62D3}</Project>
       <Name>Realmius</Name>

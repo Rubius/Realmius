@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Realmius.Server.Models
 {
@@ -26,8 +26,8 @@ namespace Realmius.Server.Models
     {
         public Dictionary<string, bool> ModifiedProperties { get; set; }
         public object Entity { get; set; }
-        public DbPropertyValues CurrentValues { get; set; }
-        public DbPropertyValues OriginalValues { get; set; }
+        public PropertyValues CurrentValues { get; set; }
+        public PropertyValues OriginalValues { get; set; }
         public EntityState State { get; set; }
     }
 }
