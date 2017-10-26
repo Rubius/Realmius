@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
 using Realmius.Contracts.Logger;
@@ -100,7 +101,7 @@ namespace Realmius.Server.Configurations
         /// <param name="db">reference to the database to retrieve Tags from it (if needed)</param>
         /// <returns>Return the tags the user has access to from this method.The method is called once, soon after the user is connected.</returns>
         public abstract IList<string> GetTagsForUser(TUser user, ChangeTrackingDbContext db);
-        
+
         /// <summary>
         /// this is where user authentication happen. 
         /// IRequest is a SignalR object, which has request.QueryString property. 
@@ -108,12 +109,12 @@ namespace Realmius.Server.Configurations
         /// (e.g. SyncServiceFactory.CreateUsingSignalR(Realm.CreateInstance, new Uri("http://localhost/Realmius?userLogin=John&pass=123"),...)) 
         /// use that information to authenticate the user on the server-side. Note, that passing login and password directly is not recommended (pass some key/hash instead) :).
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="principal"></param>
         /// <returns>
         /// If user is authenticated, return any object that identifies it (could be a string with username). This object will be passed back to you later in CheckAndProcess and GetTagsForUser
         /// If the user is not authenticated return null or throw an exception.
         ///</returns>
-        public abstract TUser AuthenticateUser(IRequest request);
+        public abstract TUser AuthenticateUser(ClaimsPrincipal principal);
         public Func<ChangeTrackingDbContext> ContextFactoryFunction { get; set; }
     }
 }
