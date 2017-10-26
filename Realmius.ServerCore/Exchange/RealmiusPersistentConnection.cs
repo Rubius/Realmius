@@ -221,7 +221,7 @@ namespace Realmius.Server.Exchange
 
         private void Send(string connectionId, string command, object data)
         {
-            Connection.Send(connectionId, command + Serialize(data));
+            Clients.Client(connectionId).InvokeAsync(command, Serialize(data));
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
@@ -233,9 +233,8 @@ namespace Realmius.Server.Exchange
 
         private void UserDisconnected(string connectionId)
         {
-            TUser user;
             if (Connections.ContainsKey(connectionId))
-                Connections.TryRemove(connectionId, out user);
+                Connections.TryRemove(connectionId, out _);
         }
 
         //protected override Task OnReconnected(IRequest request, string connectionId)
