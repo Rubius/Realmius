@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Realmius.Contracts\Realmius.Contracts.csproj" />
-    <ProjectReference Include="..\..\..\Realmius.ServerCore\Realmius.ServerCore.csproj" />
+    <ProjectReference Include="..\..\..\Realmius.Server\Realmius.Server.csproj" />
   </ItemGroup>
 
 </Project>
