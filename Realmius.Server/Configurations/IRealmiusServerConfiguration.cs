@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using Microsoft.AspNet.SignalR;
 using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
@@ -38,7 +39,7 @@ namespace Realmius.Server.Configurations
 
         bool CheckAndProcess(CheckAndProcessArgs<TUser> args);
         object[] KeyForType(Type type, string itemPrimaryKey);
-        TUser AuthenticateUser(IRequest request);
+        TUser AuthenticateUser(ClaimsPrincipal principal);
 
         Func<ChangeTrackingDbContext> ContextFactoryFunction { get; set; }
     }

@@ -37,7 +37,6 @@ namespace Realmius.Server.Models
         [MaxLength(40)]
         public string MobilePrimaryKey { get; set; }
 
-        [Index("IX_Download0", 2)]
         [Key]
         [Column(Order = 0)]
         [MaxLength(40)]
@@ -45,11 +44,9 @@ namespace Realmius.Server.Models
 
         public bool IsDeleted { get; set; }
 
-        [Index("IX_Download0", 1)]
         public DateTimeOffset LastChange { get; set; }
         public string FullObjectAsJson { get; set; }
 
-        [Index("IX_Download0", 3)]
         [MaxLength(40)]
         public string Tag0 { get; set; }
         [MaxLength(40)]
