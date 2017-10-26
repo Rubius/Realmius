@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Owin;
+using Microsoft.AspNetCore.Builder;
 using Realmius.Server.Configurations;
 using Realmius.Server.Exchange;
 using Realmius.Server.Infrastructure;
@@ -12,15 +12,16 @@ namespace Realmius.Server.QuickStart
     {
         public static void SetupSignalRServer<T>(
             string url,
-            IAppBuilder app,
+            IApplicationBuilder app,
             IRealmiusServerConfiguration<T> configuration)
         {
-            app.MapSignalR<RealmiusPersistentConnection<T>>(url);
+            app.UseSignalR(builder => builder.MapHub<RealmiusPersistentConnection<T>>(url));
+            //app.MapSignalR<RealmiusPersistentConnection<T>>(url);
         }
 
         public static void SetupShareEverythingSignalRServer(
             string url,
-            IAppBuilder app,
+            IApplicationBuilder app,
             Func<ChangeTrackingDbContext> contextFunc,
             params Type[] types)
         {

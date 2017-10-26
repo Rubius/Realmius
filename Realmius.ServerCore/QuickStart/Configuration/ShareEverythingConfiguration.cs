@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using Realmius.Server.Configurations;
 using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
@@ -58,9 +59,9 @@ namespace Realmius.Server.QuickStart
             return true;
         }
 
-        public override object AuthenticateUser(IRequest request)
+        public override object AuthenticateUser(ClaimsPrincipal principal)
         {
-            return new { };
+            throw new NotImplementedException();
         }
     }
 }
