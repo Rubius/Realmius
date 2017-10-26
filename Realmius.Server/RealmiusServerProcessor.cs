@@ -65,7 +65,7 @@ namespace Realmius.Server
                     throw new InvalidOperationException($"Type {type} does not implement IRealmiusObjectServer, unable to continue");
             }
 
-            _connectionString = _dbContextFactoryFunc().Database.Connection.ConnectionString;
+            _connectionString = _dbContextFactoryFunc().Database.GetDbConnection().ConnectionString;
         }
 
         public UploadDataResponse Upload(UploadDataRequest request, TUser user)
