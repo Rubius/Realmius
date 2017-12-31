@@ -521,7 +521,7 @@ namespace Realmius.SyncService
 
                     var fullPath = Path.Combine(FileSystem.Current.LocalStorage.Path, path);
                     var fileContent = await FileSystem.Current.GetFileFromPathAsync(fullPath);
-                    var stream = await fileContent.OpenAsync(FileAccess.Read);
+                    var stream = await fileContent.OpenAsync(PCLStorage.FileAccess.Read);
 
                     var streamContent = new StreamContent(stream);
 

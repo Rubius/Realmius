@@ -26,13 +26,10 @@ namespace Realmius.Server.Models
     {
         public int Id { get; set; }
 
-        [Index]
         [MaxLength(40)]
         public string RecordIdString { get; set; }
-        [Index]
         public int RecordIdInt { get; set; }
 
-        [Index("IX_Time")]
         public DateTimeOffset Time { get; set; }
         public string EntityType { get; set; }
         public string BeforeJson { get; set; }

@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 using Microsoft.EntityFrameworkCore;
-using Realmius.Server.Migrations;
 
 namespace Realmius.Server.Models
 {
@@ -28,8 +27,6 @@ namespace Realmius.Server.Models
 
         static SyncStatusDbContext()
         {
-            //Database.SetInitializer(new MigrateDatabaseToLatestVersion<SyncStatusDbContext, Configuration>(true));
-            //Database.SetInitializer<SyncStatusDbContext>(new DropCreateDatabaseIfModelChanges<SyncStatusDbContext>());
         }
 
         public SyncStatusDbContext()
