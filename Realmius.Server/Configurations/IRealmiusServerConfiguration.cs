@@ -19,8 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using Microsoft.AspNet.SignalR;
-using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
 using Realmius.Contracts.Logger;
 

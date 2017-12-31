@@ -1,15 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius", "Realmius\Realmius.csproj", "{B1651A06-7CEC-4529-B8EE-E594D26A62D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realmius", "Realmius\Realmius.csproj", "{B1651A06-7CEC-4529-B8EE-E594D26A62D3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178} = {EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius.Contracts", "Realmius.Contracts\Realmius.Contracts.csproj", "{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realmius.Contracts", "Realmius.Contracts\Realmius.Contracts.csproj", "{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius.Server", "Realmius.Server\Realmius.Server.csproj", "{197EEC4A-5985-4422-B76F-887281D7BC04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realmius.Server", "Realmius.Server\Realmius.Server.csproj", "{197EEC4A-5985-4422-B76F-887281D7BC04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius.Tests", "Realmius.Tests\Realmius.Tests.csproj", "{2C4A00F9-0B66-4CBA-BBD0-601172B00278}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realmius.Tests", "Realmius.Tests\Realmius.Tests.csproj", "{2C4A00F9-0B66-4CBA-BBD0-601172B00278}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +39,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0A4B9868-065A-4DA0-8423-7FB0203BCCFF}
 	EndGlobalSection
 EndGlobal

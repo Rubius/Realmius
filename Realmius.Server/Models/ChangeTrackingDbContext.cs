@@ -138,8 +138,8 @@ namespace Realmius.Server.Models
                         || e.State == EntityState.Deleted
                     ).Select(x => new EfEntityInfo
                     {
-                        ModifiedProperties = x.State == EntityState.Deleted 
-                            ? new Dictionary<string, bool>() 
+                        ModifiedProperties = x.State == EntityState.Deleted
+                            ? new Dictionary<string, bool>()
                             : x.CurrentValues.Properties.ToDictionary(z => z.Name, z => x.Property(z.Name).IsModified),
                         Entity = x.Entity,
                         CurrentValues = x.State == EntityState.Deleted ? null : x.CurrentValues?.Clone(),
@@ -244,6 +244,15 @@ namespace Realmius.Server.Models
 
             modelBuilder.Entity<SyncStatusServerObject>()
                 .HasIndex(x => x.Tag0);
+
+            modelBuilder.Entity<LogEntryBase>()
+              .HasIndex(x => x.Time);
+
+            modelBuilder.Entity<LogEntryBase>()
+                .HasIndex(x => x.RecordIdInt);
+
+            modelBuilder.Entity<LogEntryBase>()
+                .HasIndex(x => x.RecordIdString);
         }
 
         public static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
