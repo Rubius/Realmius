@@ -20,6 +20,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -44,7 +45,7 @@ namespace Realmius.Tests.Server
             _contextFunc = () => new LocalDbContext();
             _config = new ShareEverythingConfiguration(_contextFunc, typeof(DbSyncObject), typeof(DbSyncObjectWithIgnoredFields));
 
-            _syncContextFunc = () => new SyncStatusDbContext(_contextFunc().Database.Connection.ConnectionString);
+            _syncContextFunc = () => new SyncStatusDbContext(_contextFunc().Database.GetDbConnection().ConnectionString);
         }
 
         [Test]
