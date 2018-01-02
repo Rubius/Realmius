@@ -77,7 +77,7 @@ namespace Realmius.Tests.Client
         private Mock<RealmiusSyncService> CreateSyncService()
         {
             Func<Realm> func = GetRealm;
-            return new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, new Type[]
+            return new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, new[]
             {
                 typeof(DbSyncClientObject),
                 typeof(DbSyncClientObject2),
@@ -92,7 +92,17 @@ namespace Realmius.Tests.Client
 
         public Realm GetRealm()
         {
-            return Realm.GetInstance(_realmFileName);
+            return Realm.GetInstance(new RealmConfiguration(_realmFileName)
+            {
+                ObjectClasses = new[]
+                {
+                    typeof(DbSyncClientObject),
+                    typeof(DbSyncClientObject2),
+                    typeof(DbSyncWithDoNotUpload),
+                    typeof(RealmRef),
+                    typeof(RealmManyRef),
+                }
+            });
         }
 
         [Fact]
