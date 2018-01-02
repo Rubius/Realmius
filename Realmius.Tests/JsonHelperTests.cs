@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 using FluentAssertions;
-using NUnit.Framework;
 using Realmius.Contracts.Helpers;
 using Xunit;
 

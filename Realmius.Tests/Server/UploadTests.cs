@@ -23,7 +23,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Newtonsoft.Json;
-using NUnit.Framework;
 using Realmius.Contracts.Models;
 using Realmius.Server;
 using Realmius.Server.Configurations;
@@ -62,7 +61,7 @@ namespace Realmius.Tests.Server
                 }
             }, null);
             result.Results.Count.Should().Be(1);
-            result.Results[0].Error.Should().ContainEquivalentOf("The entity type UnknownSyncObject is not part of the model for the current context");
+            result.Results[0].Error.Should().ContainEquivalentOf("Cannot create a DbSet for 'UnknownSyncObject' ");
         }
 
         public class IntFieldSentAsStringObject : IRealmiusObjectServer
@@ -119,7 +118,7 @@ namespace Realmius.Tests.Server
         }
 
 
-        [Fact]
+        [Fact(Skip = "No ManyToMany in EFCore yet")]
         public void ManyToManyRef()
         {
             var db = _contextFunc();
@@ -870,15 +869,19 @@ namespace Realmius.Tests.Server
             var obj3 = db2.DbSyncObjects.Find("123");
             obj3.Text.Should().Be("asd");
 
-            try
-            {
-                obj2Entry.State = EntityState.Modified;
-            }
-            catch (InvalidOperationException)
-            {
-                db2.Entry(obj3).State = EntityState.Detached;
-                obj2Entry.State = EntityState.Modified;
-            }
+            db2.Entry(obj3).State = EntityState.Detached;
+            db2.Entry(obj2).State = EntityState.Modified;
+
+            //try
+            //{
+            //    obj2Entry.State = EntityState.Modified;
+            //}
+            //catch (InvalidOperationException)
+            //{
+            //    db2.Entry(obj3).State = EntityState.Detached;
+            //    db2.Entry(obj2).State = EntityState.Modified;
+            //    //obj2Entry.State = EntityState.Modified;
+            //}
 
             var entry = db2.ChangeTracker.Entries().First();
             var m1 = entry.Property("Text").IsModified;

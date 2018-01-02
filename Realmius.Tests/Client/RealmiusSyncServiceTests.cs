@@ -25,7 +25,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
-using NUnit.Framework;
 using Realmius.Contracts.Models;
 using Realmius.SyncService;
 using Realmius.SyncService.ApiClient;
@@ -49,7 +48,7 @@ namespace Realmius.Tests.Client
 
         public RealmiusSyncServiceTests()
         {
-            
+
             _apiClientMock = new Mock<IApiClient>();
 
             _uploadRequests = new List<UploadDataRequest>();
@@ -73,7 +72,7 @@ namespace Realmius.Tests.Client
             RealmiusSyncService.DelayWhenUploadRequestFailed = 10;
         }
 
-        
+
         public void Dispose()
         {
             _realmiusSyncService.Dispose();
@@ -83,7 +82,17 @@ namespace Realmius.Tests.Client
         {
             Func<Realm> func = GetRealm;
 
-            var mock = new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, Assembly.GetExecutingAssembly())
+            var mock = new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, new Type[]
+            {
+                typeof(DbSyncClientObject),
+                typeof(DbSyncClientObject2),
+                typeof(DbSyncWithDoNotUpload),
+                typeof(RealmRef),
+                typeof(RealmManyRef),
+                typeof(Serializer1),
+                typeof(Serializer_Link),
+                typeof(Serializer_Collection),
+            })
             {
                 CallBase = true,
             };

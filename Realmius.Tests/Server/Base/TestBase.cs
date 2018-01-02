@@ -18,11 +18,11 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using Realmius.Server.QuickStart;
 using Realmius.Tests.Server.Models;
+using Xunit;
 using Z.EntityFramework.Plus;
-
+[assembly: CollectionBehavior(CollectionBehavior.CollectionPerAssembly, DisableTestParallelization = true, MaxParallelThreads = 1)]
 namespace Realmius.Tests.Server
 {
     public static class TestsExtensions
@@ -33,7 +33,7 @@ namespace Realmius.Tests.Server
         }
     }
 
-    public class TestBase
+    public class TestBase : IDisposable
     {
 
         public TestBase()
@@ -49,6 +49,10 @@ namespace Realmius.Tests.Server
             context.DbSyncObjectWithIgnoredFields.Delete();
             context.UnknownSyncObjectServers.Delete();
             context.CreateSyncStatusContext().SyncStatusServerObjects.Delete();
+        }
+
+        public void Dispose()
+        {
         }
     }
 }

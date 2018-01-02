@@ -24,7 +24,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
-using NUnit.Framework;
 using Realmius.Contracts.Models;
 using Realmius.SyncService;
 using Realmius.SyncService.ApiClient;
@@ -78,7 +77,14 @@ namespace Realmius.Tests.Client
         private Mock<RealmiusSyncService> CreateSyncService()
         {
             Func<Realm> func = GetRealm;
-            return new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, Assembly.GetExecutingAssembly())
+            return new Mock<RealmiusSyncService>(func, _apiClientMock.Object, false, new Type[]
+            {
+                typeof(DbSyncClientObject),
+                typeof(DbSyncClientObject2),
+                typeof(DbSyncWithDoNotUpload),
+                typeof(RealmRef),
+                typeof(RealmManyRef),
+            })
             {
                 CallBase = true,
             };
