@@ -29,8 +29,26 @@ namespace Realmius.Server.Models
         {
         }
 
-        public SyncStatusDbContext()
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<SyncStatusServerObject>()
+                .HasKey(c => new { c.MobilePrimaryKey, c.Type })
+                ;
+
+            modelBuilder.Entity<SyncStatusServerObject>()
+                .HasIndex(x => x.LastChange);
+
+            modelBuilder.Entity<SyncStatusServerObject>()
+                .HasIndex(x => x.Tag0);
+
+            modelBuilder.Entity<LogEntryBase>()
+                .HasIndex(x => x.Time);
+
+            modelBuilder.Entity<LogEntryBase>()
+                .HasIndex(x => x.RecordIdInt);
+
+            modelBuilder.Entity<LogEntryBase>()
+                .HasIndex(x => x.RecordIdString);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

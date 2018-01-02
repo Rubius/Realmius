@@ -228,27 +228,6 @@ namespace Realmius.Server.Models
             return result;
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<SyncStatusServerObject>()
-                .HasIndex(x => x.LastChange);
-
-            modelBuilder.Entity<SyncStatusServerObject>()
-                .HasIndex(x => x.Type);
-
-            modelBuilder.Entity<SyncStatusServerObject>()
-                .HasIndex(x => x.Tag0);
-
-            modelBuilder.Entity<LogEntryBase>()
-              .HasIndex(x => x.Time);
-
-            modelBuilder.Entity<LogEntryBase>()
-                .HasIndex(x => x.RecordIdInt);
-
-            modelBuilder.Entity<LogEntryBase>()
-                .HasIndex(x => x.RecordIdString);
-        }
-
         public static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
         {
             ContractResolver = new RealmServerObjectResolver(),
@@ -500,26 +479,9 @@ namespace Realmius.Server.Models
         {
             var keyType = GetKeyType(type);
             var key = keyType == typeof(Guid) ? Guid.Parse(keyString) : Convert.ChangeType(keyString, keyType);
-
-            //var entitySet = GetEntitySet(type);
-
-            throw new NotImplementedException("lol");
-            var dbSet = (dynamic)GetType().GetProperty("").GetValue(this, null);
-            return (object)dbSet.Find(key);
+            var entityType = this.Model.FindEntityType(type);
+            return this.Find(entityType.ClrType, key);
         }
-
-        //private EntitySet GetEntitySet(string typeName)
-        //{
-        //    this.ChangeTracker.Entries().Where(x => x.Metadata.Name == typeName)
-        //    var adapter = (IObjectContextAdapter)this;
-        //    var context = adapter.ObjectContext;
-        //    var container = context.MetadataWorkspace.GetEntityContainer(context.DefaultContainerName, DataSpace.CSpace);
-        //    var entitySet = container.EntitySets.FirstOrDefault(x => x.ElementType.Name == typeName);
-        //    if (entitySet == null)
-        //        throw new InvalidOperationException($"Type '{typeName}' not found in the DbContext");
-
-        //    return entitySet;
-        //}
 
         internal Type GetKeyType(string typeName)
         {

@@ -39,6 +39,7 @@ namespace Realmius.Tests.Server
         public TestBase()
         {
             var context = new LocalDbContext();
+            context.Database.EnsureCreated();
 
             var config = new ShareEverythingConfiguration(() => new LocalDbContext(), typeof(DbSyncObject));
             context.EnableSyncTracking = false;
