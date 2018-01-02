@@ -23,7 +23,6 @@ using System.Security.Claims;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using NUnit.Framework;
 using Realmius.Contracts.Models;
 using Realmius.Server;
 using Realmius.Server.Configurations;
@@ -44,7 +43,6 @@ namespace Realmius.Tests.Server
         }
     }
 
-    [TestFixture]
     public class TagsTests : TestBase
     {
         private Func<LocalDbContext> _contextFunc;

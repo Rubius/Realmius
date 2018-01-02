@@ -23,7 +23,6 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NUnit.Framework;
 using Realmius.Server.Models;
 using Realmius.Server.QuickStart;
 using Realmius.Tests.Server.Models;

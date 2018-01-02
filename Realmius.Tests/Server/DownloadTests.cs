@@ -22,7 +22,6 @@ using System.Linq;
 using System.Threading;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
 using Realmius.Contracts.Models;
 using Realmius.Server;
 using Realmius.Server.QuickStart;
@@ -59,7 +58,7 @@ namespace Realmius.Tests.Server
             result.ChangedObjects.Should().BeEmpty();
         }
 
-        [Fact]
+        [Fact(Skip = "No ManyToMany for EFCore")]
         public void ManyToManyRef()
         {
             var ef = _contextFunc();

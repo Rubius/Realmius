@@ -32,7 +32,7 @@ namespace Realmius.Server.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<SyncStatusServerObject>()
-                .HasKey(c => new { c.MobilePrimaryKey, c.Type })
+                .HasKey(c => new { c.Type, c.MobilePrimaryKey })
                 ;
 
             modelBuilder.Entity<SyncStatusServerObject>()

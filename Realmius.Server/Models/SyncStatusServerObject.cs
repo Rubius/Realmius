@@ -32,13 +32,9 @@ namespace Realmius.Server.Models
     [Table("_RealmSyncStatus")]
     public class SyncStatusServerObject
     {
-        [Key]
-        [Column(Order = 1)]
         [MaxLength(40)]
         public string MobilePrimaryKey { get; set; }
 
-        [Key]
-        [Column(Order = 0)]
         [MaxLength(40)]
         public string Type { get; set; }
 
@@ -56,26 +52,34 @@ namespace Realmius.Server.Models
         [MaxLength(40)]
         public string Tag3 { get; set; }
 
-        private string _columnChangeDatesSerialized;
-        public string ColumnChangeDatesSerialized
-        {
-            get => _columnChangeDatesSerialized;
-            set
-            {
-                _columnChangeDatesSerialized = value;
-                ColumnChangeDates = value == null
-                    ? null
-                    : JsonConvert.DeserializeObject<Dictionary<string, DateTimeOffset>>(value);
-            }
-        }
+        private string _columnChangeDatesLastDeserialized;
+        private Dictionary<string, DateTimeOffset> _columnChangeDates = new Dictionary<string, DateTimeOffset>();
+
+        public string ColumnChangeDatesSerialized { get; set; }
 
         public void UpdateColumnChangeDatesSerialized()
         {
-            _columnChangeDatesSerialized = JsonConvert.SerializeObject(ColumnChangeDates);
+            ColumnChangeDatesSerialized = JsonConvert.SerializeObject(ColumnChangeDates);
         }
 
         [NotMapped]
-        public Dictionary<string, DateTimeOffset> ColumnChangeDates { get; set; } = new Dictionary<string, DateTimeOffset>();
+        public Dictionary<string, DateTimeOffset> ColumnChangeDates
+        {
+            get
+            {
+                if (_columnChangeDatesLastDeserialized == ColumnChangeDatesSerialized)
+                    return _columnChangeDates;
+
+                if (!string.IsNullOrEmpty(ColumnChangeDatesSerialized))
+                    _columnChangeDates = JsonConvert.DeserializeObject<Dictionary<string, DateTimeOffset>>(ColumnChangeDatesSerialized) ?? new Dictionary<string, DateTimeOffset>();
+                else
+                    _columnChangeDates = new Dictionary<string, DateTimeOffset>();
+
+                _columnChangeDatesLastDeserialized = ColumnChangeDatesSerialized;
+                return _columnChangeDates;
+            }
+            set => _columnChangeDates = value;
+        }
 
         public SyncStatusServerObject()
         {

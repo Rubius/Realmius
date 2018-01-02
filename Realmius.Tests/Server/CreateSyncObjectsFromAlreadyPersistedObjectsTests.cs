@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using FluentAssertions;
-using NUnit.Framework;
 using Realmius.Contracts.Models;
 using Realmius.Server;
 using Realmius.Server.QuickStart;

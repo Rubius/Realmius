@@ -24,6 +24,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Realmius.Contracts.Helpers;
@@ -154,7 +155,6 @@ namespace Realmius.Server.Models
                     var typeName = GetEfTypeName(entity.Entity);
                     if (!_syncedTypes.ContainsKey(typeName))
                         continue;
-                    var syncTypeInfo = _syncedTypes[typeName];
 
                     var obj = (IRealmiusObjectServer)entity.Entity;
                     var syncStatusObject = AddOrCreateNewSyncObject(syncStatusContext, typeName, obj.MobilePrimaryKey);
@@ -273,7 +273,7 @@ namespace Realmius.Server.Models
 
         private SyncStatusServerObject AddOrCreateNewSyncObject(SyncStatusDbContext syncStatusContext, string type, string mobilePrimaryKey)
         {
-            var syncObj = syncStatusContext.SyncStatusServerObjects.Find(type, mobilePrimaryKey);
+            var syncObj = syncStatusContext.SyncStatusServerObjects.Find(new object[] { type, mobilePrimaryKey });
             if (syncObj == null)
             {
                 syncObj = new SyncStatusServerObject(type, mobilePrimaryKey);
@@ -485,13 +485,22 @@ namespace Realmius.Server.Models
         {
             var keyType = GetKeyType(type);
             var key = keyType == typeof(Guid) ? Guid.Parse(keyString) : Convert.ChangeType(keyString, keyType);
-            var entityType = this.Model.FindEntityType(type);
-            return this.Find(entityType.ClrType, key);
+            return this.Find(GetEntityType(type).ClrType, key);
         }
 
+        private Dictionary<string, IEntityType> _entityTypes;
+
+        internal IEntityType GetEntityType(string typeName)
+        {
+            if (_entityTypes == null)
+            {
+                _entityTypes = Model.GetEntityTypes().ToDictionary(x => x.ClrType.Name, x => x);
+            }
+            return _entityTypes[typeName];
+        }
         internal Type GetKeyType(string typeName)
         {
-            var entityType = Model.FindEntityType(typeName);
+            var entityType = GetEntityType(typeName);
             // todo: rework to support multiple primary keys for entity
             return entityType.FindPrimaryKey().Properties.FirstOrDefault()?.ClrType;
 
