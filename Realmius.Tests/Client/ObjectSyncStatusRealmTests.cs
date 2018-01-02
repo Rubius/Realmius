@@ -19,13 +19,13 @@
 using FluentAssertions;
 using NUnit.Framework;
 using Realmius.SyncService.RealmModels;
+using Xunit;
 
 namespace Realmius.Tests.Client
 {
-    [TestFixture]
     public class ObjectSyncStatusRealmTests
     {
-        [Test]
+        [Fact]
         public void KeyGenerationTest1()
         {
             var status = new ObjectSyncStatusRealm
@@ -38,7 +38,7 @@ namespace Realmius.Tests.Client
             status.Type.Should().BeEquivalentTo("qwe");
         }
 
-        [Test]
+        [Fact]
         public void KeyGenerationTest2()
         {
             var status = new ObjectSyncStatusRealm

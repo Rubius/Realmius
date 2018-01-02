@@ -26,10 +26,10 @@ using Realmius.Contracts.Models;
 using Realmius.Server;
 using Realmius.Server.QuickStart;
 using Realmius.Tests.Server.Models;
+using Xunit;
 
 namespace Realmius.Tests.Server
 {
-    [TestFixture]
     public class CreateSyncObjectsFromAlreadyPersistedObjectsTests : TestBase
     {
         private Func<LocalDbContext> _contextFunc;
@@ -39,17 +39,11 @@ namespace Realmius.Tests.Server
         public CreateSyncObjectsFromAlreadyPersistedObjectsTests()
         {
             _contextFunc = () => new LocalDbContext();
-        }
-
-        [SetUp]
-        public override void Setup()
-        {
-            base.Setup();
             _user = new { };
             _processor = new RealmiusServerProcessor<object>(new ShareEverythingConfiguration(_contextFunc, typeof(DbSyncObject)));
         }
 
-        [Test]
+        [Fact]
         public void KeyType()
         {
             var db = _contextFunc();
@@ -59,7 +53,7 @@ namespace Realmius.Tests.Server
             db.GetKeyType(nameof(IdIntObject)).Should().Be(typeof(int));
         }
 
-        [Test]
+        [Fact]
         public void GetObjectByKey()
         {
             // Assert
@@ -91,7 +85,7 @@ namespace Realmius.Tests.Server
             ((IdIntObject)db2.GetObjectByKey(nameof(IdIntObject), "4")).Text.Should().BeEquivalentTo("5");
         }
 
-        [Test]
+        [Fact]
         public void Attach_NewObject()
         {
             var db = _contextFunc();
@@ -133,7 +127,7 @@ namespace Realmius.Tests.Server
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, SerializedObject: { \"Text\": \"x\", \"Tags\": null, \"Id\": \"2\"}");
         }
 
-        [Test]
+        [Fact]
         public void Attach_UpdatedObject()
         {
             var db = _contextFunc();
@@ -184,7 +178,7 @@ namespace Realmius.Tests.Server
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, SerializedObject: { \"Text\": \"qwe\", \"Tags\": \"c\", \"Id\": \"2\"}");
         }
 
-        [Test]
+        [Fact]
         public void Attach_DeletedObject()
         {
             var time = DateTimeOffset.UtcNow;

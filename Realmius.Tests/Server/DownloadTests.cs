@@ -27,10 +27,10 @@ using Realmius.Contracts.Models;
 using Realmius.Server;
 using Realmius.Server.QuickStart;
 using Realmius.Tests.Server.Models;
+using Xunit;
 
 namespace Realmius.Tests.Server
 {
-    [TestFixture]
     public class DownloadTests : TestBase
     {
         private Func<LocalDbContext> _contextFunc;
@@ -38,11 +38,8 @@ namespace Realmius.Tests.Server
         private ShareEverythingConfiguration _config;
         private object _user;
 
-        [SetUp]
-        public override void Setup()
+        public DownloadTests()
         {
-            base.Setup();
-
             _contextFunc = () => new LocalDbContext();
             _config = new ShareEverythingConfiguration(_contextFunc, typeof(DbSyncObject), typeof(RefSyncObject));
 
@@ -50,7 +47,7 @@ namespace Realmius.Tests.Server
             _controller = new RealmiusServerProcessor(_config);
         }
 
-        [Test]
+        [Fact]
         public void NoData()
         {
             var result = _controller.Download(new DownloadDataRequest
@@ -62,7 +59,7 @@ namespace Realmius.Tests.Server
             result.ChangedObjects.Should().BeEmpty();
         }
 
-        [Test]
+        [Fact]
         public void ManyToManyRef()
         {
             var ef = _contextFunc();
@@ -97,7 +94,7 @@ namespace Realmius.Tests.Server
                 .Should().BeEquivalentTo("Type: RefSyncObject, Key: 1, SerializedObject: { \"Text\": \"123\", \"References\": null, \"Id\": \"1\"}, Type: RefSyncObject, Key: 2, SerializedObject: { \"Text\": \"zxc\", \"References\": null, \"Id\": \"2\"}, Type: RefSyncObject, Key: 3, SerializedObject: { \"Text\": \"asd\", \"References\": [  \"1\",  \"2\" ], \"Id\": \"3\"}");
         }
 
-        [Test]
+        [Fact]
         public void SomeData_WithOldChangeTime_DoNotReturn()
         {
             var ef = _contextFunc();
@@ -117,7 +114,7 @@ namespace Realmius.Tests.Server
             result.ChangedObjects.Should().BeEmpty();
         }
 
-        [Test]
+        [Fact]
         public void Delete()
         {
             var ef = _contextFunc();
@@ -145,7 +142,7 @@ namespace Realmius.Tests.Server
                 .Should().BeEquivalentTo("Type: DbSyncObject, Key: 2, Deleted");
         }
 
-        [Test]
+        [Fact]
         public void SomeData_WithOldNewerTime_DoReturn()
         {
             var ef = _contextFunc();
@@ -168,7 +165,7 @@ namespace Realmius.Tests.Server
             DateTime.UtcNow.Subtract(result.LastChange["all"].DateTime).Should().BeLessThan(TimeSpan.FromSeconds(1));
         }
 
-        [Test]
+        [Fact]
         public void UpdateModelViaAttachToContext_NotAllFieldsAreUpdated()
         {
             var ef = _contextFunc();
@@ -207,7 +204,7 @@ namespace Realmius.Tests.Server
             DateTime.UtcNow.Subtract(result.LastChange["all"].DateTime).Should().BeLessThan(TimeSpan.FromSeconds(1));
         }
 
-        [Test]
+        [Fact]
         public void UpdateModelViaUpdate_NotAllFieldsAreUpdated()
         {
             var ef = _contextFunc();
@@ -239,7 +236,7 @@ namespace Realmius.Tests.Server
             DateTime.UtcNow.Subtract(result.LastChange["all"].DateTime).Should().BeLessThan(TimeSpan.FromSeconds(1));
         }
 
-        [Test]
+        [Fact]
         public void Download_AlreadyDownloadedDataIsNotReturned()
         {
             var ef = _contextFunc();
@@ -279,7 +276,7 @@ namespace Realmius.Tests.Server
             result3.ChangedObjects.Count.Should().Be(1);
         }
 
-        [Test]
+        [Fact]
         public void NotConfiguredType()
         {
             var db = _contextFunc();

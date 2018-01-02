@@ -35,8 +35,8 @@ namespace Realmius.Tests.Server
 
     public class TestBase
     {
-        [SetUp]
-        public virtual void Setup()
+
+        public TestBase()
         {
             var context = new LocalDbContext();
 

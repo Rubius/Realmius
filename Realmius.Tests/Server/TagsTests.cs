@@ -30,6 +30,7 @@ using Realmius.Server.Configurations;
 using Realmius.Server.Models;
 using Realmius.Server.QuickStart;
 using Realmius.Tests.Server.Models;
+using Xunit;
 
 namespace Realmius.Tests.Server
 {
@@ -83,17 +84,14 @@ namespace Realmius.Tests.Server
             }
         }
 
-        [SetUp]
-        public override void Setup()
+        public TagsTests()
         {
-            base.Setup();
-
             _contextFunc = () => new LocalDbContext();
             _config = new Config(_contextFunc);
             _processor = new RealmiusServerProcessor<LimitedUser>(_config);
         }
 
-        [Test]
+        [Fact]
         public void Authorized()
         {
             var result1 = _processor.Upload(new UploadDataRequest()
@@ -129,7 +127,7 @@ namespace Realmius.Tests.Server
         }
 
 
-        [Test]
+        [Fact]
         public void OnlyDownloadSpecifiedTags_1()
         {
             var result1 = _processor.Upload(new UploadDataRequest()
@@ -174,7 +172,7 @@ namespace Realmius.Tests.Server
             result2.ChangedObjects.Count.Should().Be(1);
         }
 
-        [Test]
+        [Fact]
         public void Query()
         {
             var context = _contextFunc();

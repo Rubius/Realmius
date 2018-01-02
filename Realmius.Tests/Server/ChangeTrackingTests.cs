@@ -27,28 +27,26 @@ using NUnit.Framework;
 using Realmius.Server.Models;
 using Realmius.Server.QuickStart;
 using Realmius.Tests.Server.Models;
+using Xunit;
 
 namespace Realmius.Tests.Server
 {
-    [TestFixture]
     public class ChangeTrackingTests : TestBase
     {
         private Func<LocalDbContext> _contextFunc;
         private ShareEverythingConfiguration _config;
         private Func<SyncStatusDbContext> _syncContextFunc;
 
-        [SetUp]
-        public override void Setup()
+        public ChangeTrackingTests()
         {
-            base.Setup();
-
             _contextFunc = () => new LocalDbContext();
             _config = new ShareEverythingConfiguration(_contextFunc, typeof(DbSyncObject), typeof(DbSyncObjectWithIgnoredFields));
 
             _syncContextFunc = () => new SyncStatusDbContext(_contextFunc().Database.GetDbConnection().ConnectionString);
         }
 
-        [Test]
+
+        [Fact]
         public void AddData()
         {
             // Arrange
@@ -73,7 +71,7 @@ namespace Realmius.Tests.Server
             res.Text.Should().Be("TestText");
         }
 
-        [Test]
+        [Fact]
         public void UpdateData()
         {
             // Arrange
@@ -103,7 +101,7 @@ namespace Realmius.Tests.Server
             textChange.Should().BeAfter(idChange);
         }
 
-        [Test]
+        [Fact]
         public void AddData_IgnoredFieldsNotSerialized()
         {
             // Arrange
@@ -133,7 +131,7 @@ namespace Realmius.Tests.Server
             jObject.Property("Tags").Should().BeNull();
         }
 
-        [Test]
+        [Fact]
         public void UpdateData_IgnoredFieldsNotSerialized()
         {
             // Arrange
