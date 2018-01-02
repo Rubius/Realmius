@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Realmius.Contracts.Models;
@@ -177,7 +178,7 @@ namespace Realmius.Tests.Server
         public void Query()
         {
             var context = _contextFunc();
-            var syncStatusContext = new SyncStatusDbContext(context.Database.Connection.ConnectionString);
+            var syncStatusContext = new SyncStatusDbContext(context.Database.GetDbConnection().ConnectionString);
             syncStatusContext.SyncStatusServerObjects.Add(
                 new SyncStatusServerObject("a", "1")
                 {
