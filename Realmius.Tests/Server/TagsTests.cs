@@ -19,8 +19,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using FluentAssertions;
-using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Realmius.Contracts.Models;
@@ -56,7 +56,7 @@ namespace Realmius.Tests.Server
                 return user.Tags;
             }
 
-            public override LimitedUser AuthenticateUser(IRequest request)
+            public override LimitedUser AuthenticateUser(ClaimsPrincipal request)
             {
                 return new LimitedUser() { };
             }

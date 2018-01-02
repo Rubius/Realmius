@@ -39,7 +39,7 @@ namespace Realmius
         
         public static IRealmiusSyncService CreateUsingSignalR(Func<Realm> realmFactoryMethod, Uri uri, Type[] typesToSync, bool deleteDatabase = false)
         {
-            var apiClient = new SignalRPersistentConnectionSyncApiClient(uri);
+            var apiClient = new SignalRSyncApiClient(uri);
             
             var syncService = new RealmiusSyncService(realmFactoryMethod, apiClient, deleteDatabase, typesToSync);
 

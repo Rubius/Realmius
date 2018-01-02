@@ -18,9 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -518,7 +518,7 @@ namespace Realmius.Tests.Server
         {
             result.Results.Count.Should().BeGreaterThan(0);
             string.Join(", ", result.Results.Select(x => x.Error).Where(x => !string.IsNullOrEmpty(x)))
-                .ShouldBeEquivalentTo("");
+                .Should().BeEquivalentTo("");
         }
 
 

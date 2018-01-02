@@ -18,9 +18,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -30,12 +32,12 @@ using Realmius.Server.Expressions;
 using Realmius.Server.Infrastructure;
 using Realmius.Server.Models;
 using Realmius.Contracts.Logger;
-
+[assembly: InternalsVisibleTo("Realmius.Tests")]
 namespace Realmius.Server
 {
     public class RealmiusServerProcessor : RealmiusServerProcessor<object>
     {
-        public RealmiusServerProcessor(IRealmiusServerConfiguration<object> configuration) 
+        public RealmiusServerProcessor(IRealmiusServerConfiguration<object> configuration)
             : base(configuration)
         {
         }
@@ -90,7 +92,7 @@ namespace Realmius.Server
                     objectInfo = new UploadDataResponseItem(item.PrimaryKey, item.Type);
                     result.Results.Add(objectInfo);
 
-                    var dbSet = ef.Set(type);
+                    var dbSet = GetDbSet(ef, type);
 
                     object[] key;
                     try
@@ -209,7 +211,7 @@ namespace Realmius.Server
                     {
                         objectInfo.Error = e.ToString();
                     }
-                    if (e is DbEntityValidationException && dbEntity != null)
+                    if (e is ValidationException && dbEntity != null)
                     {
                         ef.Entry(dbEntity).State = EntityState.Detached; //if one entity fails EF validation, we should still save all the others (if possible)
                     }
@@ -222,6 +224,19 @@ namespace Realmius.Server
             //OnDataUpdated(updatedResult);
 
             return result;
+        }
+
+        private static Type _changeTrackingDbContextType = typeof(ChangeTrackingDbContext);
+        private static MethodInfo _changeTrackingDbContextTypeSetMethod = _changeTrackingDbContextType.GetMethod("Set");
+        private static Dictionary<Type, MethodInfo> _dbSetMethods = new Dictionary<Type, MethodInfo>();
+        private DbSet<IRealmiusObjectServer> GetDbSet(ChangeTrackingDbContext ef, Type type)
+        {
+            if (!_dbSetMethods.TryGetValue(type, out MethodInfo method))
+            {
+                method = _changeTrackingDbContextTypeSetMethod.MakeGenericMethod(type);
+                _dbSetMethods[type] = method;
+            }
+            return (DbSet<IRealmiusObjectServer>)method.Invoke(ef, new object[] { });
         }
 
         public virtual IList<string> GetTagsForUser(TUser user)

@@ -19,9 +19,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Realmius.SyncService;
 using Realms;
-
+[assembly:InternalsVisibleTo("Realmius.Tests")]
 namespace Realmius
 {
     public static class RealmExtensions

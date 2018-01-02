@@ -38,7 +38,7 @@ namespace Realmius.Server.Exchange
     {
         protected readonly RealmiusServerProcessor<TUser> Processor;
         protected static RealmiusServerProcessor<TUser> ProcessorStatic;
-        private static readonly ConcurrentDictionary<string, TUser> Connections = new ConcurrentDictionary<string, TUser>();
+        internal static readonly ConcurrentDictionary<string, TUser> Connections = new ConcurrentDictionary<string, TUser>();
         private static JsonSerializerSettings SerializerSettings;
         private static bool _initialized;
         private ILogger Logger => Processor.Configuration.Logger;
@@ -87,31 +87,33 @@ namespace Realmius.Server.Exchange
             };
         }
 
-        protected override Task OnReceived(IRequest request, string connectionId, string data)
+        //protected override Task OnReceived(IRequest request, string connectionId, string data)
+        //{
+        //    if (data.Length < MethodConstants.CommandNameLength)
+        //        return Task.FromResult(true);
+
+        //    var command = data.Substring(0, MethodConstants.CommandNameLength);
+        //    var parameter = data.Substring(MethodConstants.CommandNameLength);
+
+        //    switch (command)
+        //    {
+        //        case MethodConstants.ServerUploadData:
+        //            var result = UploadData(Deserialize<UploadDataRequest>(parameter), connectionId);
+        //            Send(connectionId, MethodConstants.ServerUploadData, result);
+        //            break;
+
+        //        default:
+        //            Logger.Exception(new InvalidOperationException($"Unknown command {command}"));
+        //            break;
+        //    }
+
+        //    return Task.CompletedTask;
+        //}
+
+        public async Task<UploadDataResponse> UploadData(UploadDataRequest request)
         {
-            if (data.Length < MethodConstants.CommandNameLength)
-                return Task.FromResult(true);
+            var connectionId = this.Context.ConnectionId;
 
-            var command = data.Substring(0, MethodConstants.CommandNameLength);
-            var parameter = data.Substring(MethodConstants.CommandNameLength);
-
-            switch (command)
-            {
-                case MethodConstants.ServerUploadData:
-                    var result = UploadData(Deserialize<UploadDataRequest>(parameter), connectionId);
-                    Send(connectionId, MethodConstants.ServerUploadData, result);
-                    break;
-
-                default:
-                    Logger.Exception(new InvalidOperationException($"Unknown command {command}"));
-                    break;
-            }
-
-            return Task.CompletedTask;
-        }
-
-        public UploadDataResponse UploadData(UploadDataRequest request, string connectionId)
-        {
             if (!Connections.ContainsKey(connectionId))
             {
                 Logger.Info($"User with ConnectionId {connectionId} not found in the connections pool (not authorized?)");
@@ -131,34 +133,34 @@ namespace Realmius.Server.Exchange
 
         public static void AddUserGroup(Func<TUser, bool> userPredicate, string group)
         {
-            var connectionIds = Connections.Where(x => userPredicate(x.Value));
-            var connection = GlobalHost.ConnectionManager.GetConnectionContext<RealmiusPersistentConnection<TUser>>();
+            //var connectionIds = Connections.Where(x => userPredicate(x.Value));
+            //var connection = GlobalHost.ConnectionManager.GetConnectionContext<RealmiusPersistentConnection<TUser>>();
 
-            foreach (KeyValuePair<string, TUser> connectionId in connectionIds)
-            {
-                connection.Groups.Add(connectionId.Key, group);
+            //foreach (KeyValuePair<string, TUser> connectionId in connectionIds)
+            //{
+            //    connection.Groups.Add(connectionId.Key, group);
 
-                var tags = ProcessorStatic.GetTagsForUser(connectionId.Value);
-                if (tags.Contains(group))
-                    continue;
+            //    var tags = ProcessorStatic.GetTagsForUser(connectionId.Value);
+            //    if (tags.Contains(group))
+            //        continue;
 
-                tags.Add(group);
-                //include data for the tag
-                var changes = ProcessorStatic.Download(new DownloadDataRequest()
-                {
-                    LastChangeTime = new Dictionary<string, DateTimeOffset>() { { group, DateTimeOffset.MinValue } },
-                    Types = ProcessorStatic.Configuration.TypesToSync.Select(x => x.Name),
-                    OnlyDownloadSpecifiedTags = true,
-                }, connectionId.Value);
+            //    tags.Add(group);
+            //    //include data for the tag
+            //    var changes = ProcessorStatic.Download(new DownloadDataRequest()
+            //    {
+            //        LastChangeTime = new Dictionary<string, DateTimeOffset>() { { group, DateTimeOffset.MinValue } },
+            //        Types = ProcessorStatic.Configuration.TypesToSync.Select(x => x.Name),
+            //        OnlyDownloadSpecifiedTags = true,
+            //    }, connectionId.Value);
 
-                var downloadData = new DownloadDataResponse()
-                {
-                    ChangedObjects = changes.ChangedObjects,
-                    LastChange = new Dictionary<string, DateTimeOffset>() { { group, DateTimeOffset.UtcNow } },
-                    LastChangeContainsNewTags = true,
-                };
-                connection.Connection.Send(connectionId.Key, MethodConstants.ClientDataDownloaded + Serialize(downloadData));
-            }
+            //    var downloadData = new DownloadDataResponse()
+            //    {
+            //        ChangedObjects = changes.ChangedObjects,
+            //        LastChange = new Dictionary<string, DateTimeOffset>() { { group, DateTimeOffset.UtcNow } },
+            //        LastChangeContainsNewTags = true,
+            //    };
+            //    connection.Connection.Send(connectionId.Key, MethodConstants.ClientDataDownloaded + Serialize(downloadData));
+            //}
 
         }
 
