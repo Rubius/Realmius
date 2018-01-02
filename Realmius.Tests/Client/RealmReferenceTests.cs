@@ -29,10 +29,10 @@ using Realmius.Contracts.Models;
 using Realmius.SyncService;
 using Realmius.SyncService.ApiClient;
 using Realms;
+using Xunit;
 
 namespace Realmius.Tests.Client
 {
-    [TestFixture]
     public class RealmReferenceTests
     {
         private Mock<IApiClient> _apiClientMock;
@@ -44,8 +44,7 @@ namespace Realmius.Tests.Client
         private int _uploadDataCounter = 0;
         private Task _uploadTask;
 
-        [SetUp]
-        public void Setup()
+        public RealmReferenceTests()
         {
             _apiClientMock = new Mock<IApiClient>();
 
@@ -90,7 +89,7 @@ namespace Realmius.Tests.Client
             return Realm.GetInstance(_realmFileName);
         }
 
-        [Test]
+        [Fact]
         public void Many_Serialize_Deserialize()
         {
             var realm = GetRealm();
@@ -146,7 +145,7 @@ namespace Realmius.Tests.Client
             string.Join(", ", ref11.Children.Select(x => x.Id)).Should().BeEquivalentTo("1, 2");
         }
 
-        [Test]
+        [Fact]
         public void ManyRef_DownloadData_ReferencesCorrectOrder()
         {
             var realm = GetRealm();
@@ -177,7 +176,7 @@ namespace Realmius.Tests.Client
             string.Join(", ", parent.Children.Select(x => x.Id)).Should().BeEquivalentTo("1");
         }
 
-        [Test]
+        [Fact]
         public void ManyRef_DownloadData_NoChildren()
         {
             var realm = GetRealm();
@@ -202,7 +201,7 @@ namespace Realmius.Tests.Client
             string.Join(", ", parent.Children.Select(x => x.Id)).Should().BeEquivalentTo("");
         }
 
-        [Test]
+        [Fact]
         public void ManyRef_DownloadData_Update()
         {
             var realm = GetRealm();
@@ -294,7 +293,7 @@ namespace Realmius.Tests.Client
             string.Join(", ", parent.Children.Select(x => x.Id)).Should().BeEquivalentTo("1, 2");
         }
 
-        [Test]
+        [Fact]
         public void Serialize_Deserialize()
         {
             var realm = GetRealm();
@@ -358,7 +357,7 @@ namespace Realmius.Tests.Client
             ref21.Parent.Id.Should().Be("1");
         }
 
-        [Test]
+        [Fact]
         public void DownloadData_ReferencesCorrectOrder()
         {
             var realm = GetRealm();
@@ -389,7 +388,7 @@ namespace Realmius.Tests.Client
                 .Should().BeEquivalentTo("1: 123 - , 2: 345 - 1");
         }
 
-        [Test]
+        [Fact]
         public void DownloadData_ReferencesWrongOrder()
         {
             var realm = GetRealm();

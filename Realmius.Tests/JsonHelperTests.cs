@@ -19,18 +19,13 @@
 using FluentAssertions;
 using NUnit.Framework;
 using Realmius.Contracts.Helpers;
+using Xunit;
 
 namespace Realmius.Tests
 {
-    [TestFixture]
     public class JsonHelperTests
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
-        [Test]
+        [Fact]
         public void GetDiff_SameObjects()
         {
             var obj = new { a = 1, b = "2" };
@@ -38,7 +33,7 @@ namespace Realmius.Tests
             diff.Should().BeEquivalentTo("{}");
         }
 
-        [Test]
+        [Fact]
         public void GetDiff_EqualObjects()
         {
             var diff = JsonHelper.GetJsonDiff(new { a = 1, b = "2" }, new { a = 1, b = "2" });
@@ -46,7 +41,7 @@ namespace Realmius.Tests
         }
 
 
-        [Test]
+        [Fact]
         public void GetDiff_OneDiff()
         {
             var diff = JsonHelper.GetJsonDiff(new { a = 1, b = "2", c = "543" }, new { a = 21, b = "21", c = "543" });

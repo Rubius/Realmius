@@ -50,14 +50,12 @@ namespace Realmius.Server.Models
         public bool EnableAudit { get; set; }
         public bool EnableSyncTracking { get; set; } = true;
 
-        private readonly string _nameOrConnectionString;
         private IRealmiusServerDbConfiguration _syncConfiguration;
         private ILogger Logger => _syncConfiguration.Logger;
         private Dictionary<string, SyncTypeInfo> _syncedTypes;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_nameOrConnectionString);
             Initialize();
         }
 
@@ -307,8 +305,8 @@ namespace Realmius.Server.Models
 
         internal SyncStatusDbContext CreateSyncStatusContext()
         {
-            // var connectionString = Database.Connection.ConnectionString;
-            var syncStatusContext = new SyncStatusDbContext(_nameOrConnectionString);
+            var connectionString = Database.GetDbConnection().ConnectionString;
+            var syncStatusContext = new SyncStatusDbContext(connectionString);
             return syncStatusContext;
         }
 
