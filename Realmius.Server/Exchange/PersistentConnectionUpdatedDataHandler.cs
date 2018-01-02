@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Realmius.Contracts.Models;
 using Realmius.Contracts.SignalR;
 using Realmius.Server.QuickStart;
@@ -11,7 +12,8 @@ namespace Realmius.Server.Exchange
     {
         internal static void HandleDataChanges<TUser>(object sender, UpdatedDataBatch updatedDataBatch)
         {
-            var hubContext = GlobalHost.ConnectionManager.GetConnectionContext<RealmiusPersistentConnection<TUser>>();
+            var hubContext = RealmiusServer.ServiceProvider.GetService<RealmiusPersistentConnection<TUser>>();
+
             foreach (var item in updatedDataBatch.Items)
             {
                 var download = new DownloadDataResponse();
@@ -25,7 +27,11 @@ namespace Realmius.Server.Exchange
 
                 download.LastChange = tags.Where(x => x != null).Distinct().ToDictionary(x => x, x => date);
                 var msg = RealmiusPersistentConnection<TUser>.Serialize(download);
-                hubContext.Groups.Send(tags, $"{MethodConstants.ClientDataDownloaded}{msg}");
+                foreach (var tag in tags.Where(x => !string.IsNullOrEmpty(x)))
+                {
+                    hubContext.Clients.Group(tag).DataDownloaded(download);
+                }
+                //hubContext.Groups.Send(tags, $"{MethodConstants.ClientDataDownloaded}{msg}");
             }
         }
     }

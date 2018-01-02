@@ -18,26 +18,26 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNet.SignalR.Client;
-using Microsoft.AspNet.SignalR.Client.Infrastructure;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Realmius.Contracts;
 using Realmius.Contracts.Models;
 using Realmius.Contracts.Logger;
+using ILogger = Realmius.Contracts.Logger.ILogger;
 
 namespace Realmius.SyncService.ApiClient
 {
     public class SignalRSyncApiClient : IApiClient, ILoggerAware
     {
-        private IHubProxy _hubProxy;
         private HubConnection _hubConnection;
         private ApiClientStartOptions _startOptions;
         private TaskCompletionSource<bool> _downloadingInitialData = new TaskCompletionSource<bool>();
-        public string HubName { get; set; }
         public Uri Uri { get; set; }
         public Task DownloadingInitialData => _downloadingInitialData.Task;
         public bool IsConnected { get; set; }
@@ -50,10 +50,9 @@ namespace Realmius.SyncService.ApiClient
             ConnectedStateChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public SignalRSyncApiClient(Uri uri, string hubName)
+        public SignalRSyncApiClient(Uri uri)
         {
             Uri = uri;
-            HubName = hubName;
         }
 
         public event EventHandler<DownloadDataResponse> NewDataDownloaded;
@@ -78,8 +77,6 @@ namespace Realmius.SyncService.ApiClient
         }
 
         private Action _hubUnsubscribe = () => { };
-        private IDisposable _downloadHandler;
-        private IDisposable _unauthorizedHandler;
         private async Task Reconnect()
         {
             try
@@ -103,23 +100,24 @@ namespace Realmius.SyncService.ApiClient
                 {
                     connectionUri = connectionUri.Replace(Uri.Query, "");
                 }
-                var hubConnection = new HubConnection(connectionUri, parameters);
+
+                var hubConnection = new HubConnectionBuilder()
+                    .WithUrl(connectionUri)
+                    //.WithConsoleLogger(LogLevel.Trace)
+                    .Build();
                 _hubConnection = hubConnection;
 
-                _hubProxy = _hubConnection.CreateHubProxy(HubName);
-                _downloadHandler = _hubProxy.On<DownloadDataResponse>("DataDownloaded", OnNewDataDownloaded);
-                _unauthorizedHandler = _hubProxy.On<UnauthorizedResponse>("Unauthorized", OnUnauthorized);
+                _hubConnection.On<DownloadDataResponse>("DataDownloaded", OnNewDataDownloaded);
+                _hubConnection.On<UnauthorizedResponse>("Unauthorized", OnUnauthorized);
 
                 _hubUnsubscribe += () =>
                 {
-                    _downloadHandler?.Dispose();
-                    _unauthorizedHandler?.Dispose();
-                    _hubConnection?.Dispose();
+                    _hubConnection?.DisposeAsync();
                 };
                 Logger.Info(
                     $"  --Connections configured, connecting to {Uri}?{string.Join("&", parameters.Select(x => x.Key + "=" + x.Value))}");
 
-                await _hubConnection.Start();
+                await _hubConnection.StartAsync();
 
                 Logger.Info("  --Connected");
 
@@ -136,18 +134,18 @@ namespace Realmius.SyncService.ApiClient
             {
                 LogAndReconnectWithDelay(webEx);
             }
-            catch (HttpClientException webEx)
-            {
-                LogAndReconnectWithDelay(webEx);
-            }
+            //catch (HttpClientException webEx)
+            //{
+            //    LogAndReconnectWithDelay(webEx);
+            //}
             catch (TimeoutException webEx)
             {
                 LogAndReconnectWithDelay(webEx);
             }
-            catch (StartException webEx)
-            {
-                LogAndReconnectWithDelay(webEx);
-            }
+            //catch (StartException webEx)
+            //{
+            //    LogAndReconnectWithDelay(webEx);
+            //}
             catch (ObjectDisposedException webEx)
             {
                 LogAndReconnectWithDelay(webEx);
@@ -198,7 +196,7 @@ namespace Realmius.SyncService.ApiClient
             Task.Delay(delay).ContinueWith((x) => Reconnect());
         }
 
-        void _hubConnection_Closed()
+        async Task _hubConnection_Closed(Exception e)
         {
             Logger.Info("Connection closed, will start reconnecting...");
             Reconnect();
@@ -221,10 +219,10 @@ namespace Realmius.SyncService.ApiClient
         {
             try
             {
-                if (_hubConnection?.State != ConnectionState.Connected)
+                if (_hubConnection == null)
                     return new UploadDataResponse();
 
-                var response = await _hubProxy?.Invoke<UploadDataResponse>("UploadData", request);
+                var response = await _hubConnection.InvokeAsync<UploadDataResponse>("UploadData", request);
 
                 return response;
             }

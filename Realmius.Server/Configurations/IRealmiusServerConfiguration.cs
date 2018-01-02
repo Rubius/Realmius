@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
 using Realmius.Server.Models;
 using Realmius.Contracts.Logger;
 
@@ -40,5 +41,6 @@ namespace Realmius.Server.Configurations
         TUser AuthenticateUser(ClaimsPrincipal principal);
 
         Func<ChangeTrackingDbContext> ContextFactoryFunction { get; set; }
+        
     }
 }

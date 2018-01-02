@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using Realmius.Server.Configurations;
 using Realmius.Server.Models;
 using Realmius.Tests.Server;
@@ -28,7 +28,6 @@ namespace Realmius.Tests
     {
         static LocalDbContext()
         {
-            Database.SetInitializer(new DropCreateDatabaseAlways<LocalDbContext>());
         }
 
         public DbSet<DbSyncObject> DbSyncObjects { get; set; }
@@ -40,11 +39,15 @@ namespace Realmius.Tests
         public DbSet<UploadTests.IntFieldSentAsStringObject> IntFieldSentAsStringObjects { get; set; }
         public DbSet<RefSyncObject> RefSyncObjects { get; set; }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        public LocalDbContext() : base()
+        {
+            
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<RefSyncObject>().HasMany(x => x.References).WithMany();
+            modelBuilder.Entity<RefSyncObject>().HasMany(x => x.References);//..WithMany();
         }
+        
     }
 }

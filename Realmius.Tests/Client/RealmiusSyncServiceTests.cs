@@ -134,7 +134,7 @@ namespace Realmius.Tests.Client
             var obj2 = realm.Find<DbSyncWithDoNotUpload>("456");
 
             obj2.Should().NotBeNull();
-            obj2.Tags.ShouldBeEquivalentTo("qwe");
+            obj2.Tags.Should().BeEquivalentTo("qwe");
             obj2.Text.Should().BeNullOrEmpty();
 
             _realmiusSyncService.Realmius.All<UploadRequestItemRealm>().Count().Should().Be(0);
@@ -365,7 +365,7 @@ namespace Realmius.Tests.Client
             var obj2 = realm.Find<DbSyncWithDoNotUpload>(key);
 
             obj2.Should().NotBeNull();
-            obj2.Tags.ShouldBeEquivalentTo("qwe");
+            obj2.Tags.Should().BeEquivalentTo("qwe");
         }
 
         [Test]
@@ -411,8 +411,8 @@ namespace Realmius.Tests.Client
             var obj2 = realm.Find<DbSyncClientObject>(key);
 
             obj2.Should().NotBeNull();
-            obj2.Text.ShouldBeEquivalentTo("zxczxczxc");
-            obj2.Id.ShouldBeEquivalentTo(key);
+            obj2.Text.Should().BeEquivalentTo("zxczxczxc");
+            obj2.Id.Should().BeEquivalentTo(key);
 
             _realmiusSyncService.Realm.Refresh();
             _realmiusSyncService.Realmius.Refresh();
@@ -496,8 +496,8 @@ namespace Realmius.Tests.Client
             var obj2 = realm.Find<DbSyncClientObject>(key);
 
             obj2.Should().NotBeNull();
-            obj2.Text.ShouldBeEquivalentTo("qwe");
-            obj2.Id.ShouldBeEquivalentTo(key);
+            obj2.Text.Should().BeEquivalentTo("qwe");
+            obj2.Id.Should().BeEquivalentTo(key);
 
             _realmiusSyncService.Realm.Refresh();
             _realmiusSyncService.Realmius.Refresh();
@@ -533,7 +533,7 @@ namespace Realmius.Tests.Client
                 Id = "1",
                 Text = "123",
                 Time = new DateTimeOffset(2017, 1, 1, 1, 1, 1, 1, TimeSpan.FromHours(1)),
-            }).ShouldBeEquivalentTo("{\"Id\":\"1\",\"Text\":\"123\",\"Time\":\"2017-01-01T01:01:01.001+01:00\",\"MobilePrimaryKey\":\"1\"}");
+            }).Should().BeEquivalentTo("{\"Id\":\"1\",\"Text\":\"123\",\"Time\":\"2017-01-01T01:01:01.001+01:00\",\"MobilePrimaryKey\":\"1\"}");
         }
 
         [Test]
@@ -543,7 +543,7 @@ namespace Realmius.Tests.Client
             {
                 Id = "1",
                 DbSyncClientObject = new DbSyncClientObject(),
-            }).ShouldBeEquivalentTo("{\"Id\":\"1\",\"MobilePrimaryKey\":\"1\"}");
+            }).Should().BeEquivalentTo("{\"Id\":\"1\",\"MobilePrimaryKey\":\"1\"}");
         }
 
         [Test]
@@ -557,7 +557,7 @@ namespace Realmius.Tests.Client
                     new DbSyncClientObject(),
                     new DbSyncClientObject(),
                 }
-            }).ShouldBeEquivalentTo("{\"Id\":\"1\",\"MobilePrimaryKey\":\"1\"}");
+            }).Should().BeEquivalentTo("{\"Id\":\"1\",\"MobilePrimaryKey\":\"1\"}");
         }
 
         [Test]

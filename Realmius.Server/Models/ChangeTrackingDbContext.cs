@@ -61,10 +61,6 @@ namespace Realmius.Server.Models
             Initialize();
         }
 
-        protected ChangeTrackingDbContext(string nameOrConnectionString)
-        {
-            _nameOrConnectionString = nameOrConnectionString;
-        }
 
         private void Initialize()
         {

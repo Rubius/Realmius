@@ -16,7 +16,7 @@ namespace Realmius.Server.QuickStart
             IRealmiusServerConfiguration<T> configuration)
         {
             app.UseSignalR(builder => builder.MapHub<RealmiusPersistentConnection<T>>(url));
-            //app.MapSignalR<RealmiusPersistentConnection<T>>(url);
+            ServiceProvider = app.ApplicationServices;
         }
 
         public static void SetupShareEverythingSignalRServer(
@@ -29,6 +29,7 @@ namespace Realmius.Server.QuickStart
             SetupSignalRServer(url, app, configuration);
         }
 
+        internal static IServiceProvider ServiceProvider { get; private set; }
         internal static readonly Dictionary<Type, IRealmiusServerDbConfiguration> Configurations = new Dictionary<Type, IRealmiusServerDbConfiguration>();
         internal static IRealmiusServerConfiguration<T> GetConfiguration<T>()
         {

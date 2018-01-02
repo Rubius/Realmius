@@ -32,9 +32,9 @@ namespace Realmius
             var newFile = await FileSystem.Current.LocalStorage.CreateFileAsync(newFileName,
                 CreationCollisionOption.ReplaceExisting);
 
-            using (var writeStream = await newFile.OpenAsync(FileAccess.ReadAndWrite))
+            using (var writeStream = await newFile.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
             {
-                using (var sourceStream = await sourceFile.OpenAsync(FileAccess.Read))
+                using (var sourceStream = await sourceFile.OpenAsync(PCLStorage.FileAccess.Read))
                 {
                     sourceStream.CopyTo(writeStream);
                     writeStream.Flush();
