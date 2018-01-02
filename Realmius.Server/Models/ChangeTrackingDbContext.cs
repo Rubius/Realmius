@@ -282,10 +282,16 @@ namespace Realmius.Server.Models
             return syncObj;
         }
 
+        private static bool _syncStatusInitialized = false;
         internal SyncStatusDbContext CreateSyncStatusContext()
         {
             var connectionString = Database.GetDbConnection().ConnectionString;
             var syncStatusContext = new SyncStatusDbContext(connectionString);
+            if (!_syncStatusInitialized)
+            {
+                _syncStatusInitialized = true;
+                syncStatusContext.Database.Migrate();
+            }
             return syncStatusContext;
         }
 

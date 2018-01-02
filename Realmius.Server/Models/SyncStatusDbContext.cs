@@ -53,12 +53,20 @@ namespace Realmius.Server.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(_connectionString);
+            if (!string.IsNullOrEmpty(_connectionString))
+            {
+                optionsBuilder.UseSqlServer(_connectionString);
+            }
         }
 
         public SyncStatusDbContext(string connectionString)
         {
             _connectionString = connectionString;
+        }
+
+        public SyncStatusDbContext(DbContextOptions<SyncStatusDbContext> dbContextOptions)
+            : base(dbContextOptions)
+        {
         }
     }
 }

@@ -23,6 +23,7 @@ using System.Runtime.CompilerServices;
 using Realmius.SyncService;
 using Realms;
 [assembly:InternalsVisibleTo("Realmius.Tests")]
+[assembly:InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Realmius
 {
     public static class RealmExtensions
