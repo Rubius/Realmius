@@ -143,9 +143,9 @@ namespace Realmius.Infrastructure
         {
             var schema = realm.Schema.Find(objectType.Name);
             var keyProperty = schema.FirstOrDefault(x => x.IsPrimaryKey);
-            if (keyProperty.Type == PropertyType.String)
+            if (((byte)keyProperty.Type & (byte)PropertyType.String) == (byte)PropertyType.String)
                 return KeyType.String;
-            if (keyProperty.Type == PropertyType.Int)
+            if (((byte)keyProperty.Type & (byte)PropertyType.Int) == (byte)PropertyType.String)
                 return KeyType.Int;
 
             throw new InvalidOperationException($"Not supported key type {keyProperty.Type} for type {objectType}");

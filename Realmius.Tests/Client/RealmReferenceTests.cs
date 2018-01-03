@@ -351,8 +351,8 @@ namespace Realmius.Tests.Client
             realm.Write(
                 () =>
                 {
-                    realm.Add(ref11);
                     _realmiusSyncService.Populate(s1, ref11, realm);
+                    realm.Add(ref11);
                 });
 
             ref11.Text.Should().Be("123");
@@ -363,8 +363,8 @@ namespace Realmius.Tests.Client
             realm.Write(
                 () =>
                 {
-                    realm.Add(ref21);
                     _realmiusSyncService.Populate(s2, ref21, realm);
+                    realm.Add(ref21);
                 });
 
             ref21.Text.Should().Be("zxc");

@@ -35,7 +35,7 @@ using Xunit;
 
 namespace Realmius.Tests.Client
 {
-    public class RealmiusSyncServiceTests : Base.TestBase, IDisposable
+    public class RealmiusSyncServiceTests : Base.TestBase//, IDisposable
     {
         private Mock<IApiClient> _apiClientMock;
         private string _realmFileName;
@@ -122,6 +122,9 @@ namespace Realmius.Tests.Client
                     typeof(DbSyncWithDoNotUpload),
                     typeof(RealmRef),
                     typeof(RealmManyRef),
+                    typeof(Serializer1),
+                    typeof(Serializer_Link),
+                    typeof(Serializer_Collection),
                 }
             });
         }
@@ -255,7 +258,7 @@ namespace Realmius.Tests.Client
         {
             var syncService = new RealmiusSyncService(GetRealm, _apiClientMock.Object, false, Assembly.GetExecutingAssembly());
             string.Join(", ", syncService._typesToSync.Select(x => x.Key))
-                .Should().BeEquivalentTo("UnknownSyncObject, RealmManyRef, DbSyncClientObject, DbSyncClientObject2, DbSyncWithDoNotUpload, RealmRef");
+                .Should().BeEquivalentTo("DbSyncClientObject, DbSyncClientObject2, DbSyncWithDoNotUpload, RealmManyRef, RealmRef");
         }
 
 
@@ -582,13 +585,16 @@ namespace Realmius.Tests.Client
         [Fact]
         public void Dispose_NoNewNotificationsAreReceived()
         {
+            _syncServiceMock.ResetCalls();
             _realmiusSyncService.Dispose();
+            
             var realm = GetRealm();
+
             realm.Write(() =>
             {
                 realm.Add(new DbSyncClientObject());
             });
-
+            
             _syncServiceMock.Verify(x => x.ObjectChanged(It.IsAny<IRealmCollection<RealmObject>>(), It.IsAny<ChangeSet>(), It.IsAny<Exception>()), Times.Never);
         }
 

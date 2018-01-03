@@ -84,7 +84,7 @@ namespace Realmius.SyncService
 
         public RealmiusSyncService(Func<Realm> realmFactoryMethod, IApiClient apiClient, bool deleteSyncDatabase, Assembly assemblyWithModels)
         {
-            
+
             var a = assemblyWithModels.ExportedTypes.Where(
                 type => type.GetTypeInfo().IsClass &&
                         typeof(IRealmiusObjectClient).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()) &&
@@ -1032,16 +1032,25 @@ namespace Realmius.SyncService
                 StoreChangedObjects(problematicChangedObjects, realmiusData, realmLocal);
         }
 
-        private void AssignKey(IRealmiusObjectClient realmiusObjectClient, string key, Realm realmLocal)
+        private void AssignKey(IRealmiusObjectClient realmiusObjectClient, string keyValue, Realm realmLocal)
         {
-            var schema = realmLocal.Schema.Find(realmiusObjectClient.GetType().Name);
+            var keyProperty = GetKeyProperty(realmLocal, realmiusObjectClient);
+            if (keyProperty.PropertyType == typeof(string))
+                keyProperty.SetValue(realmiusObjectClient, keyValue);
+            if (
+                keyProperty.PropertyType == typeof(int) || keyProperty.PropertyType == typeof(int?)
+                || keyProperty.PropertyType == typeof(long) || keyProperty.PropertyType == typeof(long?)
+                )
+                keyProperty.SetValue(realmiusObjectClient, int.Parse(keyValue));
+        }
+
+        private PropertyInfo GetKeyProperty(Realm realm, IRealmiusObjectClient realmiusObjectClient)
+        {
+            var schema = realm.Schema.Find(realmiusObjectClient.GetType().Name);
 
             var keyPropertySchema = schema.FirstOrDefault(x => x.IsPrimaryKey);
             var keyProperty = realmiusObjectClient.GetType().GetRuntimeProperty(keyPropertySchema.Name);
-            if (keyPropertySchema.Type == PropertyType.String)
-                keyProperty.SetValue(realmiusObjectClient, key);
-            if (keyPropertySchema.Type == PropertyType.Int)
-                keyProperty.SetValue(realmiusObjectClient, int.Parse(key));
+            return keyProperty;
         }
 
         protected internal bool Populate(string changeObjectSerializedObject, IRealmiusObjectClient objInDb, Realm realm)
@@ -1055,9 +1064,25 @@ namespace Realmius.SyncService
                 Converters = new List<JsonConverter> { serializer },
                 ObjectCreationHandling = ObjectCreationHandling.Reuse,
             };
+            //var jToken = JToken.Parse(changeObjectSerializedObject);
+            //var keyProperty = GetKeyProperty(realm, objInDb).Name;
+            //var idToken = jToken.SelectToken(keyProperty);
+            //if (idToken != null)
+            //{
+            //    idToken.Parent.Remove();
+            //}
+            //Populate(jToken, objInDb, settings);
             JsonConvert.PopulateObject(changeObjectSerializedObject, objInDb, settings);
 
             return !serializer.NotFoundReferencesDetected;
+        }
+
+        public static void Populate<T>(JToken value, T target, JsonSerializerSettings settings) where T : class
+        {
+            using (var sr = value.CreateReader())
+            {
+                JsonSerializer.Create(settings).Populate(sr, target);
+            }
         }
 
         private void Unsubscribe()

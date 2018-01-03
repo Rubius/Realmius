@@ -242,3 +242,4 @@ ModelManifest.xml
 .fake/
 /Examples/MessagingSystem/SQLQuery1.sql
 /.nukey
+/tmp
