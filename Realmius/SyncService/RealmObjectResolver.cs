@@ -43,6 +43,7 @@ namespace Realmius.SyncService
                                         && p.PropertyName != "ObjectSchema"
                                         && p.PropertyName != "IsManaged"
                                         && p.PropertyName != "IsValid"
+                                        && p.PropertyName != "BacklinksCount"
                                            && p.PropertyName != "LastSynchronizedVersion"
                                            && p.PropertyName != "SyncState"
                                            && (!p.AttributeProvider.GetAttributes(typeof(DoNotUploadAttribute), true).Any())

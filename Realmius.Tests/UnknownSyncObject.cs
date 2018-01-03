@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 using Realmius.Server;
-using Realmius.SyncService;
 using Realms;
 
 namespace Realmius.Tests
@@ -32,7 +31,7 @@ namespace Realmius.Tests
 
         #endregion //IRealmiusObject
     }
-    public class UnknownSyncObject : RealmObject, IRealmiusObjectClient, IRealmiusObjectServer
+    public class UnknownSyncObject : RealmObject, IRealmiusObjectServer//, Realmius.SyncService.IRealmiusObjectClient
     {
         #region IRealmiusObject
 
