@@ -7,7 +7,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="1.0.0-alpha2-final" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="PCLStorage" Version="1.0.2" />
     <PackageReference Include="Realm.Database" Version="2.1.0" />
   </ItemGroup>
 

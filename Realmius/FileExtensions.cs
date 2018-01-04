@@ -19,7 +19,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using PCLStorage;
 
 namespace Realmius
 {
@@ -27,21 +26,10 @@ namespace Realmius
     {
         public static async Task<string> CopyFileToUserLocation(string path)
         {
-            var sourceFile = await FileSystem.Current.GetFileFromPathAsync(path);
             var newFileName = Guid.NewGuid() + Path.GetExtension(path);
-            var newFile = await FileSystem.Current.LocalStorage.CreateFileAsync(newFileName,
-                CreationCollisionOption.ReplaceExisting);
+            File.Copy(path, newFileName);
 
-            using (var writeStream = await newFile.OpenAsync(PCLStorage.FileAccess.ReadAndWrite))
-            {
-                using (var sourceStream = await sourceFile.OpenAsync(PCLStorage.FileAccess.Read))
-                {
-                    sourceStream.CopyTo(writeStream);
-                    writeStream.Flush();
-                }
-            }
-
-            return newFile.Path;
+            return Path.GetFullPath(newFileName);
         }
     }
 }

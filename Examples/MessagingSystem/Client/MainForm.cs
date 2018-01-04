@@ -66,7 +66,7 @@ namespace Client
 
             var syncService = SyncServiceFactory.CreateUsingSignalR(
                 GetRealm,
-                new Uri(_serverUrl + $"/Realmius?clientId={clientId}"),
+                new Uri(_serverUrl + $"/Realmius/ShareEverything?clientId={clientId}"),
                 new[]
                 {
                     typeof(Message)
@@ -115,6 +115,26 @@ namespace Client
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+        }
+
+        private void messagesBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void messageBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void clientID_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

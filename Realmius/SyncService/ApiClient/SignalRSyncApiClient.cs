@@ -71,9 +71,17 @@ namespace Realmius.SyncService.ApiClient
 
         public async Task Start(ApiClientStartOptions startOptions)
         {
-            _startOptions = startOptions;
+            try
+            {
+                _startOptions = startOptions;
 
-            await Reconnect();
+                await Reconnect();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         private Action _hubUnsubscribe = () => { };

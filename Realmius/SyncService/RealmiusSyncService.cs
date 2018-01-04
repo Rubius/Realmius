@@ -28,7 +28,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using PCLStorage;
 using Realmius.Contracts.Helpers;
 using Realmius.Contracts.Models;
 using Realmius.Infrastructure;
@@ -519,9 +518,8 @@ namespace Realmius.SyncService
                     var url = file.Url;
                     var queryParams = file.QueryParams;
 
-                    var fullPath = Path.Combine(FileSystem.Current.LocalStorage.Path, path);
-                    var fileContent = await FileSystem.Current.GetFileFromPathAsync(fullPath);
-                    var stream = await fileContent.OpenAsync(PCLStorage.FileAccess.Read);
+                    var fullPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), path);
+                    var stream = File.OpenRead(path);
 
                     var streamContent = new StreamContent(stream);
 
@@ -1156,7 +1154,7 @@ namespace Realmius.SyncService
             var realm = CreateRealmius();
 
             Uri uri1 = new Uri(pathToFile);
-            Uri uri2 = new Uri(FileSystem.Current.LocalStorage.Path + "/");
+            Uri uri2 = new Uri(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/");
             string relativePath = uri2.MakeRelativeUri(uri1).ToString();
 
             var fileInfo = new UploadFileInfo()

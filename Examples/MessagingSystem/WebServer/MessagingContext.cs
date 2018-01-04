@@ -23,10 +23,9 @@ namespace WebServer
 {
     public class MessagingContext : ChangeTrackingDbContext
     {
-        public MessagingContext(string nameOrConnectionString) : base(nameOrConnectionString)
+        public MessagingContext(DbContextOptions<MessagingContext> options) : base(options)
         {
         }
-
         public DbSet<Message> Messages { get; set; }
     }
 }

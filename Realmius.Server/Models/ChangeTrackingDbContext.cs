@@ -38,6 +38,14 @@ namespace Realmius.Server.Models
 {
     public abstract class ChangeTrackingDbContext : DbContext
     {
+        protected ChangeTrackingDbContext()
+        {
+        }
+
+        protected ChangeTrackingDbContext(DbContextOptions options) : base(options)
+        {
+        }
+
         public object User { get; set; }
 
         internal static Dictionary<Type, IRealmiusServerDbConfiguration> Configurations = new Dictionary<Type, IRealmiusServerDbConfiguration>();

@@ -1,21 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Realmius", "Realmius", "{F4F42F18-5D8B-44F2-A6A2-15898D77C318}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius", "..\..\Realmius\Realmius.csproj", "{B1651A06-7CEC-4529-B8EE-E594D26A62D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realmius", "..\..\Realmius\Realmius.csproj", "{B1651A06-7CEC-4529-B8EE-E594D26A62D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius.Contracts", "..\..\Realmius.Contracts\Realmius.Contracts.csproj", "{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realmius.Contracts", "..\..\Realmius.Contracts\Realmius.Contracts.csproj", "{EEC4EB66-DE49-47B1-B29C-3F20EDCE2178}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realmius.Tests", "..\..\Realmius.Tests\Realmius.Tests.csproj", "{2C4A00F9-0B66-4CBA-BBD0-601172B00278}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realmius.Tests", "..\..\Realmius.Tests\Realmius.Tests.csproj", "{2C4A00F9-0B66-4CBA-BBD0-601172B00278}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{4C98245E-B143-4F96-99E5-79F0D87E9854}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realmius.Server", "..\..\Realmius.Server\Realmius.Server.csproj", "{CA43D966-D57F-4043-B61A-2CA1B48E2025}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServer", "WebServer\WebServer.csproj", "{066FAED8-2380-48B3-8219-C6BCBD36FED4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebServer", "WebServer\WebServer.csproj", "{066FAED8-2380-48B3-8219-C6BCBD36FED4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

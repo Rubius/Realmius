@@ -26,7 +26,7 @@ namespace Realmius.Server.Exchange
                 };
 
                 download.LastChange = tags.Where(x => x != null).Distinct().ToDictionary(x => x, x => date);
-                var msg = RealmiusPersistentConnection<TUser>.Serialize(download);
+                //var msg = RealmiusPersistentConnection<TUser>.Serialize(download);
                 foreach (var tag in tags.Where(x => !string.IsNullOrEmpty(x)))
                 {
                     hubContext.Clients.Group(tag).DataDownloaded(download);
