@@ -55,7 +55,7 @@ namespace Realmius.Server.QuickStart
             if (string.IsNullOrEmpty(options.Url))
                 throw new ArgumentNullException(nameof(options.Url), "Url option must be set");
 
-            serviceCollection.AddSingleton<IRealmiusServerConfiguration<T>>(options.Configuration);
+            serviceCollection.AddSingleton(options.Configuration);
             serviceCollection.AddSignalR();
 
             _realmiusOptions[typeof(T)] = options;
@@ -76,14 +76,16 @@ namespace Realmius.Server.QuickStart
 
         public static IApplicationBuilder UseRealmius(this IApplicationBuilder applicationBuilder)
         {
-            foreach (var realmiusOption in _realmiusOptions)
+            RealmiusServer.ServiceProvider = applicationBuilder.ApplicationServices;
+
+            applicationBuilder.UseSignalR(builder =>
             {
-                applicationBuilder.UseSignalR(builder =>
+                //builder.GetType().GetMethod("MapHub").MakeGenericMethod()
+                foreach (var realmiusOption in _realmiusOptions)
                 {
-                    //builder.GetType().GetMethod("MapHub").MakeGenericMethod()
                     builder.MapHub<RealmiusPersistentConnection<object>>(realmiusOption.Value.Url);
-                });
-            }
+                }
+            });
 
             return applicationBuilder;
         }

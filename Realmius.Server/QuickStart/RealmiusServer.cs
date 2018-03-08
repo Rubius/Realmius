@@ -47,7 +47,7 @@ namespace Realmius.Server.QuickStart
         //    SetupSignalRServer(url, app, configuration);
         //}
 
-        internal static IServiceProvider ServiceProvider { get; private set; }
+        public static IServiceProvider ServiceProvider { get; set; }
         internal static readonly Dictionary<Type, IRealmiusServerDbConfiguration> Configurations = new Dictionary<Type, IRealmiusServerDbConfiguration>();
         internal static IRealmiusServerConfiguration<T> GetConfiguration<T>()
         {

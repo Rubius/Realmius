@@ -28,7 +28,7 @@ namespace Client
 {
     public partial class MainForm : Form
     {
-        private string _serverUrl = "http://localhost:55790";
+        private string _serverUrl = "http://localhost:45000";
 
         private string _realmFileName;
 
