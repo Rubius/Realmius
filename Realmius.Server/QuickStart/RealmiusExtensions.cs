@@ -66,7 +66,7 @@ namespace Realmius.Server.QuickStart
         {
             var options = new RealmiusOptions<object>
             {
-                Url = "Realmius/ShareEverything",
+                Url = "/Realmius/ShareEverything",
                 Configuration = new ShareEverythingConfiguration(contextFunc, types)
             };
             AddRealmius(serviceCollection, options);

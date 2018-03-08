@@ -197,17 +197,17 @@ namespace Realmius.SyncService.ApiClient
             OnConnectedStateChanged();
         }
 
+        private void _hubConnection_Closed(Exception obj)
+        {
+            Logger.Info("Connection closed, will start reconnecting...");
+            Reconnect();
+        }
+
         void LogAndReconnectWithDelay(Exception exception)
         {
             const int delay = 1000;
             Logger.Info($"Unable to connect, will attempt to reconnect in {delay / 1000} seconds!!!");
             Task.Delay(delay).ContinueWith((x) => Reconnect());
-        }
-
-        async Task _hubConnection_Closed(Exception e)
-        {
-            Logger.Info("Connection closed, will start reconnecting...");
-            Reconnect();
         }
 
         public void Stop()
