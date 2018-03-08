@@ -487,6 +487,9 @@ namespace Realmius.SyncService
         public int ParallelFileUploads { get; set; } = 2;
         public virtual async Task UploadFiles()
         {
+            // todo: restore later
+            return;
+
             if (!_apiClient.IsConnected)
                 return;
 

@@ -23,6 +23,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Sockets.Http.Features;
 using Newtonsoft.Json;
 using Realmius.Contracts;
 using Realmius.Contracts.Models;
@@ -177,12 +178,15 @@ namespace Realmius.Server.Exchange
             }
             Connections[connectionId] = user;
 
-            var lastDownloadString = (string) Context.Connection.Metadata[Constants.LastDownloadParameterName];
+            var httpContextFeature = Context.Connection.Features.Get<IHttpContextFeature>();
+            var httpQuery = httpContextFeature.HttpContext.Request.Query;
+
+            var lastDownloadString = (string) httpQuery[Constants.LastDownloadParameterName];
             Dictionary<string, DateTimeOffset> lastDownload;
             var userTags = Processor.GetTagsForUser(user);
             if (string.IsNullOrEmpty(lastDownloadString))
             {
-                var lastDownloadOld = (string) Context.Connection.Metadata[Constants.LastDownloadParameterNameOld];
+                var lastDownloadOld = (string) httpQuery[Constants.LastDownloadParameterNameOld];
                 if (string.IsNullOrEmpty(lastDownloadOld))
                 {
                     lastDownload = new Dictionary<string, DateTimeOffset>();
@@ -197,7 +201,7 @@ namespace Realmius.Server.Exchange
             {
                 lastDownload = JsonConvert.DeserializeObject<Dictionary<string, DateTimeOffset>>(lastDownloadString);
             }
-            var types = (string) Context.Connection.Metadata[Constants.SyncTypesParameterName];
+            var types = (string) httpQuery[Constants.SyncTypesParameterName];
             var data = Processor.Download(new DownloadDataRequest()
             {
                 LastChangeTime = lastDownload,

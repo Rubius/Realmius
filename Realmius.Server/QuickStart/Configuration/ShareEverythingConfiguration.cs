@@ -61,7 +61,7 @@ namespace Realmius.Server.QuickStart
 
         public override object AuthenticateUser(ClaimsPrincipal principal)
         {
-            throw new NotImplementedException();
+            return new { };
         }
     }
 }
